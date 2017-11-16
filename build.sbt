@@ -3,8 +3,8 @@ import Dependencies._
 lazy val root = (project in file("."))
   .settings(allSettings)
   .settings(noPublishSettings)
-  .aggregate(core)
-  .dependsOn(core)
+  .aggregate(core, example, benchmark)
+  .dependsOn(core, example, benchmark)
 
 lazy val allSettings =
   buildSettings ++ baseSettings ++ publishSettings
