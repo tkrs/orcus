@@ -17,6 +17,7 @@ lazy val buildSettings = Seq(
     Ver.`scala2.11`,
     Ver.`scala2.12`,
   ),
+  addCompilerPlugin(Pkg.kindProjector),
 )
 
 lazy val baseSettings = Seq(
@@ -80,7 +81,24 @@ lazy val core = project.in(file("modules/core"))
     description := "orcus core",
     moduleName := "orcus-core",
     name := "core",
+    libraryDependencies ++= Seq(
+      Pkg.cats,
+      Pkg.hbase % "provided",
+    ).map(_.withSources)
   )
+
+lazy val free = project.in(file("modules/free"))
+  .settings(allSettings)
+  .settings(
+    description := "orcus free",
+    moduleName := "orcus-free",
+    name := "free",
+    libraryDependencies ++= Seq(
+      Pkg.cats,
+      Pkg.hbase % "provided",
+    ).map(_.withSources)
+  )
+  .dependsOn(core)
 
 lazy val example = project.in(file("modules/example"))
   .settings(allSettings)
@@ -90,9 +108,13 @@ lazy val example = project.in(file("modules/example"))
     moduleName := "orcus-example",
     name := "example",
     crossScalaVersions := Seq(Ver.`scala2.12`),
-    fork := true
+    fork := true,
+    libraryDependencies ++= Seq(
+      Pkg.bigtable,
+      Pkg.logbackClassic,
+    ).map(_.withSources)
   )
-  .dependsOn(core)
+  .dependsOn(free)
 
 lazy val benchmark = (project in file("modules/benchmark"))
   .settings(allSettings)
@@ -104,7 +126,7 @@ lazy val benchmark = (project in file("modules/benchmark"))
     crossScalaVersions := Seq(Ver.`scala2.12`),
   )
   .enablePlugins(JmhPlugin)
-  .dependsOn(core)
+  .dependsOn(free)
 
 // See https://tpolecat.github.io/2017/04/25/scalac-flags.html
 lazy val compilerOptions = Seq(
