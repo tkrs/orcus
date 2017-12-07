@@ -65,7 +65,7 @@ class TableTest extends FunSpec with MockitoSugar with Matchers {
   }
 
   describe("exists") {
-    it("should return Boolean value get from Table.exists(Get)") {
+    it("should return value obtained from Table.exists(Get) as-is") {
       val m   = mock[Table]
       val n   = "1"
       val rk  = Bytes.toBytes(n)
@@ -93,7 +93,7 @@ class TableTest extends FunSpec with MockitoSugar with Matchers {
   }
 
   describe("get") {
-    it("should return value get from Table.get(Get)") {
+    it("should return value obtained from Table.get(Get) as-is") {
       val m   = mock[Table]
       val n   = "1"
       val rk  = Bytes.toBytes(n)
@@ -122,7 +122,7 @@ class TableTest extends FunSpec with MockitoSugar with Matchers {
   }
 
   describe("put") {
-    it("should return Unit get from Table.put(Put)") {
+    it("should return Unit obtained from Table.put(Put) as-is") {
       val m   = mock[Table]
       val n   = "1"
       val rk  = Bytes.toBytes(n)
@@ -150,7 +150,7 @@ class TableTest extends FunSpec with MockitoSugar with Matchers {
   }
 
   describe("getScanner") {
-    it("should return ResultScanner get from Table.getScanner(Scan)") {
+    it("should return ResultScanner obtained from Table.getScanner(Scan) as-is") {
       val m    = mock[Table]
       val n    = "1"
       val rk   = Bytes.toBytes(n)
@@ -179,7 +179,7 @@ class TableTest extends FunSpec with MockitoSugar with Matchers {
   }
 
   describe("delete") {
-    it("should return Unit get from Table.delete(Delete)") {
+    it("should return Unit obtained from Table.delete(Delete) as-is") {
       val m      = mock[Table]
       val n      = "1"
       val rk     = Bytes.toBytes(n)
@@ -207,7 +207,7 @@ class TableTest extends FunSpec with MockitoSugar with Matchers {
   }
 
   describe("append") {
-    it("should return value get from Table.append(Append)") {
+    it("should return Result obtained from Table.append(Append) as-is") {
       val m      = mock[Table]
       val n      = "1"
       val rk     = Bytes.toBytes(n)
@@ -236,7 +236,7 @@ class TableTest extends FunSpec with MockitoSugar with Matchers {
   }
 
   describe("increment") {
-    it("should return value get from Table.increment(Increment)") {
+    it("should return Result obtained from Table.increment(Increment) as-is") {
       val m         = mock[Table]
       val n         = "1"
       val rk        = Bytes.toBytes(n)
@@ -265,7 +265,7 @@ class TableTest extends FunSpec with MockitoSugar with Matchers {
   }
 
   describe("close") {
-    it("should return Unit get from Table.close()") {
+    it("should return Unit obtained from Table.close() as-is") {
       val m = mock[Table]
 
       doNothing().when(m).close()

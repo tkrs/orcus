@@ -11,7 +11,7 @@ class ResultScannerSpec extends FunSpec with MockitoSugar with Matchers {
   type F[A] = Either[Throwable, A]
 
   describe("nextOne") {
-    it("should return Result with get from ResultScanner.next()") {
+    it("should return Result obtained from ResultScanner.next() as-is") {
       val m        = mock[ResultScanner]
       val expected = mock[Result]
 
@@ -22,7 +22,7 @@ class ResultScannerSpec extends FunSpec with MockitoSugar with Matchers {
       assert(expected === v)
       verify(m).next()
     }
-    it("should return None when ResultScanner.next() returns null") {
+    it("should return empty when ResultScanner.next() returns null") {
       val m = mock[ResultScanner]
 
       when(m.next()).thenReturn(null)
@@ -35,7 +35,7 @@ class ResultScannerSpec extends FunSpec with MockitoSugar with Matchers {
   }
 
   describe("next") {
-    it("should return Result with get from ResultScanner.next(Int)") {
+    it("should return Result sequence obtained from ResultScanner.next(Int)") {
       val m        = mock[ResultScanner]
       val expected = Iterator.continually(mock[Result]).take(10).toArray[Result]
 

@@ -13,7 +13,7 @@ class ResultSpec extends FunSpec with MockitoSugar with Matchers {
   type F[A] = Either[Throwable, A]
 
   describe("getValue") {
-    it("should return value with get from Result.getValue(Array[Byte], Array[Byte])") {
+    it("should return value obtained from Result.getValue(Array[Byte], Array[Byte]) as-is") {
       val m   = mock[Result]
       val cfn = Bytes.toBytes("1")
       val cn  = Bytes.toBytes("2")
@@ -28,7 +28,7 @@ class ResultSpec extends FunSpec with MockitoSugar with Matchers {
       assert(expected === Bytes.toString(v))
       verify(m).getValue(cfn, cn)
     }
-    it("should return None when Result.getValue(Array[Byte], Array[Byte]) return null") {
+    it("should return empty when Result.getValue(Array[Byte], Array[Byte]) returns null") {
       val m   = mock[Result]
       val cfn = Bytes.toBytes("1")
       val cn  = Bytes.toBytes("2")
@@ -58,7 +58,7 @@ class ResultSpec extends FunSpec with MockitoSugar with Matchers {
       assert(expected === Bytes.toString(v.array()))
       verify(m).getValueAsByteBuffer(cfn, cn)
     }
-    it("should return None when Result.getValueAsByteBuffer(Array[Byte], Array[Byte]) return null") {
+    it("should return empty when Result.getValueAsByteBuffer(Array[Byte], Array[Byte]) return null") {
       val m   = mock[Result]
       val cfn = Bytes.toBytes("1")
       val cn  = Bytes.toBytes("2")
