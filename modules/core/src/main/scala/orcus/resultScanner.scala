@@ -7,8 +7,8 @@ object resultScanner {
   def nextOne[F[_]](resultScanner: ResultScanner)(
       implicit
       ME: MonadError[F, Throwable]
-  ): F[Result] =
-    ME.catchNonFatal(resultScanner.next())
+  ): F[Option[Result]] =
+    ME.catchNonFatal(Option(resultScanner.next()))
 
   def next[F[_]](resultScanner: ResultScanner, i: Int)(
       implicit

@@ -27,6 +27,6 @@ object Dependencies {
     lazy val bigtable       = "com.google.cloud.bigtable" % "bigtable-hbase-1.x" % Ver.bigtable
     lazy val logbackClassic = "ch.qos.logback"            % "logback-classic"    % Ver.logback
 
-    lazy val forTest = Seq(scalatest, scalacheck, mockito).map(_ % Test)
+    lazy val forTest = Seq(scalatest, scalacheck, mockito).map(_ % "test")
   }
 }
