@@ -3,15 +3,7 @@ package orcus.free.handler
 import cats.{MonadError, ~>}
 import cats.data.Kleisli
 import orcus.free.TableOp
-import org.apache.hadoop.hbase.client.{
-  Append => HAppend,
-  Delete => HDelete,
-  Get => HGet,
-  Increment => HIncrement,
-  Put => HPut,
-  Scan => HScan,
-  Table => HTable
-}
+import org.apache.hadoop.hbase.client.{Table => HTable}
 
 object table {
 
@@ -26,17 +18,17 @@ object table {
         ME: MonadError[M, Throwable]): Handler[M] =
       new Handler[M] {
         override def apply[A](fa: TableOp[A]): Kleisli[M, HTable, A] = fa match {
-          case Name                     => kleisli(getName[M])
-          case Configuration            => kleisli(getConfiguration[M])
-          case Descriptor               => kleisli(getTableDescriptor[M])
-          case Exists(a)                => kleisli(exists[M](_, a))
-          case Get(a: HGet)             => kleisli(get[M](_, a))
-          case Put(a: HPut)             => kleisli(put[M](_, a))
-          case Scan(a: HScan)           => kleisli(getScanner[M](_, a))
-          case Delete(a: HDelete)       => kleisli(delete[M](_, a))
-          case Append(a: HAppend)       => kleisli(append[M](_, a))
-          case Increment(a: HIncrement) => kleisli(increment[M](_, a))
-          case Close                    => kleisli(close[M])
+          case GetName            => kleisli(getName[M])
+          case GetConfiguration   => kleisli(getConfiguration[M])
+          case GetTableDescriptor => kleisli(getTableDescriptor[M])
+          case Exists(a)          => kleisli(exists[M](_, a))
+          case Get(a)             => kleisli(get[M](_, a))
+          case Put(a)             => kleisli(put[M](_, a))
+          case Scan(a)            => kleisli(getScanner[M](_, a))
+          case Delete(a)          => kleisli(delete[M](_, a))
+          case Append(a)          => kleisli(append[M](_, a))
+          case Increment(a)       => kleisli(increment[M](_, a))
+          case Close              => kleisli(close[M])
         }
       }
   }

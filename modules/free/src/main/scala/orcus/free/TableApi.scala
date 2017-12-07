@@ -17,15 +17,15 @@ import org.apache.hadoop.hbase.client.{
 trait TableApi[F[_]] {
   type TableF[A] = Free[F, A]
 
-  def name: TableF[TableName]
-  def configuration: TableF[HConfig]
-  def descriptor: TableF[HTableDescriptor]
+  def getName: TableF[TableName]
+  def getConfiguration: TableF[HConfig]
+  def getTableDescriptor: TableF[HTableDescriptor]
   def exists(get: HGet): TableF[Boolean]
   // def existsAll(gets: Seq[Get]): TableF[Seq[Boolean]]
   // def batch[A](actions: Seq[Row]): TableF[Seq[A]]
   def get(a: HGet): TableF[HResult]
   def put(a: HPut): TableF[Unit]
-  def scan(a: HScan): TableF[HResultScanner]
+  def getScanner(a: HScan): TableF[HResultScanner]
   def delete(a: HDelete): TableF[Unit]
   def append(a: HAppend): TableF[HResult]
   def increment(a: HIncrement): TableF[HResult]
@@ -35,9 +35,9 @@ trait TableApi[F[_]] {
 sealed trait TableOp[A]
 
 object TableOp {
-  final case object Name                    extends TableOp[TableName]
-  final case object Configuration           extends TableOp[HConfig]
-  final case object Descriptor              extends TableOp[HTableDescriptor]
+  final case object GetName                 extends TableOp[TableName]
+  final case object GetConfiguration        extends TableOp[HConfig]
+  final case object GetTableDescriptor      extends TableOp[HTableDescriptor]
   final case class Exists(a: HGet)          extends TableOp[Boolean]
   final case class Get(a: HGet)             extends TableOp[HResult]
   final case class Put(a: HPut)             extends TableOp[Unit]
@@ -51,14 +51,14 @@ object TableOp {
 final class TableOps[M[_]](implicit inj: Inject[TableOp, M]) extends TableApi[M] {
   import TableOp._
 
-  override def name: TableF[TableName] =
-    Free.inject[TableOp, M](Name)
+  override def getName: TableF[TableName] =
+    Free.inject[TableOp, M](GetName)
 
-  override def configuration: TableF[HConfig] =
-    Free.inject[TableOp, M](Configuration)
+  override def getConfiguration: TableF[HConfig] =
+    Free.inject[TableOp, M](GetConfiguration)
 
-  override def descriptor: TableF[HTableDescriptor] =
-    Free.inject[TableOp, M](Descriptor)
+  override def getTableDescriptor: TableF[HTableDescriptor] =
+    Free.inject[TableOp, M](GetTableDescriptor)
 
   override def exists(a: HGet): TableF[Boolean] =
     Free.inject[TableOp, M](Exists(a))
@@ -73,7 +73,7 @@ final class TableOps[M[_]](implicit inj: Inject[TableOp, M]) extends TableApi[M]
   override def put(a: HPut): TableF[Unit] =
     Free.inject[TableOp, M](Put(a))
 
-  override def scan(a: HScan): TableF[HResultScanner] =
+  override def getScanner(a: HScan): TableF[HResultScanner] =
     Free.inject[TableOp, M](Scan(a))
 
   override def delete(a: HDelete): TableF[Unit] =
