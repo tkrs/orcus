@@ -98,7 +98,8 @@ lazy val core = project.in(file("modules/core"))
     libraryDependencies ++= Seq(
       Pkg.cats,
       Pkg.hbase % "provided",
-    ).map(_.withSources)
+    ).map(_.withSources),
+    libraryDependencies ++= Pkg.forTest
   )
 
 lazy val free = project.in(file("modules/free"))
@@ -110,7 +111,8 @@ lazy val free = project.in(file("modules/free"))
     libraryDependencies ++= Seq(
       Pkg.cats,
       Pkg.hbase % "provided",
-    ).map(_.withSources)
+    ).map(_.withSources),
+    libraryDependencies ++= Pkg.forTest
   )
   .dependsOn(core)
 
