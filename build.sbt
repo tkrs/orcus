@@ -107,7 +107,6 @@ lazy val example = project.in(file("modules/example"))
     description := "orcus example",
     moduleName := "orcus-example",
     name := "example",
-    crossScalaVersions := Seq(Ver.`scala2.12`),
     fork := true,
     libraryDependencies ++= Seq(
       Pkg.bigtable,
@@ -123,7 +122,6 @@ lazy val benchmark = (project in file("modules/benchmark"))
     description := "orcus benchmark",
     moduleName := "orcus-benchmark",
     name := "benchmark",
-    crossScalaVersions := Seq(Ver.`scala2.12`),
   )
   .enablePlugins(JmhPlugin)
   .dependsOn(free)
