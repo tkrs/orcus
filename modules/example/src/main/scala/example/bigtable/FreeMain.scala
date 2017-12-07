@@ -66,11 +66,10 @@ object FreeMain extends App {
   }
 
   def resultProgram[F[_]](results: Seq[Result])(implicit
-                                                ev1: ResultScannerOps[F],
-                                                ev2: ResultOps[F]): Free[F, Vector[Array[Byte]]] = {
+                                                ev1: ResultOps[F]): Free[F, Vector[Array[Byte]]] = {
     for {
       ys <- results.toVector
-             .map(r => ev2.getValue(r, columnFamilyName, columnName))
+             .map(r => ev1.getValue(r, columnFamilyName, columnName))
              .sequence[Free[F, ?], Array[Byte]]
     } yield ys
   }

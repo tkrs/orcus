@@ -1,9 +1,7 @@
 package orcus.free.handler
 
 import cats.{MonadError, ~>}
-import cats.data.Kleisli
 import orcus.free.ResultScannerOp
-import org.apache.hadoop.hbase.client.ResultScanner
 
 object resultScanner {
 
