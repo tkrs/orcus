@@ -128,7 +128,7 @@ lazy val example = project.in(file("modules/example"))
     ).map(_.withSources)
   )
   .settings(
-    coverageExcludedPackages := "example\\..*"
+    coverageEnabled := false
   )
   .dependsOn(free)
 
