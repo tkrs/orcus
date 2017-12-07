@@ -127,6 +127,9 @@ lazy val example = project.in(file("modules/example"))
       Pkg.logbackClassic,
     ).map(_.withSources)
   )
+  .settings(
+    coverageExcludedPackages := "example\\..*"
+  )
   .dependsOn(free)
 
 lazy val benchmark = (project in file("modules/benchmark"))
