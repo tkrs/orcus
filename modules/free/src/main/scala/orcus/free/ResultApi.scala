@@ -8,19 +8,22 @@ import org.apache.hadoop.hbase.client.Result
 trait ResultApi[F[_]] {
   type ResultF[A] = Free[F, A]
 
-  def getValue(result: Result, family: Array[Byte], qualifier: Array[Byte]): ResultF[Array[Byte]]
+  def getValue(result: Result,
+               family: Array[Byte],
+               qualifier: Array[Byte]): ResultF[Option[Array[Byte]]]
+
   def getValueAsByteBuffer(result: Result,
                            family: Array[Byte],
-                           qualifier: Array[Byte]): ResultF[ByteBuffer]
+                           qualifier: Array[Byte]): ResultF[Option[ByteBuffer]]
 }
 
 sealed trait ResultOp[A]
 
 object ResultOp {
   final case class GetValue(result: Result, family: Array[Byte], qualifier: Array[Byte])
-      extends ResultOp[Array[Byte]]
+      extends ResultOp[Option[Array[Byte]]]
   final case class GetValueAsByteBuffer(result: Result, family: Array[Byte], qualifier: Array[Byte])
-      extends ResultOp[ByteBuffer]
+      extends ResultOp[Option[ByteBuffer]]
 }
 
 class ResultOps[M[_]](implicit inj: Inject[ResultOp, M]) extends ResultApi[M] {
@@ -28,12 +31,12 @@ class ResultOps[M[_]](implicit inj: Inject[ResultOp, M]) extends ResultApi[M] {
 
   override def getValue(result: Result,
                         family: Array[Byte],
-                        qualifier: Array[Byte]): ResultF[Array[Byte]] =
+                        qualifier: Array[Byte]): ResultF[Option[Array[Byte]]] =
     Free.inject[ResultOp, M](GetValue(result, family, qualifier))
 
   override def getValueAsByteBuffer(result: Result,
                                     family: Array[Byte],
-                                    qualifier: Array[Byte]): ResultF[ByteBuffer] =
+                                    qualifier: Array[Byte]): ResultF[Option[ByteBuffer]] =
     Free.inject[ResultOp, M](GetValueAsByteBuffer(result, family, qualifier))
 }
 
