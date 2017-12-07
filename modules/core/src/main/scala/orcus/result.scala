@@ -3,7 +3,6 @@ package orcus
 import java.nio.ByteBuffer
 
 import cats.MonadError
-import cats.data.Kleisli
 import org.apache.hadoop.hbase.client.Result
 
 object result {
