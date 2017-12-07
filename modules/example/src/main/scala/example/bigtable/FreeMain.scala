@@ -60,7 +60,7 @@ object FreeMain extends App {
 
     for {
       scan <- Free.pure(mkScan)
-      r    <- ev1.scan(scan)
+      r    <- ev1.getScanner(scan)
       xs   <- ev2.next(r, numRecords)
     } yield xs
   }
