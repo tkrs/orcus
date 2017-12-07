@@ -17,6 +17,7 @@ import org.apache.hadoop.hbase.client.{
 import org.apache.hadoop.hbase.{HTableDescriptor, TableName => HTableName}
 
 object table {
+
   def getName[F[_]](t: HTable)(
       implicit
       ME: MonadError[F, Throwable]
@@ -33,7 +34,7 @@ object table {
       implicit
       ME: MonadError[F, Throwable]
   ): F[HTableDescriptor] =
-    ME.pure(t.getTableDescriptor)
+    ME.catchNonFatal(t.getTableDescriptor)
 
   def exists[F[_]](t: HTable, get: HGet)(
       implicit
@@ -82,43 +83,6 @@ object table {
   ): F[Unit] =
     ME.catchNonFatal(t.close())
 
-  def nameK[F[_]](implicit ME: MonadError[F, Throwable]): Kleisli[F, HTable, HTableName] =
-    Kleisli(getName[F])
-
-  def configurationK[F[_]](implicit ME: MonadError[F, Throwable]): Kleisli[F, HTable, HConfig] =
-    Kleisli(getConfiguration[F])
-
-  def descriptorK[F[_]](
-      implicit ME: MonadError[F, Throwable]): Kleisli[F, HTable, HTableDescriptor] =
-    Kleisli(getTableDescriptor[F])
-
-  def existsK[F[_]](get: HGet)(implicit
-                               ME: MonadError[F, Throwable]): Kleisli[F, HTable, Boolean] =
-    Kleisli(exists[F](_, get))
-
-  def getK[F[_]](a: HGet)(implicit
-                          ME: MonadError[F, Throwable]): Kleisli[F, HTable, HResult] =
-    Kleisli(get[F](_, a))
-
-  def putK[F[_]](a: HPut)(implicit
-                          ME: MonadError[F, Throwable]): Kleisli[F, HTable, Unit] =
-    Kleisli(put[F](_, a))
-
-  def scanK[F[_]](a: HScan)(implicit
-                            ME: MonadError[F, Throwable]): Kleisli[F, HTable, HResultScanner] =
-    Kleisli(getScanner[F](_, a))
-
-  def deleteK[F[_]](a: HDelete)(implicit ME: MonadError[F, Throwable]): Kleisli[F, HTable, Unit] =
-    Kleisli(delete[F](_, a))
-
-  def appendK[F[_]](a: HAppend)(implicit
-                                ME: MonadError[F, Throwable]): Kleisli[F, HTable, HResult] =
-    Kleisli(append[F](_, a))
-
-  def incrementK[F[_]](a: HIncrement)(
-      implicit ME: MonadError[F, Throwable]): Kleisli[F, HTable, HResult] =
-    Kleisli(increment[F](_, a))
-
-  def closeK[F[_]](implicit ME: MonadError[F, Throwable]): Kleisli[F, HTable, Unit] =
-    Kleisli(close[F])
+  def kleisli[F[_], A](f: HTable => F[A]): Kleisli[F, HTable, A] =
+    Kleisli[F, HTable, A](f)
 }
