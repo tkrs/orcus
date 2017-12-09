@@ -1,7 +1,6 @@
 package orcus
 
 import java.nio.ByteBuffer
-import java.util.function.BiConsumer
 
 import cats.MonadError
 import codec.{Decoder, FamilyDecoder, ValueCodec}
@@ -9,7 +8,6 @@ import org.apache.hadoop.hbase.Cell
 import org.apache.hadoop.hbase.client.Result
 
 import scala.collection.JavaConverters._
-import scala.collection.mutable
 
 object result {
 
@@ -61,11 +59,9 @@ object result {
       ME: MonadError[M, Throwable],
       A: FamilyDecoder[A]
   ): M[A] =
-    ME.flatMap(getFamilyMap1[String, Array[Byte], M](r, family)) { m =>
-      A(m) match {
-        case Right(v) => ME.pure(v)
-        case Left(e)  => ME.raiseError(e)
-      }
+    A(r.getFamilyMap(family)) match {
+      case Right(v) => ME.pure(v)
+      case Left(e)  => ME.raiseError(e)
     }
 
   def getFamilyMap[M[_]](r: Result, family: Array[Byte])(
@@ -73,26 +69,6 @@ object result {
       ME: MonadError[M, Throwable]
   ): M[Map[Array[Byte], Array[Byte]]] =
     ME.pure(r.getFamilyMap(family) match { case null => Map.empty; case xs => xs.asScala.toMap })
-
-  def getFamilyMap1[K, V, M[_]](r: Result, family: Array[Byte])(
-      implicit
-      K: ValueCodec[K],
-      V: ValueCodec[V],
-      ME: MonadError[M, Throwable]
-  ): M[Map[K, V]] =
-    ME.pure(r.getFamilyMap(family) match {
-      case null => Map.empty
-      case xs =>
-        val m = mutable.Map[K, V]()
-        val f = new BiConsumer[Array[Byte], Array[Byte]] {
-          override def accept(t: Array[Byte], u: Array[Byte]): Unit = {
-            m += K.decode(t) -> V.decode(u)
-            ()
-          }
-        }
-        xs.forEach(f)
-        m.toMap
-    })
 
   def to[A, M[_]](r: Result)(
       implicit

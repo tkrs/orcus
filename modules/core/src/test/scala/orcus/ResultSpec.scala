@@ -240,7 +240,25 @@ class ResultSpec extends FunSpec with MockitoSugar with Matchers {
 
       assert(v === foo)
     }
-    it("should return default when getFamilyMap returns null") {
+    it("should convert to typed Map obtained from getFamilyMap") {
+
+      val m   = mock[Result]
+      val cfn = Bytes.toBytes("1")
+
+      val map = new util.TreeMap[Array[Byte], Array[Byte]](Bytes.BYTES_COMPARATOR)
+      val foo = Map(20 -> "x", 30 -> "y", 40 -> "z")
+
+      map.put(Bytes.toBytes(20), Bytes.toBytes("x"))
+      map.put(Bytes.toBytes(30), Bytes.toBytes("y"))
+      map.put(Bytes.toBytes(40), Bytes.toBytes("z"))
+
+      when(m.getFamilyMap(cfn)).thenReturn(map)
+
+      val Right(v) = result.getFamily[Map[Int, String], F](m, cfn)
+
+      assert(v === foo)
+    }
+    it("should return empty when getFamilyMap returns null") {
       final case class Foo(x: Int, y: String, z: Boolean)
 
       val m   = mock[Result]
@@ -249,8 +267,6 @@ class ResultSpec extends FunSpec with MockitoSugar with Matchers {
       when(m.getFamilyMap(cfn)).thenReturn(null)
 
       val Right(v) = result.getFamily[Option[Foo], F](m, cfn)
-
-      println(v)
 
       assert(v.isEmpty)
     }
