@@ -1,31 +1,133 @@
 package orcus
 
 import java.nio.ByteBuffer
+import java.util
 
 import cats.instances.either._
+import org.apache.hadoop.hbase.Cell
 import org.apache.hadoop.hbase.client.Result
 import org.apache.hadoop.hbase.util.Bytes
 import org.scalatest._
 import org.scalatest.mockito.MockitoSugar
 import org.mockito.Mockito._
 
+import scala.collection.JavaConverters._
+
 class ResultSpec extends FunSpec with MockitoSugar with Matchers {
   type F[A] = Either[Throwable, A]
 
+  describe("getRow") {
+    it("should take the row from Result.getRow() as-is") {
+      val m = mock[Result]
+
+      val expected = "3"
+      val row      = Bytes.toBytes(expected)
+
+      when(m.getRow).thenReturn(row)
+
+      val Right(Some(v)) = result.getRow[F](m)
+
+      assert(expected === Bytes.toString(v))
+      verify(m).getRow
+    }
+    it("should return empty when Result.getRow() returns null") {
+      val m = mock[Result]
+
+      when(m.getRow).thenReturn(null)
+
+      val Right(v) = result.getRow[F](m)
+
+      assert(v.isEmpty)
+      verify(m).getRow
+    }
+  }
+
+  describe("rawCells") {
+    it("should take the cells from Result.rawCells() and convert it to scala's Seq") {
+      val m     = mock[Result]
+      val cells = Iterator.continually(mock[Cell]).take(10).toArray[Cell]
+
+      when(m.rawCells()).thenReturn(cells)
+
+      val Right(v) = result.rawCells[F](m)
+
+      assert(v === cells.toSeq)
+      verify(m).rawCells()
+    }
+    it("should return empty when Result.rawCells() returns null") {
+      val m     = mock[Result]
+      val cells = null
+
+      when(m.rawCells()).thenReturn(cells)
+
+      val Right(v) = result.rawCells[F](m)
+
+      assert(v.isEmpty)
+      verify(m).rawCells()
+    }
+  }
+
+  describe("getColumnCells") {
+    it(
+      "should take the value from Result.getColumnCells(Array[Byte], Array[Byte]) and convert it to scala's Seq") {
+      val m   = mock[Result]
+      val cfn = Bytes.toBytes("1")
+      val cn  = Bytes.toBytes("2")
+
+      val cells = Iterator.continually(mock[Cell]).take(10).toList.asJava
+
+      when(m.getColumnCells(cfn, cn)).thenReturn(cells)
+
+      val Right(v) = result.getColumnCells[F](m, cfn, cn)
+
+      assert(v === cells.asScala)
+      verify(m).getColumnCells(cfn, cn)
+    }
+  }
+
+  describe("getColumnLatestCell") {
+    it("should take the value from Result.getColumnLatestCell(Array[Byte], Array[Byte])") {
+      val m   = mock[Result]
+      val cfn = Bytes.toBytes("1")
+      val cn  = Bytes.toBytes("2")
+
+      val cell = mock[Cell]
+
+      when(m.getColumnLatestCell(cfn, cn)).thenReturn(cell)
+
+      val Right(Some(v)) = result.getColumnLatestCell[F](m, cfn, cn)
+
+      assert(v === cell)
+      verify(m).getColumnLatestCell(cfn, cn)
+    }
+    it("should return empty when Result.getColumnLatestCell(Array[Byte], Array[Byte]) returns null") {
+      val m   = mock[Result]
+      val cfn = Bytes.toBytes("1")
+      val cn  = Bytes.toBytes("2")
+
+      when(m.getColumnLatestCell(cfn, cn)).thenReturn(null)
+
+      val Right(v) = result.getColumnLatestCell[F](m, cfn, cn)
+
+      assert(v.isEmpty)
+      verify(m).getColumnLatestCell(cfn, cn)
+    }
+  }
+
   describe("getValue") {
-    it("should return value obtained from Result.getValue(Array[Byte], Array[Byte]) as-is") {
+    it("should take the value from Result.getValue(Array[Byte], Array[Byte]) as-is") {
       val m   = mock[Result]
       val cfn = Bytes.toBytes("1")
       val cn  = Bytes.toBytes("2")
 
       val expected = "3"
-      val re       = Bytes.toBytes(expected)
+      val value    = Bytes.toBytes(expected)
 
-      when(m.getValue(cfn, cn)).thenReturn(re)
+      when(m.getValue(cfn, cn)).thenReturn(value)
 
       val Right(Some(v)) = result.getValue[F](m, cfn, cn)
 
-      assert(expected === Bytes.toString(v))
+      assert(Bytes.toString(v) === expected)
       verify(m).getValue(cfn, cn)
     }
     it("should return empty when Result.getValue(Array[Byte], Array[Byte]) returns null") {
@@ -43,19 +145,19 @@ class ResultSpec extends FunSpec with MockitoSugar with Matchers {
   }
 
   describe("getValueAsByteBuffer") {
-    it("should return value with get from Result.getValueAsByteBuffer(Array[Byte], Array[Byte])") {
+    it("should take the value from Result.getValueAsByteBuffer(Array[Byte], Array[Byte])") {
       val m   = mock[Result]
       val cfn = Bytes.toBytes("1")
       val cn  = Bytes.toBytes("2")
 
       val expected = "3"
-      val re       = ByteBuffer.wrap(Bytes.toBytes(expected))
+      val value    = ByteBuffer.wrap(Bytes.toBytes(expected))
 
-      when(m.getValueAsByteBuffer(cfn, cn)).thenReturn(re)
+      when(m.getValueAsByteBuffer(cfn, cn)).thenReturn(value)
 
       val Right(Some(v)) = result.getValueAsByteBuffer[F](m, cfn, cn)
 
-      assert(expected === Bytes.toString(v.array()))
+      assert(Bytes.toString(v.array()) === expected)
       verify(m).getValueAsByteBuffer(cfn, cn)
     }
     it("should return empty when Result.getValueAsByteBuffer(Array[Byte], Array[Byte]) return null") {
@@ -69,6 +171,33 @@ class ResultSpec extends FunSpec with MockitoSugar with Matchers {
 
       assert(e.isEmpty)
       verify(m).getValueAsByteBuffer(cfn, cn)
+    }
+  }
+
+  describe("getFamilyMap") {
+    it("should take the map from Result.getFamilyMap(Array[Byte]) and convert it to scala's Map") {
+      val m   = mock[Result]
+      val cfn = Bytes.toBytes("1")
+
+      val map = mock[util.NavigableMap[Array[Byte], Array[Byte]]]
+
+      when(m.getFamilyMap(cfn)).thenReturn(map)
+
+      val Right(v) = result.getFamilyMap[F](m, cfn)
+
+      assert(v === map.asScala.toMap)
+      verify(m).getFamilyMap(cfn)
+    }
+    it("should return empty when Result.getFamilyMap(Array[Byte]) returns null") {
+      val m   = mock[Result]
+      val cfn = Bytes.toBytes("1")
+
+      when(m.getFamilyMap(cfn)).thenReturn(null)
+
+      val Right(v) = result.getFamilyMap[F](m, cfn)
+
+      assert(v.isEmpty)
+      verify(m).getFamilyMap(cfn)
     }
   }
 }

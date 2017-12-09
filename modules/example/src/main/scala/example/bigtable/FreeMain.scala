@@ -107,8 +107,8 @@ object FreeMain extends App {
       R: ResultHandler[M],
       RS: ResultScannerHandler[M]
   ): Op ~> Kleisli[M, Table, ?] = {
-    val op1: Op1 ~> Kleisli[M, Table, ?] = RS.liftF[Table] or R.liftF[Table]
-    val op: Op ~> Kleisli[M, Table, ?]   = T or op1
+    val op1 = RS.liftF[Table] or R.liftF[Table]
+    val op  = T or op1
     op
   }
 
