@@ -67,11 +67,11 @@ object FreeMain extends App {
 
   def resultProgram[F[_]](results: Seq[Result])(
       implicit
-      ev1: ResultOps[F]): Free[F, Vector[Option[Array[Byte]]]] = {
+      ev1: ResultOps[F]): Free[F, Vector[Option[String]]] = {
     for {
       ys <- results.toVector
-             .map(r => ev1.getValue(r, columnFamilyName, columnName))
-             .sequence[Free[F, ?], Option[Array[Byte]]]
+             .map(r => ev1.get[String](r, columnFamilyName, columnName))
+             .sequence[Free[F, ?], Option[String]]
     } yield ys
   }
 
@@ -87,7 +87,7 @@ object FreeMain extends App {
       _ = println(t)
       xs <- scanProgram[F](rowKey, numRecords, (h, t))
       ys <- resultProgram(xs)
-    } yield ys.map(_.map(Bytes.toString))
+    } yield ys
   }
 
   val projectId  = sys.props("project-id")
