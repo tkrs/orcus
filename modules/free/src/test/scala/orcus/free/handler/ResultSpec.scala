@@ -13,6 +13,7 @@ import org.apache.hadoop.hbase.util.Bytes
 import org.scalatest.{FunSpec, Matchers}
 import org.scalatest.mockito.MockitoSugar
 import org.mockito.Mockito._
+import org.mockito.ArgumentMatchers._
 
 import scala.collection.JavaConverters._
 
@@ -93,6 +94,26 @@ class ResultSpec extends FunSpec with MockitoSugar with Matchers {
         assert(v === cell)
       }
     }
+    describe("get") {
+      it("should take the value successfully") {
+        val m = mock[Result]
+
+        val family     = "1"
+        val qualifier  = "2"
+        val value      = "3"
+        val _family    = Bytes.toBytes(family)
+        val _qualifier = Bytes.toBytes(qualifier)
+        val _value     = Bytes.toBytes(value)
+
+        when(m.getValue(_family, _qualifier)).thenReturn(_value)
+
+        val Right(Some(v)) = ops[ResultOp]
+          .get[String](m, _family, _qualifier)
+          .foldMap(interpreter[F, String])
+
+        assert(v === value)
+      }
+    }
     describe("getValue") {
       it("should take the value successfully") {
         val m = mock[Result]
@@ -148,6 +169,80 @@ class ResultSpec extends FunSpec with MockitoSugar with Matchers {
           .foldMap(interpreter[F, Map[Array[Byte], Array[Byte]]])
 
         assert(v === value.asScala.toMap)
+      }
+    }
+    describe("getFamily") {
+      it("should take the value successfully") {
+        case class Foo(x: Int)
+        val m = mock[Result]
+
+        val family  = "1"
+        val value   = new util.TreeMap[Array[Byte], Array[Byte]](Bytes.BYTES_COMPARATOR)
+        val _family = Bytes.toBytes(family)
+
+        value.put(Bytes.toBytes("x"), Bytes.toBytes(1: Int))
+
+        when(m.getFamilyMap(_family)).thenReturn(value)
+
+        val Right(v) = ops[ResultOp]
+          .getFamily[Foo](m, _family)
+          .foldMap(interpreter[F, Foo])
+
+        assert(v === Foo(x = 1))
+      }
+      it("should return error when it type conversion is failed") {
+        case class Foo(x: Int, y: Int)
+        val m = mock[Result]
+
+        val family  = "1"
+        val value   = new util.TreeMap[Array[Byte], Array[Byte]](Bytes.BYTES_COMPARATOR)
+        val _family = Bytes.toBytes(family)
+
+        value.put(Bytes.toBytes("x"), Bytes.toBytes(1: Int))
+
+        when(m.getFamilyMap(_family)).thenReturn(value)
+
+        val v = ops[ResultOp]
+          .getFamily[Foo](m, _family)
+          .foldMap(interpreter[F, Foo])
+
+        assert(v.isLeft)
+      }
+    }
+    describe("to") {
+      it("should take the value successfully") {
+        case class Bar(x: String)
+        case class Foo(a: Bar)
+        val m = mock[Result]
+
+        val value = new util.TreeMap[Array[Byte], Array[Byte]](Bytes.BYTES_COMPARATOR)
+
+        value.put(Bytes.toBytes("x"), Bytes.toBytes("*"))
+
+        when(m.getFamilyMap(any[Array[Byte]])).thenReturn(value)
+
+        val Right(v) = ops[ResultOp]
+          .to[Foo](m)
+          .foldMap(interpreter[F, Foo])
+
+        assert(v === Foo(Bar("*")))
+      }
+      it("should return error when it type conversion is failed") {
+        case class Bar(x: Int, y: Int)
+        case class Foo(a: Bar)
+        val m = mock[Result]
+
+        val value = new util.TreeMap[Array[Byte], Array[Byte]](Bytes.BYTES_COMPARATOR)
+
+        value.put(Bytes.toBytes("x"), Bytes.toBytes(1: Int))
+
+        when(m.getFamilyMap(any[Array[Byte]])).thenReturn(value)
+
+        val v = ops[ResultOp]
+          .to[Foo](m)
+          .foldMap(interpreter[F, Foo])
+
+        assert(v.isLeft)
       }
     }
   }
