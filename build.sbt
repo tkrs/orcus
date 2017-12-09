@@ -98,6 +98,7 @@ lazy val core = project.in(file("modules/core"))
     name := "core",
     libraryDependencies ++= Seq(
       Pkg.cats,
+      Pkg.shapeless,
       Pkg.hbase % "provided",
     ).map(_.withSources),
     libraryDependencies ++= Pkg.forTest

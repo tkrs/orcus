@@ -10,6 +10,7 @@ import org.apache.hadoop.hbase.util.Bytes
 import org.scalatest._
 import org.scalatest.mockito.MockitoSugar
 import org.mockito.Mockito._
+import org.mockito.ArgumentMatchers._
 
 import scala.collection.JavaConverters._
 
@@ -114,6 +115,24 @@ class ResultSpec extends FunSpec with MockitoSugar with Matchers {
     }
   }
 
+  describe("get") {
+    it(
+      "should take the value from Result.getValue(Array[Byte], Array[Byte]) and convert it to arbitrary types") {
+      val m   = mock[Result]
+      val cfn = Bytes.toBytes("1")
+      val cn  = Bytes.toBytes("2")
+
+      val expected = Double.MaxValue
+      val value    = Bytes.toBytes(expected)
+
+      when(m.getValue(cfn, cn)).thenReturn(value)
+
+      val Right(Some(v)) = result.get[Double, F](m, cfn, cn)
+
+      assert(v === expected)
+    }
+  }
+
   describe("getValue") {
     it("should take the value from Result.getValue(Array[Byte], Array[Byte]) as-is") {
       val m   = mock[Result]
@@ -198,6 +217,84 @@ class ResultSpec extends FunSpec with MockitoSugar with Matchers {
 
       assert(v.isEmpty)
       verify(m).getFamilyMap(cfn)
+    }
+  }
+
+  describe("getFamily") {
+    it("should convert to arbitrary type obtained from getFamilyMap") {
+      final case class Foo(x: Int, y: String, z: Boolean)
+
+      val m   = mock[Result]
+      val cfn = Bytes.toBytes("1")
+
+      val map = new util.TreeMap[Array[Byte], Array[Byte]](Bytes.BYTES_COMPARATOR)
+      val foo = Foo(x = Int.MinValue, y = "Johann Carl Friedrich Gauss", z = true)
+
+      map.put(Bytes.toBytes("x"), Bytes.toBytes(foo.x))
+      map.put(Bytes.toBytes("y"), Bytes.toBytes(foo.y))
+      map.put(Bytes.toBytes("z"), Bytes.toBytes(foo.z))
+
+      when(m.getFamilyMap(cfn)).thenReturn(map)
+
+      val Right(v) = result.getFamily[Foo, F](m, cfn)
+
+      assert(v === foo)
+    }
+    it("should return default when getFamilyMap returns null") {
+      final case class Foo(x: Int, y: String, z: Boolean)
+
+      val m   = mock[Result]
+      val cfn = Bytes.toBytes("1")
+
+      when(m.getFamilyMap(cfn)).thenReturn(null)
+
+      val Right(v) = result.getFamily[Option[Foo], F](m, cfn)
+
+      println(v)
+
+      assert(v.isEmpty)
+    }
+  }
+
+  describe("to") {
+    it("should convert to arbitrary type") {
+      final case class Bar(x: Int, y: String, z: Boolean)
+      final case class Foo(bar: Bar)
+
+      val m = mock[Result]
+
+      val map = new util.TreeMap[Array[Byte], Array[Byte]](Bytes.BYTES_COMPARATOR)
+      val bar = Bar(x = Int.MinValue, y = "Johann Carl Friedrich Gauss", z = true)
+
+      map.put(Bytes.toBytes("x"), Bytes.toBytes(bar.x))
+      map.put(Bytes.toBytes("y"), Bytes.toBytes(bar.y))
+      map.put(Bytes.toBytes("z"), Bytes.toBytes(bar.z))
+
+      when(m.getFamilyMap(any[Array[Byte]])).thenReturn(map)
+
+      val Right(v) = result.to[Foo, F](m)
+
+      assert(v === Foo(bar))
+    }
+    it("should return error when it conversion to failed") {
+      final case class Bar(x: Int, y: String, z: Boolean)
+      final case class Quux(a: Int)
+      final case class Foo(bar: Bar, quuz: Quux)
+
+      val m = mock[Result]
+
+      val map = new util.TreeMap[Array[Byte], Array[Byte]](Bytes.BYTES_COMPARATOR)
+      val bar = Bar(x = Int.MinValue, y = "Johann Carl Friedrich Gauss", z = true)
+
+      map.put(Bytes.toBytes("x"), Bytes.toBytes(bar.x))
+      map.put(Bytes.toBytes("y"), Bytes.toBytes(bar.y))
+      map.put(Bytes.toBytes("z"), Bytes.toBytes(bar.z))
+
+      when(m.getFamilyMap(any[Array[Byte]])).thenReturn(map)
+
+      val v = result.to[Foo, F](m)
+
+      assert(v.isLeft)
     }
   }
 }
