@@ -1,16 +1,20 @@
 package orcus.free.handler
 
 import java.nio.ByteBuffer
+import java.util
 
 import cats.~>
 import cats.instances.either._
 import orcus.free.{ResultOp, ResultOps}
 import orcus.free.handler.result.Handler
+import org.apache.hadoop.hbase.Cell
 import org.apache.hadoop.hbase.client.Result
 import org.apache.hadoop.hbase.util.Bytes
 import org.scalatest.{FunSpec, Matchers}
 import org.scalatest.mockito.MockitoSugar
 import org.mockito.Mockito._
+
+import scala.collection.JavaConverters._
 
 class ResultSpec extends FunSpec with MockitoSugar with Matchers {
 
@@ -21,8 +25,76 @@ class ResultSpec extends FunSpec with MockitoSugar with Matchers {
   def ops[M[_]](implicit T: ResultOps[M]): ResultOps[M] = T
 
   describe("Handler") {
+    describe("getRow") {
+      it("should take the row successfully") {
+        val m = mock[Result]
+
+        val row  = "1"
+        val _row = Bytes.toBytes(row)
+        when(m.getRow).thenReturn(_row)
+
+        val Right(Some(v)) = ops[ResultOp]
+          .getRow(m)
+          .foldMap(interpreter[F, Array[Byte]])
+
+        assert(Bytes.toString(v) === row)
+      }
+    }
+    describe("rawCells") {
+      it("should take the cells successfully") {
+        val m = mock[Result]
+
+        val cells = Iterator.continually(mock[Cell]).take(10).toSeq
+
+        when(m.rawCells()).thenReturn(cells.toArray[Cell])
+
+        val Right(v) = ops[ResultOp]
+          .rawCells(m)
+          .foldMap(interpreter[F, Seq[Cell]])
+
+        assert(v === cells)
+      }
+    }
+    describe("getColumnCells") {
+      it("should take the cells successfully") {
+        val m = mock[Result]
+
+        val family     = "1"
+        val qualifier  = "2"
+        val cells      = Iterator.continually(mock[Cell]).take(10).toSeq
+        val _family    = Bytes.toBytes(family)
+        val _qualifier = Bytes.toBytes(qualifier)
+
+        when(m.getColumnCells(_family, _qualifier)).thenReturn(cells.asJava)
+
+        val Right(v) = ops[ResultOp]
+          .getColumnCells(m, _family, _qualifier)
+          .foldMap(interpreter[F, Seq[Cell]])
+
+        assert(v === cells)
+      }
+    }
+    describe("getColumnLatestCell") {
+      it("should take the cell successfully") {
+        val m = mock[Result]
+
+        val family     = "1"
+        val qualifier  = "2"
+        val cell       = mock[Cell]
+        val _family    = Bytes.toBytes(family)
+        val _qualifier = Bytes.toBytes(qualifier)
+
+        when(m.getColumnLatestCell(_family, _qualifier)).thenReturn(cell)
+
+        val Right(Some(v)) = ops[ResultOp]
+          .getColumnLatestCell(m, _family, _qualifier)
+          .foldMap(interpreter[F, Cell])
+
+        assert(v === cell)
+      }
+    }
     describe("getValue") {
-      it("should return value successfully") {
+      it("should take the value successfully") {
         val m = mock[Result]
 
         val family     = "1"
@@ -42,7 +114,7 @@ class ResultSpec extends FunSpec with MockitoSugar with Matchers {
       }
     }
     describe("getValueAsByteBuffer") {
-      it("should return value successfully") {
+      it("should take the value successfully") {
         val m = mock[Result]
 
         val family     = "1"
@@ -59,6 +131,23 @@ class ResultSpec extends FunSpec with MockitoSugar with Matchers {
           .foldMap(interpreter[F, ByteBuffer])
 
         assert(Bytes.toString(v.array()) === value)
+      }
+    }
+    describe("getFamilyMap") {
+      it("should take the map successfully") {
+        val m = mock[Result]
+
+        val family  = "1"
+        val value   = new util.TreeMap[Array[Byte], Array[Byte]]
+        val _family = Bytes.toBytes(family)
+
+        when(m.getFamilyMap(_family)).thenReturn(value)
+
+        val Right(v) = ops[ResultOp]
+          .getFamilyMap(m, _family)
+          .foldMap(interpreter[F, Map[Array[Byte], Array[Byte]]])
+
+        assert(v === value.asScala.toMap)
       }
     }
   }

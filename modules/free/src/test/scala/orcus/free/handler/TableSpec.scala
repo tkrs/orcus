@@ -33,7 +33,7 @@ class TableSpec extends FunSpec with MockitoSugar with Matchers {
 
   describe("Handler") {
     describe("getName") {
-      it("should return table name successfully") {
+      it("should take the table name successfully") {
         val m = mock[Table]
 
         val tn = TableName.valueOf("1")
@@ -47,7 +47,7 @@ class TableSpec extends FunSpec with MockitoSugar with Matchers {
     }
 
     describe("getConfiguration") {
-      it("should return configuration successfully") {
+      it("should take the configuration successfully") {
         val m = mock[Table]
 
         val c = new Configuration(false)
@@ -61,7 +61,7 @@ class TableSpec extends FunSpec with MockitoSugar with Matchers {
     }
 
     describe("getHTableDescriptor") {
-      it("should return table descriptor successfully") {
+      it("should take the table descriptor successfully") {
         val m = mock[Table]
 
         val d = new HTableDescriptor(TableName.valueOf("1"))
@@ -75,7 +75,7 @@ class TableSpec extends FunSpec with MockitoSugar with Matchers {
     }
 
     describe("exists") {
-      it("should return existence successfully") {
+      it("should take the existence successfully") {
         val m = mock[Table]
 
         val g = new HGet(Bytes.toBytes("1"))
@@ -89,7 +89,7 @@ class TableSpec extends FunSpec with MockitoSugar with Matchers {
     }
 
     describe("get") {
-      it("should return value successfully") {
+      it("should take the result successfully") {
         val m = mock[Table]
         val r = mock[Result]
 
@@ -104,7 +104,7 @@ class TableSpec extends FunSpec with MockitoSugar with Matchers {
     }
 
     describe("put") {
-      it("should put successfully") {
+      it("should put the row successfully") {
         val m = mock[Table]
 
         val g = new HPut(Bytes.toBytes("1"))
@@ -118,7 +118,7 @@ class TableSpec extends FunSpec with MockitoSugar with Matchers {
     }
 
     describe("getScanner") {
-      it("should return result of the scanner successfully") {
+      it("should take the scan result successfully") {
         val m = mock[Table]
         val r = mock[ResultScanner]
 
@@ -133,7 +133,7 @@ class TableSpec extends FunSpec with MockitoSugar with Matchers {
     }
 
     describe("delete") {
-      it("should delete successfully") {
+      it("should delete the row successfully") {
         val m = mock[Table]
 
         val d = new HDelete(Bytes.toBytes("1"))
@@ -147,7 +147,7 @@ class TableSpec extends FunSpec with MockitoSugar with Matchers {
     }
 
     describe("append") {
-      it("should return result successfully") {
+      it("should append the row successfully") {
         val m = mock[Table]
         val r = mock[Result]
 
@@ -162,7 +162,7 @@ class TableSpec extends FunSpec with MockitoSugar with Matchers {
     }
 
     describe("increment") {
-      it("should return result successfully") {
+      it("should take the row successfully") {
         val m = mock[Table]
         val r = mock[Result]
 
@@ -177,7 +177,7 @@ class TableSpec extends FunSpec with MockitoSugar with Matchers {
     }
 
     describe("close") {
-      it("should return result successfully") {
+      it("should close successfully") {
         val m = mock[Table]
 
         doNothing().when(m).close()

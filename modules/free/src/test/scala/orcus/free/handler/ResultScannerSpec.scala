@@ -21,7 +21,7 @@ class ResultScannerSpec extends FunSpec with MockitoSugar with Matchers {
 
   describe("Handler") {
     describe("nextOne") {
-      it("should return value successfully") {
+      it("should take the result successfully") {
         val m = mock[ResultScanner]
         val r = mock[Result]
 
@@ -35,7 +35,7 @@ class ResultScannerSpec extends FunSpec with MockitoSugar with Matchers {
       }
     }
     describe("next") {
-      it("should return value successfully") {
+      it("should take the results successfully") {
         val m = mock[ResultScanner]
         val r = Iterator.continually(mock[Result]).take(10).toArray[Result]
 
