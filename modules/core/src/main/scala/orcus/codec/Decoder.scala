@@ -15,7 +15,7 @@ object Decoder extends Decoder1 {
   def apply[A](implicit A: Decoder[A]): Decoder[A] = A
 }
 
-trait Decoder1 {
+trait Decoder1 extends Decoder2 {
 
   implicit def decodeHNil: Decoder[HNil] = new Decoder[HNil] {
     def apply(result: Result): Either[Throwable, HNil] = Right(HNil)
@@ -48,5 +48,17 @@ trait Decoder1 {
     new Decoder[A0] {
       def apply(result: Result): Either[Throwable, A0] =
         A.value(result) match { case Right(v) => Right(gen.from(v)); case Left(e) => Left(e) }
+    }
+}
+
+trait Decoder2 {
+
+  implicit def decodeOption[A](implicit A: Decoder[A]): Decoder[Option[A]] =
+    new Decoder[Option[A]] {
+      override def apply(result: Result): Either[Throwable, Option[A]] =
+        A.apply(result) match {
+          case Right(v) => Right(Some(v))
+          case Left(_)  => Right(None)
+        }
     }
 }

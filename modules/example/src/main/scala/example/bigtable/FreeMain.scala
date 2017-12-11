@@ -18,6 +18,9 @@ import org.apache.hadoop.hbase.util.Bytes
 
 import scala.util.Try
 
+final case class CF1(greeting1: String)
+final case class Hello(cf1: CF1)
+
 object FreeMain extends App {
   import setup._
   import Functions._
@@ -71,11 +74,11 @@ object FreeMain extends App {
 
   def resultProgram[F[_]](results: Seq[Result])(
       implicit
-      ev1: ResultOps[F]): Free[F, Vector[Option[String]]] = {
+      ev1: ResultOps[F]): Free[F, Vector[Option[Hello]]] = {
     for {
       ys <- results.toVector
-             .map(r => ev1.get[String](r, columnFamilyName, columnName))
-             .sequence[Free[F, ?], Option[String]]
+             .map(r => ev1.to[Option[Hello]](r))
+             .sequence[Free[F, ?], Option[Hello]]
     } yield ys
   }
 
