@@ -9,7 +9,7 @@ import org.apache.hadoop.hbase.security.visibility.CellVisibility
 
 import scala.collection.JavaConverters._
 
-final class Increment(_obj: HIncrement)(implicit keyCodec: ValueCodec[String]) {
+final class Increment(_obj: HIncrement) {
 
   /**
     * @see [[org.apache.hadoop.hbase.client.Increment#setACL]]
@@ -70,9 +70,10 @@ final class Increment(_obj: HIncrement)(implicit keyCodec: ValueCodec[String]) {
   /**
     * @see [[org.apache.hadoop.hbase.client.Increment#addColumn]]
     */
-  def withColumn[K, V](family: String, qualifier: K, amount: Long)(implicit
-                                                                   K: ValueCodec[K]): Increment = {
-    _obj.addColumn(keyCodec.encode(family), K.encode(qualifier), amount)
+  def withColumn[K, V](family: Array[Byte], qualifier: K, amount: Long)(
+      implicit
+      K: ValueCodec[K]): Increment = {
+    _obj.addColumn(family, K.encode(qualifier), amount)
     this
   }
 

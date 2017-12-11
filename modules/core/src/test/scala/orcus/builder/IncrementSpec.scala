@@ -66,9 +66,10 @@ class IncrementSpec extends BuilderSpec {
   }
   describe("withColumn") {
     it("should call setColumn") {
-      val m = spy(new HIncrement(rowkey))
-      new Increment(m).withColumn("cf", "v", 100)
-      verify(m).addColumn(Bytes.toBytes("cf"), Bytes.toBytes("v"), 100)
+      val m  = spy(new HIncrement(rowkey))
+      val cf = Bytes.toBytes("a")
+      new Increment(m).withColumn(cf, "v", 100)
+      verify(m).addColumn(cf, Bytes.toBytes("v"), 100)
     }
   }
 }

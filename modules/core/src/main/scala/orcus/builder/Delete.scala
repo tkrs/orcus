@@ -9,7 +9,7 @@ import org.apache.hadoop.hbase.security.visibility.CellVisibility
 
 import scala.collection.JavaConverters._
 
-final class Delete(_obj: HDelete)(implicit keyCodec: ValueCodec[String]) {
+final class Delete(_obj: HDelete) {
 
   /**
     * @see [[org.apache.hadoop.hbase.client.Delete#setACL]]
@@ -62,60 +62,62 @@ final class Delete(_obj: HDelete)(implicit keyCodec: ValueCodec[String]) {
   /**
     * @see [[org.apache.hadoop.hbase.client.Delete#addFamily(byte[])]]
     */
-  def withFamily(family: String): Delete = {
-    _obj.addFamily(keyCodec.encode(family))
+  def withFamily(family: Array[Byte]): Delete = {
+    _obj.addFamily(family)
     this
   }
 
   /**
     * @see [[org.apache.hadoop.hbase.client.Delete#addFamily(byte[], long)]]
     */
-  def withFamilyTo(family: String, maxTimestamp: Long): Delete = {
-    _obj.addFamily(keyCodec.encode(family), maxTimestamp)
+  def withFamilyTo(family: Array[Byte], maxTimestamp: Long): Delete = {
+    _obj.addFamily(family, maxTimestamp)
     this
   }
 
   /**
     * @see [[org.apache.hadoop.hbase.client.Delete#addFamilyVersion(byte[], long)]]
     */
-  def withFamilyVersion(family: String, timestamp: Long): Delete = {
-    _obj.addFamilyVersion(keyCodec.encode(family), timestamp)
+  def withFamilyVersion(family: Array[Byte], timestamp: Long): Delete = {
+    _obj.addFamilyVersion(family, timestamp)
     this
   }
 
   /**
     * @see [[org.apache.hadoop.hbase.client.Delete#addColumn(byte[], byte[])]]
     */
-  def withColumnLatest[K](family: String, qualifier: K)(implicit
-                                                        K: ValueCodec[K]): Delete = {
-    _obj.addColumn(keyCodec.encode(family), K.encode(qualifier))
+  def withColumnLatest[K](family: Array[Byte], qualifier: K)(implicit
+                                                             K: ValueCodec[K]): Delete = {
+    _obj.addColumn(family, K.encode(qualifier))
     this
   }
 
   /**
     * @see [[org.apache.hadoop.hbase.client.Delete#addColumn(byte[], byte[], long)]]
     */
-  def withColumnVersion[K](family: String, qualifier: K, ts: Long)(implicit
-                                                                   K: ValueCodec[K]): Delete = {
-    _obj.addColumn(keyCodec.encode(family), K.encode(qualifier), ts)
+  def withColumnVersion[K](family: Array[Byte], qualifier: K, ts: Long)(
+      implicit
+      K: ValueCodec[K]): Delete = {
+    _obj.addColumn(family, K.encode(qualifier), ts)
     this
   }
 
   /**
     * @see [[org.apache.hadoop.hbase.client.Delete#addColumns(byte[], byte[])]]
     */
-  def withColumns[K](family: String, qualifier: K)(implicit
-                                                   K: ValueCodec[K]): Delete = {
-    _obj.addColumns(keyCodec.encode(family), K.encode(qualifier))
+  def withColumns[K](family: Array[Byte], qualifier: K)(implicit
+                                                        K: ValueCodec[K]): Delete = {
+    _obj.addColumns(family, K.encode(qualifier))
     this
   }
 
   /**
     * @see [[org.apache.hadoop.hbase.client.Delete#addColumns(byte[], byte[], long)]]
     */
-  def withColumnsVersion[K](family: String, qualifier: K, ts: Long)(implicit
-                                                                    K: ValueCodec[K]): Delete = {
-    _obj.addColumns(keyCodec.encode(family), K.encode(qualifier), ts)
+  def withColumnsVersion[K](family: Array[Byte], qualifier: K, ts: Long)(
+      implicit
+      K: ValueCodec[K]): Delete = {
+    _obj.addColumns(family, K.encode(qualifier), ts)
     this
   }
 

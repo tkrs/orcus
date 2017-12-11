@@ -45,9 +45,10 @@ class AppendSpec extends BuilderSpec {
   describe("withValue") {
 
     it("should call add") {
-      val m = spy(new HAppend(rowkey))
-      new Append(m).withValue("1", "2", 3)
-      verify(m).add(Bytes.toBytes("1"), Bytes.toBytes("2"), Bytes.toBytes(3))
+      val m  = spy(new HAppend(rowkey))
+      val cf = Bytes.toBytes("1")
+      new Append(m).withValue(cf, "2", 3)
+      verify(m).add(cf, Bytes.toBytes("2"), Bytes.toBytes(3))
     }
   }
   describe("withReturnResults") {

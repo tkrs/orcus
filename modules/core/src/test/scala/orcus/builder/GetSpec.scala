@@ -41,16 +41,18 @@ class GetSpec extends BuilderSpec {
   }
   describe("withFamily") {
     it("should call addFamily") {
-      val m = spy(new HGet(rowkey))
-      new Get(m).withFamily("a")
-      verify(m).addFamily(Bytes.toBytes("a"))
+      val m  = spy(new HGet(rowkey))
+      val cf = Bytes.toBytes("a")
+      new Get(m).withFamily(cf)
+      verify(m).addFamily(cf)
     }
   }
   describe("withColumn") {
     it("should call addColumn") {
-      val m = spy(new HGet(rowkey))
-      new Get(m).withColumn("a", "b")
-      verify(m).addColumn(Bytes.toBytes("a"), Bytes.toBytes("b"))
+      val m  = spy(new HGet(rowkey))
+      val cf = Bytes.toBytes("a")
+      new Get(m).withColumn(cf, "b")
+      verify(m).addColumn(cf, Bytes.toBytes("b"))
     }
   }
   describe("withCacheBlocks") {

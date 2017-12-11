@@ -9,7 +9,7 @@ import org.apache.hadoop.hbase.security.visibility.CellVisibility
 
 import scala.collection.JavaConverters._
 
-final class Put(_obj: HPut)(implicit keyCodec: ValueCodec[String]) {
+final class Put(_obj: HPut) {
 
   /**
     * @see [[org.apache.hadoop.hbase.client.Put#setACL]]
@@ -70,42 +70,42 @@ final class Put(_obj: HPut)(implicit keyCodec: ValueCodec[String]) {
   /**
     * @see [[org.apache.hadoop.hbase.client.Put#addColumn(byte[], byte[], byte[])]]
     */
-  def withColumn[K, V](family: String, qualifier: K, value: V)(implicit
-                                                               K: ValueCodec[K],
-                                                               V: ValueCodec[V]): Put = {
-    _obj.addColumn(keyCodec.encode(family), K.encode(qualifier), V.encode(value))
+  def withColumn[K, V](family: Array[Byte], qualifier: K, value: V)(implicit
+                                                                    K: ValueCodec[K],
+                                                                    V: ValueCodec[V]): Put = {
+    _obj.addColumn(family, K.encode(qualifier), V.encode(value))
     this
   }
 
   /**
     * @see [[org.apache.hadoop.hbase.client.Put#addColumn(byte[], byte[], long, byte[])]]
     */
-  def withColumnVersion[K, V](family: String, qualifier: K, ts: Long, value: V)(
+  def withColumnVersion[K, V](family: Array[Byte], qualifier: K, ts: Long, value: V)(
       implicit
       K: ValueCodec[K],
       V: ValueCodec[V]): Put = {
-    _obj.addColumn(keyCodec.encode(family), K.encode(qualifier), ts, V.encode(value))
+    _obj.addColumn(family, K.encode(qualifier), ts, V.encode(value))
     this
   }
 
   /**
     * @see [[org.apache.hadoop.hbase.client.Put#addImmutable(byte[], byte[], byte[])]]
     */
-  def withImmutable[K, V](family: String, qualifier: K, value: V)(implicit
-                                                                  K: ValueCodec[K],
-                                                                  V: ValueCodec[V]): Put = {
-    _obj.addImmutable(keyCodec.encode(family), K.encode(qualifier), V.encode(value))
+  def withImmutable[K, V](family: Array[Byte], qualifier: K, value: V)(implicit
+                                                                       K: ValueCodec[K],
+                                                                       V: ValueCodec[V]): Put = {
+    _obj.addImmutable(family, K.encode(qualifier), V.encode(value))
     this
   }
 
   /**
     * @see [[org.apache.hadoop.hbase.client.Put#addImmutable(byte[], byte[], long, byte[])]]
     */
-  def withImmutableVersion[K, V](family: String, qualifier: K, ts: Long, value: V)(
+  def withImmutableVersion[K, V](family: Array[Byte], qualifier: K, ts: Long, value: V)(
       implicit
       K: ValueCodec[K],
       V: ValueCodec[V]): Put = {
-    _obj.addImmutable(keyCodec.encode(family), K.encode(qualifier), ts, V.encode(value))
+    _obj.addImmutable(family, K.encode(qualifier), ts, V.encode(value))
     this
   }
 

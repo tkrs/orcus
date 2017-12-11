@@ -66,30 +66,34 @@ class PutSpec extends BuilderSpec {
   }
   describe("withColumn") {
     it("should call addColumn") {
-      val m = spy(new HPut(rowkey))
-      new Put(m).withColumn("a", "b", "c")
-      verify(m).addColumn(Bytes.toBytes("a"), Bytes.toBytes("b"), Bytes.toBytes("c"))
+      val m  = spy(new HPut(rowkey))
+      val cf = Bytes.toBytes("a")
+      new Put(m).withColumn(cf, "b", "c")
+      verify(m).addColumn(cf, Bytes.toBytes("b"), Bytes.toBytes("c"))
     }
   }
   describe("withColumnVersion") {
     it("should call addColumn") {
-      val m = spy(new HPut(rowkey))
-      new Put(m).withColumnVersion("a", "b", 1, "c")
-      verify(m).addColumn(Bytes.toBytes("a"), Bytes.toBytes("b"), 1, Bytes.toBytes("c"))
+      val m  = spy(new HPut(rowkey))
+      val cf = Bytes.toBytes("a")
+      new Put(m).withColumnVersion(cf, "b", 1, "c")
+      verify(m).addColumn(cf, Bytes.toBytes("b"), 1, Bytes.toBytes("c"))
     }
   }
   describe("withImmutable") {
     it("should call addImmutable") {
-      val m = spy(new HPut(rowkey))
-      new Put(m).withImmutable("a", "b", "c")
-      verify(m).addImmutable(Bytes.toBytes("a"), Bytes.toBytes("b"), Bytes.toBytes("c"))
+      val m  = spy(new HPut(rowkey))
+      val cf = Bytes.toBytes("a")
+      new Put(m).withImmutable(cf, "b", "c")
+      verify(m).addImmutable(cf, Bytes.toBytes("b"), Bytes.toBytes("c"))
     }
   }
   describe("withImmutableVersion") {
     it("should call addImmutable") {
-      val m = spy(new HPut(rowkey))
-      new Put(m).withImmutableVersion("a", "b", 1, "c")
-      verify(m).addImmutable(Bytes.toBytes("a"), Bytes.toBytes("b"), 1, Bytes.toBytes("c"))
+      val m  = spy(new HPut(rowkey))
+      val cf = Bytes.toBytes("a")
+      new Put(m).withImmutableVersion(cf, "b", 1, "c")
+      verify(m).addImmutable(cf, Bytes.toBytes("b"), 1, Bytes.toBytes("c"))
     }
   }
 }
