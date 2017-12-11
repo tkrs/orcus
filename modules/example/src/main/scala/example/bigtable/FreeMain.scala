@@ -27,11 +27,12 @@ object FreeMain extends App {
     def mkPut: Put = {
       val ts     = System.currentTimeMillis()
       val rowKey = Bytes.toBytes(s"$prefix#${Long.MaxValue - ts}")
-      val put    = new Put(rowKey, ts)
-      put.setTTL(1800)
-      put.addColumn(columnFamilyName,
-                    columnName,
-                    Bytes.toBytes(s"$greeting at ${Instant.ofEpochMilli(ts)}"))
+
+      new Put(rowKey, ts)
+        .setTTL(1800)
+        .addColumn(columnFamilyName,
+                   columnName,
+                   Bytes.toBytes(s"$greeting at ${Instant.ofEpochMilli(ts)}"))
     }
 
     def prog =
@@ -52,10 +53,9 @@ object FreeMain extends App {
       ev2: ResultScannerOps[F]): Free[F, Seq[Result]] = {
 
     def mkScan: Scan = {
-      val scan = new Scan()
-      scan.setRowPrefixFilter(Bytes.toBytes(prefix))
-      scan.setTimeRange(range._1, range._2)
-      scan
+      new Scan()
+        .setRowPrefixFilter(Bytes.toBytes(prefix))
+        .setTimeRange(range._1, range._2)
     }
 
     for {
