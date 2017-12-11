@@ -11,65 +11,41 @@ import scala.collection.JavaConverters._
 
 final class Increment(_obj: HIncrement) {
 
-  /**
-    * @see [[org.apache.hadoop.hbase.client.Increment#setACL]]
-    */
   def withACL(user: String, perms: Permission): Increment = {
     _obj.setACL(user, perms)
     this
   }
 
-  /**
-    * @see [[org.apache.hadoop.hbase.client.Increment#setCellVisibility]]
-    */
   def withCellVisibility(expression: CellVisibility): Increment = {
     _obj.setCellVisibility(expression)
     this
   }
 
-  /**
-    * @see [[org.apache.hadoop.hbase.client.Increment#setDurability]]
-    */
   def withDurability(durability: Durability): Increment = {
     _obj.setDurability(durability)
     this
   }
 
-  /**
-    * @see [[org.apache.hadoop.hbase.client.Increment#setId]]
-    */
   def withId(id: String): Increment = {
     _obj.setId(id)
     this
   }
 
-  /**
-    * @see [[org.apache.hadoop.hbase.client.Increment#setAttribute]]
-    */
   def withAttribute(name: String, value: Array[Byte]): Increment = {
     _obj.setAttribute(name, value)
     this
   }
 
-  /**
-    * @see [[org.apache.hadoop.hbase.client.Increment#setClusterIds]]
-    */
   def withClusterIds(clusterIds: Seq[UUID]): Increment = {
     _obj.setClusterIds(clusterIds.asJava)
     this
   }
 
-  /**
-    * @see [[org.apache.hadoop.hbase.client.Increment#setTTL]]
-    */
   def withTTL(ttl: Long): Increment = {
     _obj.setTTL(ttl)
     this
   }
 
-  /**
-    * @see [[org.apache.hadoop.hbase.client.Increment#addColumn]]
-    */
   def withColumn[K, V](family: Array[Byte], qualifier: K, amount: Long)(
       implicit
       K: ValueCodec[K]): Increment = {
@@ -77,8 +53,5 @@ final class Increment(_obj: HIncrement) {
     this
   }
 
-  /**
-    * Returns [[org.apache.hadoop.hbase.client.Increment]]
-    */
   def get: HIncrement = _obj
 }
