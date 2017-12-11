@@ -2,7 +2,7 @@ package orcus
 
 import java.nio.ByteBuffer
 
-import cats.MonadError
+import cats.{Monad, MonadError}
 import codec.{Decoder, FamilyDecoder, ValueCodec}
 import org.apache.hadoop.hbase.Cell
 import org.apache.hadoop.hbase.client.Result
@@ -13,51 +13,51 @@ object result {
 
   def getRow[M[_]](r: Result)(
       implicit
-      ME: MonadError[M, Throwable]
+      ME: Monad[M]
   ): M[Option[Array[Byte]]] =
     ME.pure(Option(r.getRow))
 
   def rawCells[M[_]](r: Result)(
       implicit
-      ME: MonadError[M, Throwable]
+      ME: Monad[M]
   ): M[Seq[Cell]] =
     ME.pure(r.rawCells() match { case null => Vector.empty; case xs => xs.toSeq })
 
   def getColumnCells[M[_]](r: Result, family: Array[Byte], qualifier: Array[Byte])(
       implicit
-      ME: MonadError[M, Throwable]
+      ME: Monad[M]
   ): M[Seq[Cell]] =
     ME.pure(r.getColumnCells(family, qualifier).asScala)
 
   def getColumnLatestCell[M[_]](r: Result, family: Array[Byte], qualifier: Array[Byte])(
       implicit
-      ME: MonadError[M, Throwable]
+      ME: Monad[M]
   ): M[Option[Cell]] =
     ME.pure(Option(r.getColumnLatestCell(family, qualifier)))
 
   def get[A, M[_]](r: Result, family: Array[Byte], qualifier: Array[Byte])(
       implicit
       A: ValueCodec[A],
-      ME: MonadError[M, Throwable]
+      ME: Monad[M]
   ): M[Option[A]] =
     ME.map(getValue[M](r, family, qualifier))(_.map(A.decode))
 
   def getValue[M[_]](r: Result, family: Array[Byte], qualifier: Array[Byte])(
       implicit
-      ME: MonadError[M, Throwable]
+      ME: Monad[M]
   ): M[Option[Array[Byte]]] =
     ME.pure(Option(r.getValue(family, qualifier)))
 
   def getValueAsByteBuffer[M[_]](r: Result, family: Array[Byte], qualifier: Array[Byte])(
       implicit
-      ME: MonadError[M, Throwable]
+      ME: Monad[M]
   ): M[Option[ByteBuffer]] =
     ME.pure(Option(r.getValueAsByteBuffer(family, qualifier)))
 
   def getFamily[A, M[_]](r: Result, family: Array[Byte])(
       implicit
-      ME: MonadError[M, Throwable],
-      A: FamilyDecoder[A]
+      A: FamilyDecoder[A],
+      ME: MonadError[M, Throwable]
   ): M[A] =
     A(r.getFamilyMap(family)) match {
       case Right(v) => ME.pure(v)
@@ -66,9 +66,12 @@ object result {
 
   def getFamilyMap[M[_]](r: Result, family: Array[Byte])(
       implicit
-      ME: MonadError[M, Throwable]
+      ME: Monad[M]
   ): M[Map[Array[Byte], Array[Byte]]] =
-    ME.pure(r.getFamilyMap(family) match { case null => Map.empty; case xs => xs.asScala.toMap })
+    ME.pure(r.getFamilyMap(family) match {
+      case null => Map.empty
+      case xs   => xs.asScala.toMap
+    })
 
   def to[A, M[_]](r: Result)(
       implicit
