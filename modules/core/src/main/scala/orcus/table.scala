@@ -1,6 +1,6 @@
 package orcus
 
-import cats.MonadError
+import cats.{Monad, MonadError}
 import cats.data.Kleisli
 import org.apache.hadoop.conf.{Configuration => HConfig}
 import org.apache.hadoop.hbase.client.{
@@ -20,13 +20,13 @@ object table {
 
   def getName[F[_]](t: HTable)(
       implicit
-      ME: MonadError[F, Throwable]
+      ME: Monad[F]
   ): F[HTableName] =
     ME.pure(t.getName)
 
   def getConfiguration[F[_]](t: HTable)(
       implicit
-      ME: MonadError[F, Throwable]
+      ME: Monad[F]
   ): F[HConfig] =
     ME.pure(t.getConfiguration)
 
