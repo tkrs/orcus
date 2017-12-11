@@ -97,12 +97,6 @@ object FreeMain extends App {
     } yield ys
   }
 
-  val projectId  = sys.props("project-id")
-  val instanceId = sys.props("instance-id")
-  val emulator   = sys.props.contains("emulator")
-  val config     = BigtableConfiguration.configure(projectId, instanceId)
-  if (emulator) config.setBoolean(BIGTABLE_USE_PLAINTEXT_NEGOTIATION, true)
-
   type K[F[_], A] = Kleisli[F, Table, A]
 
   type Op1[A] = Coproduct[ResultScannerOp, ResultOp, A]
