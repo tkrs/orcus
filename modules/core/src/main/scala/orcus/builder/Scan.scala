@@ -6,7 +6,7 @@ import org.apache.hadoop.hbase.filter.Filter
 import org.apache.hadoop.hbase.security.access.Permission
 import org.apache.hadoop.hbase.security.visibility.Authorizations
 
-final class Scan(_obj: HScan)(implicit keyCodec: ValueCodec[String]) {
+final class Scan(_obj: HScan) {
 
   /**
     * @see [[org.apache.hadoop.hbase.client.Scan#setACL]]
@@ -41,19 +41,27 @@ final class Scan(_obj: HScan)(implicit keyCodec: ValueCodec[String]) {
   }
 
   /**
+    * @see [[org.apache.hadoop.hbase.client.Scan#setRowPrefixFilter]]
+    */
+  def withRowPrefixFilter(prefix: Array[Byte]): Scan = {
+    _obj.setRowPrefixFilter(prefix)
+    this
+  }
+
+  /**
     * @see [[org.apache.hadoop.hbase.client.Scan#addFamily]]
     */
-  def withFamily(family: String): Scan = {
-    _obj.addFamily(keyCodec.encode(family))
+  def withFamily(family: Array[Byte]): Scan = {
+    _obj.addFamily(family)
     this
   }
 
   /**
     * @see [[org.apache.hadoop.hbase.client.Scan#addColumn]]
     */
-  def withColumn[K](family: String, qualifier: K)(implicit
-                                                  K: ValueCodec[K]): Scan = {
-    _obj.addColumn(keyCodec.encode(family), K.encode(qualifier))
+  def withColumn[K](family: Array[Byte], qualifier: K)(implicit
+                                                       K: ValueCodec[K]): Scan = {
+    _obj.addColumn(family, K.encode(qualifier))
     this
   }
 
@@ -100,16 +108,16 @@ final class Scan(_obj: HScan)(implicit keyCodec: ValueCodec[String]) {
   /**
     * @see [[org.apache.hadoop.hbase.client.Scan#setStartRow]]
     */
-  def withStartRow(row: String): Scan = {
-    _obj.setStartRow(keyCodec.encode(row))
+  def withStartRow(row: Array[Byte]): Scan = {
+    _obj.setStartRow(row)
     this
   }
 
   /**
     * @see [[org.apache.hadoop.hbase.client.Scan#setStopRow]]
     */
-  def withStopRow(row: String): Scan = {
-    _obj.setStopRow(keyCodec.encode(row))
+  def withStopRow(row: Array[Byte]): Scan = {
+    _obj.setStopRow(row)
     this
   }
 
@@ -132,8 +140,8 @@ final class Scan(_obj: HScan)(implicit keyCodec: ValueCodec[String]) {
   /**
     * @see [[org.apache.hadoop.hbase.client.Scan#setColumnFamilyTimeRange]]
     */
-  def withColumnFamilyTimeRange(family: String, min: Long, max: Long): Scan = {
-    _obj.setColumnFamilyTimeRange(keyCodec.encode(family), min, max)
+  def withColumnFamilyTimeRange(family: Array[Byte], min: Long, max: Long): Scan = {
+    _obj.setColumnFamilyTimeRange(family, min, max)
     this
   }
 

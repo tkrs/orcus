@@ -6,7 +6,7 @@ import org.apache.hadoop.hbase.filter.Filter
 import org.apache.hadoop.hbase.security.access.Permission
 import org.apache.hadoop.hbase.security.visibility.Authorizations
 
-final class Get(_obj: HGet)(implicit keyCodec: ValueCodec[String]) {
+final class Get(_obj: HGet) {
 
   /**
     * @see [[org.apache.hadoop.hbase.client.Get#setACL]]
@@ -43,17 +43,17 @@ final class Get(_obj: HGet)(implicit keyCodec: ValueCodec[String]) {
   /**
     * @see [[org.apache.hadoop.hbase.client.Get#addFamily(byte[])]]
     */
-  def withFamily(family: String): Get = {
-    _obj.addFamily(keyCodec.encode(family))
+  def withFamily(family: Array[Byte]): Get = {
+    _obj.addFamily(family)
     this
   }
 
   /**
     * @see [[org.apache.hadoop.hbase.client.Get#addColumn(byte[], byte[])]]
     */
-  def withColumn[K](family: String, qualifier: K)(implicit
-                                                  K: ValueCodec[K]): Get = {
-    _obj.addColumn(keyCodec.encode(family), K.encode(qualifier))
+  def withColumn[K](family: Array[Byte], qualifier: K)(implicit
+                                                       K: ValueCodec[K]): Get = {
+    _obj.addColumn(family, K.encode(qualifier))
     this
   }
 

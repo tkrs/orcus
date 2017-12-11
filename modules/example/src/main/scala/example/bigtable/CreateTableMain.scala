@@ -2,7 +2,8 @@ package example.bigtable
 
 import com.google.cloud.bigtable.hbase.{BigtableConfiguration, BigtableOptionsFactory}
 import org.apache.hadoop.hbase.client._
-import org.apache.hadoop.hbase.{HColumnDescriptor, HTableDescriptor}
+import org.apache.hadoop.hbase.util.Bytes
+import org.apache.hadoop.hbase.{HColumnDescriptor, HTableDescriptor, TableName}
 
 import scala.util.{Success, Try}
 
@@ -14,6 +15,12 @@ object setup {
   val emulator   = sys.props.contains("emulator")
   val config     = BigtableConfiguration.configure(projectId, instanceId)
   if (emulator) config.setBoolean(BIGTABLE_USE_PLAINTEXT_NEGOTIATION, true)
+
+  val tableName: TableName          = TableName.valueOf("Hello")
+  val columnFamilyName: Array[Byte] = Bytes.toBytes("cf1")
+  val columnName: Array[Byte]       = Bytes.toBytes("greeting1")
+  val greeting: String              = "Hello World!"
+
 }
 
 object CreateTableMain extends App {

@@ -9,7 +9,7 @@ import org.apache.hadoop.hbase.security.visibility.CellVisibility
 
 import scala.collection.JavaConverters._
 
-final class Append(_obj: HAppend)(implicit keyCodec: ValueCodec[String]) {
+final class Append(_obj: HAppend) {
 
   /**
     * @see [[org.apache.hadoop.hbase.client.Append#setACL]]
@@ -70,10 +70,10 @@ final class Append(_obj: HAppend)(implicit keyCodec: ValueCodec[String]) {
   /**
     * @see [[org.apache.hadoop.hbase.client.Append#add(byte[], byte[], byte[])]]
     */
-  def withValue[K, V](family: String, qualifier: K, value: V)(implicit
-                                                              K: ValueCodec[K],
-                                                              V: ValueCodec[V]): Append = {
-    _obj.add(keyCodec.encode(family), K.encode(qualifier), V.encode(value))
+  def withValue[K, V](family: Array[Byte], qualifier: K, value: V)(implicit
+                                                                   K: ValueCodec[K],
+                                                                   V: ValueCodec[V]): Append = {
+    _obj.add(family, K.encode(qualifier), V.encode(value))
     this
   }
 

@@ -60,51 +60,58 @@ class DeleteSpec extends BuilderSpec {
   }
   describe("withFamily") {
     it("should call addFamily") {
-      val m = spy(new HDelete(rowkey))
-      new Delete(m).withFamily("a")
-      verify(m).addFamily(Bytes.toBytes("a"))
+      val m  = spy(new HDelete(rowkey))
+      val cf = Bytes.toBytes("a")
+      new Delete(m).withFamily(cf)
+      verify(m).addFamily(cf)
     }
   }
   describe("withFamilyTo") {
     it("should call addFamily") {
-      val m = spy(new HDelete(rowkey))
-      new Delete(m).withFamilyTo("a", 10)
-      verify(m).addFamily(Bytes.toBytes("a"), 10)
+      val m  = spy(new HDelete(rowkey))
+      val cf = Bytes.toBytes("a")
+      new Delete(m).withFamilyTo(cf, 10)
+      verify(m).addFamily(cf, 10)
     }
   }
   describe("withFamilyVersion") {
     it("should call addFamily") {
-      val m = spy(new HDelete(rowkey))
-      new Delete(m).withFamilyVersion("a", 10)
-      verify(m).addFamilyVersion(Bytes.toBytes("a"), 10)
+      val m  = spy(new HDelete(rowkey))
+      val cf = Bytes.toBytes("a")
+      new Delete(m).withFamilyVersion(cf, 10)
+      verify(m).addFamilyVersion(cf, 10)
     }
   }
   describe("withColumnLatest") {
     it("should call addColumn") {
-      val m = spy(new HDelete(rowkey))
-      new Delete(m).withColumnLatest("a", 10)
-      verify(m).addColumn(Bytes.toBytes("a"), Bytes.toBytes(10))
+      val m  = spy(new HDelete(rowkey))
+      val cf = Bytes.toBytes("a")
+      new Delete(m).withColumnLatest(cf, 10)
+      verify(m).addColumn(cf, Bytes.toBytes(10))
     }
   }
   describe("withColumnVersion") {
     it("should call addColumn") {
-      val m = spy(new HDelete(rowkey))
-      new Delete(m).withColumnVersion("a", 10, 10)
-      verify(m).addColumn(Bytes.toBytes("a"), Bytes.toBytes(10), 10)
+      val m  = spy(new HDelete(rowkey))
+      val cf = Bytes.toBytes("a")
+      new Delete(m).withColumnVersion(cf, 10, 10)
+      verify(m).addColumn(cf, Bytes.toBytes(10), 10)
     }
   }
   describe("withColumns") {
     it("should call addColumns") {
-      val m = spy(new HDelete(rowkey))
-      new Delete(m).withColumns("a", 10)
-      verify(m).addColumns(Bytes.toBytes("a"), Bytes.toBytes(10))
+      val m  = spy(new HDelete(rowkey))
+      val cf = Bytes.toBytes("a")
+      new Delete(m).withColumns(cf, 10)
+      verify(m).addColumns(cf, Bytes.toBytes(10))
     }
   }
   describe("withColumnsVersion") {
     it("should call addColumns") {
-      val m = spy(new HDelete(rowkey))
-      new Delete(m).withColumnsVersion("a", 10, 10)
-      verify(m).addColumns(Bytes.toBytes("a"), Bytes.toBytes(10), 10)
+      val m  = spy(new HDelete(rowkey))
+      val cf = Bytes.toBytes("a")
+      new Delete(m).withColumnsVersion(cf, 10, 10)
+      verify(m).addColumns(cf, Bytes.toBytes(10), 10)
     }
   }
 }

@@ -8,6 +8,7 @@ import cats.implicits._
 import cats.~>
 import com.google.cloud.bigtable.hbase.BigtableConfiguration
 import com.google.cloud.bigtable.hbase.BigtableOptionsFactory._
+import orcus.builder._
 import orcus.free._
 import orcus.free.handler.result.{Handler => ResultHandler}
 import orcus.free.handler.resultScanner.{Handler => ResultScannerHandler}
@@ -18,30 +19,32 @@ import org.apache.hadoop.hbase.util.Bytes
 import scala.util.Try
 
 object FreeMain extends App {
+  import setup._
   import Functions._
 
   def putProgram[F[_]](prefix: String, numRecords: Int)(
       implicit
       ev1: TableOps[F]): Free[F, Vector[(Array[Byte], Long)]] = {
 
-    def mkPut: Put = {
+    def mkPut = {
       val ts     = System.currentTimeMillis()
       val rowKey = Bytes.toBytes(s"$prefix#${Long.MaxValue - ts}")
 
-      new Put(rowKey, ts)
-        .setTTL(1800)
-        .addColumn(columnFamilyName,
-                   columnName,
-                   Bytes.toBytes(s"$greeting at ${Instant.ofEpochMilli(ts)}"))
+      putTimestamp(rowKey, ts)
+        .withTTL(1800)
+        .withColumn(columnFamilyName,
+                    columnName,
+                    Bytes.toBytes(s"$greeting at ${Instant.ofEpochMilli(ts)}"))
+        .get
     }
 
     def prog =
       for {
-        _   <- Free.pure(Thread.sleep(10))
-        put <- Free.pure(mkPut)
-        _   <- ev1.put(put)
+        _    <- Free.pure(Thread.sleep(10))
+        _put <- Free.pure(mkPut)
+        _    <- ev1.put(_put)
       } yield {
-        (put.getRow, put.getTimeStamp)
+        (_put.getRow, _put.getTimeStamp)
       }
 
     Iterator.continually(prog).take(numRecords).toVector.sequence[Free[F, ?], (Array[Byte], Long)]
@@ -52,16 +55,17 @@ object FreeMain extends App {
       ev1: TableOps[F],
       ev2: ResultScannerOps[F]): Free[F, Seq[Result]] = {
 
-    def mkScan: Scan = {
-      new Scan()
-        .setRowPrefixFilter(Bytes.toBytes(prefix))
-        .setTimeRange(range._1, range._2)
+    def mkScan = {
+      scan()
+        .withRowPrefixFilter(Bytes.toBytes(prefix))
+        .withTimeRange(range._1, range._2)
+        .get
     }
 
     for {
-      scan <- Free.pure(mkScan)
-      r    <- ev1.getScanner(scan)
-      xs   <- ev2.next(r, numRecords)
+      _scan <- Free.pure(mkScan)
+      r     <- ev1.getScanner(_scan)
+      xs    <- ev2.next(r, numRecords)
     } yield xs
   }
 

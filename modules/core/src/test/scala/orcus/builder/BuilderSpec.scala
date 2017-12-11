@@ -5,6 +5,5 @@ import org.scalatest.mockito.MockitoSugar
 import org.scalatest.{FunSpec, Matchers}
 
 trait BuilderSpec extends FunSpec with MockitoSugar with Matchers {
-  val _rowkey: String     = "KEY"
-  val rowkey: Array[Byte] = Bytes.toBytes(_rowkey)
+  val rowkey: Array[Byte] = Bytes.toBytes("KEY")
 }

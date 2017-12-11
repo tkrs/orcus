@@ -8,13 +8,14 @@ import org.apache.hadoop.hbase.client.{
   Append => HAppend,
   Increment => HIncrement
 }
-import org.apache.hadoop.hbase.util.Bytes
 
 package object builder {
-  final def get(key: String): Get             = new Get(new HGet(Bytes.toBytes(key)))
-  final def scan(key: String): Scan           = new Scan(new HScan(Bytes.toBytes(key)))
-  final def put(key: String): Put             = new Put(new HPut(Bytes.toBytes(key)))
-  final def delete(key: String): Delete       = new Delete(new HDelete(Bytes.toBytes(key)))
-  final def append(key: String): Append       = new Append(new HAppend(Bytes.toBytes(key)))
-  final def increment(key: String): Increment = new Increment(new HIncrement(Bytes.toBytes(key)))
+  final def get(row: Array[Byte]): Get                    = new Get(new HGet(row))
+  final def scan(): Scan                                  = new Scan(new HScan())
+  final def scanRow(startRow: Array[Byte]): Scan          = new Scan(new HScan(startRow))
+  final def put(row: Array[Byte]): Put                    = new Put(new HPut(row))
+  final def putTimestamp(row: Array[Byte], ts: Long): Put = new Put(new HPut(row, ts))
+  final def delete(row: Array[Byte]): Delete              = new Delete(new HDelete(row))
+  final def append(row: Array[Byte]): Append              = new Append(new HAppend(row))
+  final def increment(row: Array[Byte]): Increment        = new Increment(new HIncrement(row))
 }

@@ -39,18 +39,28 @@ class ScanSpec extends BuilderSpec {
       verify(m).setAttribute("n", Bytes.toBytes("v"))
     }
   }
+  describe("withRowPrefixFilter") {
+    it("should call setRowPrefixFilter") {
+      val m      = spy(new HScan())
+      val prefix = Bytes.toBytes("abc")
+      new Scan(m).withRowPrefixFilter(prefix)
+      verify(m).setRowPrefixFilter(prefix)
+    }
+  }
   describe("withFamily") {
     it("should call addFamily") {
-      val m = spy(new HScan(rowkey))
-      new Scan(m).withFamily("a")
-      verify(m).addFamily(Bytes.toBytes("a"))
+      val m  = spy(new HScan(rowkey))
+      val cf = Bytes.toBytes("a")
+      new Scan(m).withFamily(cf)
+      verify(m).addFamily(cf)
     }
   }
   describe("withColumn") {
     it("should call addColumn") {
-      val m = spy(new HScan(rowkey))
-      new Scan(m).withColumn("a", "b")
-      verify(m).addColumn(Bytes.toBytes("a"), Bytes.toBytes("b"))
+      val m  = spy(new HScan(rowkey))
+      val cf = Bytes.toBytes("a")
+      new Scan(m).withColumn(cf, "b")
+      verify(m).addColumn(cf, Bytes.toBytes("b"))
     }
   }
   describe("withCacheBlocks") {
@@ -91,14 +101,14 @@ class ScanSpec extends BuilderSpec {
   describe("withStartRow") {
     it("should call setStartRow") {
       val m = spy(new HScan(rowkey))
-      new Scan(m).withStartRow(_rowkey)
+      new Scan(m).withStartRow(rowkey)
       verify(m).setStartRow(rowkey)
     }
   }
   describe("withStopRow") {
     it("should call setStopRow") {
       val m = spy(new HScan(rowkey))
-      new Scan(m).withStopRow(_rowkey)
+      new Scan(m).withStopRow(rowkey)
       verify(m).setStopRow(rowkey)
     }
   }
@@ -118,9 +128,10 @@ class ScanSpec extends BuilderSpec {
   }
   describe("withColumnFamilyTimeRange") {
     it("should call setColumnFamilyTimeRange") {
-      val m = spy(new HScan(rowkey))
-      new Scan(m).withColumnFamilyTimeRange("a", 1, 2)
-      verify(m).setColumnFamilyTimeRange(Bytes.toBytes("a"), 1, 2)
+      val m  = spy(new HScan(rowkey))
+      val cf = Bytes.toBytes("a")
+      new Scan(m).withColumnFamilyTimeRange(cf, 1, 2)
+      verify(m).setColumnFamilyTimeRange(cf, 1, 2)
     }
   }
   describe("withBatch") {
