@@ -13,46 +13,46 @@ object result {
 
   def getRow[M[_]](r: Result)(
       implicit
-      ME: Monad[M]
+      M: Monad[M]
   ): M[Option[Array[Byte]]] =
-    ME.pure(Option(r.getRow))
+    M.pure(Option(r.getRow))
 
   def rawCells[M[_]](r: Result)(
       implicit
-      ME: Monad[M]
+      M: Monad[M]
   ): M[Seq[Cell]] =
-    ME.pure(r.rawCells() match { case null => Vector.empty; case xs => xs.toSeq })
+    M.pure(r.rawCells() match { case null => Vector.empty; case xs => xs.toSeq })
 
   def getColumnCells[M[_]](r: Result, family: Array[Byte], qualifier: Array[Byte])(
       implicit
-      ME: Monad[M]
+      M: Monad[M]
   ): M[Seq[Cell]] =
-    ME.pure(r.getColumnCells(family, qualifier).asScala)
+    M.pure(r.getColumnCells(family, qualifier).asScala)
 
   def getColumnLatestCell[M[_]](r: Result, family: Array[Byte], qualifier: Array[Byte])(
       implicit
-      ME: Monad[M]
+      M: Monad[M]
   ): M[Option[Cell]] =
-    ME.pure(Option(r.getColumnLatestCell(family, qualifier)))
+    M.pure(Option(r.getColumnLatestCell(family, qualifier)))
 
   def get[A, M[_]](r: Result, family: Array[Byte], qualifier: Array[Byte])(
       implicit
       A: ValueCodec[A],
-      ME: Monad[M]
+      M: Monad[M]
   ): M[Option[A]] =
-    ME.map(getValue[M](r, family, qualifier))(_.map(A.decode))
+    M.map(getValue[M](r, family, qualifier))(_.map(A.decode))
 
   def getValue[M[_]](r: Result, family: Array[Byte], qualifier: Array[Byte])(
       implicit
-      ME: Monad[M]
+      M: Monad[M]
   ): M[Option[Array[Byte]]] =
-    ME.pure(Option(r.getValue(family, qualifier)))
+    M.pure(Option(r.getValue(family, qualifier)))
 
   def getValueAsByteBuffer[M[_]](r: Result, family: Array[Byte], qualifier: Array[Byte])(
       implicit
-      ME: Monad[M]
+      M: Monad[M]
   ): M[Option[ByteBuffer]] =
-    ME.pure(Option(r.getValueAsByteBuffer(family, qualifier)))
+    M.pure(Option(r.getValueAsByteBuffer(family, qualifier)))
 
   def getFamily[A, M[_]](r: Result, family: Array[Byte])(
       implicit
