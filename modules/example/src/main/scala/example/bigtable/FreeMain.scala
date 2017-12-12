@@ -7,7 +7,6 @@ import cats.free.Free
 import cats.implicits._
 import cats.~>
 import com.google.cloud.bigtable.hbase.BigtableConfiguration
-import com.google.cloud.bigtable.hbase.BigtableOptionsFactory._
 import orcus.builder._
 import orcus.free._
 import orcus.free.handler.result.{Handler => ResultHandler}
@@ -96,12 +95,6 @@ object FreeMain extends App {
       ys <- resultProgram(xs)
     } yield ys
   }
-
-  val projectId  = sys.props("project-id")
-  val instanceId = sys.props("instance-id")
-  val emulator   = sys.props.contains("emulator")
-  val config     = BigtableConfiguration.configure(projectId, instanceId)
-  if (emulator) config.setBoolean(BIGTABLE_USE_PLAINTEXT_NEGOTIATION, true)
 
   type K[F[_], A] = Kleisli[F, Table, A]
 
