@@ -7,7 +7,6 @@ import cats.free.Free
 import cats.implicits._
 import cats.~>
 import com.google.cloud.bigtable.hbase.BigtableConfiguration
-import com.google.cloud.bigtable.hbase.BigtableOptionsFactory._
 import orcus.builder._
 import orcus.free._
 import orcus.free.handler.result.{Handler => ResultHandler}

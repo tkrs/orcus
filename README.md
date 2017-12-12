@@ -11,7 +11,7 @@ orcus is a HBase client for Scala. It is just a wrapper to [Java Client](https:/
 Add to your build.sbt
 
 ```
-libraryDependencies += "com.github.tkrs" %% "orcus-free" % "0.3.0"
+libraryDependencies += "com.github.tkrs" %% "orcus-free" % "$VERSION"
 ```
 
 And, so look at this [example](https://github.com/tkrs/orcus/tree/master/modules/example/src/main/scala/example/bigtable)
