@@ -34,6 +34,7 @@ object FreeMain extends App {
 
       putTimestamp(rowKey, ts)
         .withTTL(1800)
+        .withDurability(Durability.ASYNC_WAL)
         .withColumn(columnFamilyName,
                     columnName,
                     Bytes.toBytes(s"$greeting at ${Instant.ofEpochMilli(ts)}"))
@@ -49,7 +50,11 @@ object FreeMain extends App {
         (_put.getRow, _put.getTimeStamp)
       }
 
-    Iterator.continually(prog).take(numRecords).toVector.sequence[Free[F, ?], (Array[Byte], Long)]
+    Iterator
+      .continually(prog)
+      .take(numRecords)
+      .toVector
+      .sequence[Free[F, ?], (Array[Byte], Long)]
   }
 
   def scanProgram[F[_]](prefix: String, numRecords: Int, range: (Long, Long))(
@@ -106,11 +111,8 @@ object FreeMain extends App {
       T: TableHandler[M],
       R: ResultHandler[M],
       RS: ResultScannerHandler[M]
-  ): Op ~> Kleisli[M, Table, ?] = {
-    val op1 = RS.liftF[Table] or R.liftF[Table]
-    val op  = T or op1
-    op
-  }
+  ): Op ~> Kleisli[M, Table, ?] =
+    T or (RS.liftF[Table] or R.liftF[Table])
 
   import cats.instances.try_._
 
