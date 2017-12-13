@@ -21,4 +21,5 @@ class ValueCodecSpec extends FunSuite with Checkers with Matchers {
   test("ValueCodec[Double]")(roundTrip[Double])
   test("ValueCodec[BigDecimal]")(roundTrip[BigDecimal])
   test("ValueCodec[String]")(roundTrip[String])
+  test("ValueCodec[Option[A]]")(roundTrip[Option[Int]])
 }
