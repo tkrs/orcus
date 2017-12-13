@@ -9,7 +9,24 @@ import shapeless._
 
 import scala.collection.generic.CanBuildFrom
 
-trait FamilyDecoder[A] {
+trait FamilyDecoder[A] { self =>
+
+  def flatMap[B](f: A => FamilyDecoder[B]): FamilyDecoder[B] = new FamilyDecoder[B] {
+    def apply(map: util.NavigableMap[Array[Byte], Array[Byte]]): Either[Throwable, B] =
+      self(map) match {
+        case Right(a)    => f(a)(map)
+        case l @ Left(_) => l.asInstanceOf[Either[Throwable, B]]
+      }
+  }
+
+  def map[B](f: A => B): FamilyDecoder[B] = new FamilyDecoder[B] {
+    def apply(map: util.NavigableMap[Array[Byte], Array[Byte]]): Either[Throwable, B] =
+      self(map) match {
+        case Right(a)    => Right(f(a))
+        case l @ Left(_) => l.asInstanceOf[Either[Throwable, B]]
+      }
+  }
+
   def apply(map: util.NavigableMap[Array[Byte], Array[Byte]]): Either[Throwable, A]
 }
 
