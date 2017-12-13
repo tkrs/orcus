@@ -1,5 +1,6 @@
 package orcus.codec
 
+import cats.Eval
 import cats.instances.either._
 import org.apache.hadoop.hbase.client.Result
 import org.apache.hadoop.hbase.util.Bytes
@@ -7,6 +8,8 @@ import shapeless.labelled._
 import shapeless._
 
 trait Decoder[A] { self =>
+
+  def apply(result: Result): Either[Throwable, A]
 
   def flatMap[B](f: A => Decoder[B]): Decoder[B] = new Decoder[B] {
     override def apply(result: Result): Either[Throwable, B] = self(result) match {
@@ -22,12 +25,25 @@ trait Decoder[A] { self =>
     }
   }
 
-  def apply(result: Result): Either[Throwable, A]
+  def mapF[B](f: A => Either[Throwable, B]): Decoder[B] = new Decoder[B] {
+    override def apply(result: Result): Either[Throwable, B] = self(result) match {
+      case Right(a)    => f(a)
+      case l @ Left(_) => l.asInstanceOf[Either[Throwable, B]]
+    }
+  }
 }
 
 object Decoder extends Decoder1 {
 
   def apply[A](implicit A: Decoder[A]): Decoder[A] = A
+
+  def pure[A](a: A): Decoder[A] = new Decoder[A] {
+    def apply(result: Result): Either[Throwable, A] = Right(a)
+  }
+
+  def eval[A](a: Eval[A]): Decoder[A] = new Decoder[A] {
+    def apply(result: Result): Either[Throwable, A] = Right(a.value)
+  }
 }
 
 trait Decoder1 extends Decoder2 {
