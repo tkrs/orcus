@@ -236,9 +236,9 @@ class ResultSpec extends FunSpec with MockitoSugar with Matchers {
 
       when(m.getFamilyMap(cfn)).thenReturn(map)
 
-      val Right(v) = result.getFamily[Foo, F](m, cfn)
+      val Right(v) = result.getFamily[Option[Foo], F](m, cfn)
 
-      assert(v === foo)
+      assert(v === Some(foo))
     }
     it("should convert to typed Map obtained from getFamilyMap") {
 
@@ -291,9 +291,9 @@ class ResultSpec extends FunSpec with MockitoSugar with Matchers {
 
       when(m.getFamilyMap(any[Array[Byte]])).thenReturn(map)
 
-      val Right(v) = result.to[Foo, F](m)
+      val Right(v) = result.to[Option[Foo], F](m)
 
-      assert(v === Foo(bar, Some(quux)))
+      assert(v === Some(Foo(bar, Some(quux))))
     }
   }
 }
