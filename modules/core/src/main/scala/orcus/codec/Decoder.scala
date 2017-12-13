@@ -44,6 +44,10 @@ object Decoder extends Decoder1 {
   def eval[A](a: Eval[A]): Decoder[A] = new Decoder[A] {
     def apply(result: Result): Either[Throwable, A] = Right(a.value)
   }
+
+  def liftF[A](a: Either[Throwable, A]) = new Decoder[A] {
+    def apply(result: Result): Either[Throwable, A] = a
+  }
 }
 
 trait Decoder1 extends Decoder2 {

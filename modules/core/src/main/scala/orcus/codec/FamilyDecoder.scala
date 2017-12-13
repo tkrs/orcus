@@ -53,6 +53,10 @@ object FamilyDecoder extends FamilyDecoder1 {
     def apply(map: util.NavigableMap[Array[Byte], Array[Byte]]): Either[Throwable, A] =
       Right(a.value)
   }
+
+  def liftF[A](a: Either[Throwable, A]): FamilyDecoder[A] = new FamilyDecoder[A] {
+    def apply(map: util.NavigableMap[Array[Byte], Array[Byte]]): Either[Throwable, A] = a
+  }
 }
 
 trait FamilyDecoder1 extends FamilyDecoder2 {
