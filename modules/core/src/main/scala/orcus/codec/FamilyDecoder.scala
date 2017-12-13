@@ -3,6 +3,7 @@ package orcus.codec
 import java.util
 import java.util.function.BiConsumer
 
+import cats.Eval
 import org.apache.hadoop.hbase.util.Bytes
 import shapeless.labelled._
 import shapeless._
@@ -11,12 +12,15 @@ import scala.collection.generic.CanBuildFrom
 
 trait FamilyDecoder[A] { self =>
 
+  def apply(map: util.NavigableMap[Array[Byte], Array[Byte]]): Either[Throwable, A]
+
   def flatMap[B](f: A => FamilyDecoder[B]): FamilyDecoder[B] = new FamilyDecoder[B] {
-    def apply(map: util.NavigableMap[Array[Byte], Array[Byte]]): Either[Throwable, B] =
+    def apply(map: util.NavigableMap[Array[Byte], Array[Byte]]): Either[Throwable, B] = {
       self(map) match {
         case Right(a)    => f(a)(map)
         case l @ Left(_) => l.asInstanceOf[Either[Throwable, B]]
       }
+    }
   }
 
   def map[B](f: A => B): FamilyDecoder[B] = new FamilyDecoder[B] {
@@ -27,12 +31,31 @@ trait FamilyDecoder[A] { self =>
       }
   }
 
-  def apply(map: util.NavigableMap[Array[Byte], Array[Byte]]): Either[Throwable, A]
+  def mapF[B](f: A => Either[Throwable, B]): FamilyDecoder[B] = new FamilyDecoder[B] {
+    def apply(map: util.NavigableMap[Array[Byte], Array[Byte]]): Either[Throwable, B] =
+      self(map) match {
+        case Right(a)    => f(a)
+        case l @ Left(_) => l.asInstanceOf[Either[Throwable, B]]
+      }
+  }
 }
 
 object FamilyDecoder extends FamilyDecoder1 {
 
   def apply[A](implicit A: FamilyDecoder[A]): FamilyDecoder[A] = A
+
+  def pure[A](a: A): FamilyDecoder[A] = new FamilyDecoder[A] {
+    def apply(map: util.NavigableMap[Array[Byte], Array[Byte]]): Either[Throwable, A] =
+      Right(a)
+  }
+
+  def eval[A](a: Eval[A]): FamilyDecoder[A] = new FamilyDecoder[A] {
+    def apply(map: util.NavigableMap[Array[Byte], Array[Byte]]): Either[Throwable, A] =
+      Right(a.value)
+  }
+}
+
+trait FamilyDecoder1 extends FamilyDecoder2 {
 
   implicit def decodeMap[M[_, _] <: Map[K, V], K, V](
       implicit
@@ -62,7 +85,7 @@ object FamilyDecoder extends FamilyDecoder1 {
     }
 }
 
-trait FamilyDecoder1 extends FamilyDecoder2 {
+trait FamilyDecoder2 extends FamilyDecoder3 {
 
   implicit def decodeHNil: FamilyDecoder[HNil] = new FamilyDecoder[HNil] {
     def apply(map: util.NavigableMap[Array[Byte], Array[Byte]]): Either[Throwable, HNil] =
@@ -95,7 +118,7 @@ trait FamilyDecoder1 extends FamilyDecoder2 {
     }
 }
 
-trait FamilyDecoder2 {
+trait FamilyDecoder3 {
 
   implicit def decodeOption[A0](
       implicit
