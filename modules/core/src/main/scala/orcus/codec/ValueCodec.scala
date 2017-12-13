@@ -2,7 +2,13 @@ package orcus.codec
 
 import org.apache.hadoop.hbase.util.Bytes
 
-trait ValueCodec[A] {
+trait ValueCodec[A] { self =>
+
+  def imap[B](fa: B => A, fb: A => B): ValueCodec[B] = new ValueCodec[B] {
+    override def encode(a: B): Array[Byte]     = self.encode(fa(a))
+    override def decode(bytes: Array[Byte]): B = fb(self.decode(bytes))
+  }
+
   def encode(a: A): Array[Byte]
   def decode(bytes: Array[Byte]): A
 }
