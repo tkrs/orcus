@@ -2,6 +2,7 @@ package orcus.codec
 
 import java.{util => ju}
 
+import cats.Eval
 import org.apache.hadoop.hbase.client.Result
 import org.apache.hadoop.hbase.util.Bytes
 import org.scalatest.FunSuite
@@ -70,5 +71,23 @@ class DecoderSpec extends FunSuite with MockitoSugar {
     val f  = Decoder[Foo].mapF(x => Left(ex))
     val l  = f(m)
     assert(l === Left(ex))
+  }
+
+  test("pure") {
+    val m = mock[Result]
+    val f = Decoder.pure(10)(m)
+    assert(f === Right(10))
+  }
+
+  test("eval") {
+    val m = mock[Result]
+    val f = Decoder.eval(Eval.now(10))(m)
+    assert(f === Right(10))
+  }
+
+  test("liftF") {
+    val m = mock[Result]
+    val f = Decoder.liftF(Right(10))(m)
+    assert(f === Right(10))
   }
 }

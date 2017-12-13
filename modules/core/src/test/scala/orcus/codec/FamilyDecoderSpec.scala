@@ -2,6 +2,7 @@ package orcus.codec
 
 import java.{util => ju}
 
+import cats.Eval
 import org.apache.hadoop.hbase.util.Bytes
 import org.scalatest.{FunSuite, Matchers}
 
@@ -50,5 +51,23 @@ class FamilyDecoderSpec extends FunSuite with Matchers {
   test("It should return empty map when family is null") {
     val f = FamilyDecoder[Map[String, String]]
     assert(f(null) === Right(Map.empty[String, String]))
+  }
+
+  test("pure") {
+    val m = new ju.TreeMap[Array[Byte], Array[Byte]]()
+    val f = FamilyDecoder.pure(10)(m)
+    assert(f === Right(10))
+  }
+
+  test("eval") {
+    val m = new ju.TreeMap[Array[Byte], Array[Byte]]()
+    val f = FamilyDecoder.eval(Eval.now(10))(m)
+    assert(f === Right(10))
+  }
+
+  test("liftF") {
+    val m = new ju.TreeMap[Array[Byte], Array[Byte]]()
+    val f = FamilyDecoder.liftF(Right(10))(m)
+    assert(f === Right(10))
   }
 }
