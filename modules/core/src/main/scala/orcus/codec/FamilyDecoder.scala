@@ -41,10 +41,10 @@ object FamilyDecoder extends FamilyDecoder1 {
       cbf: CanBuildFrom[Nothing, (K, V), M[K, V]]): FamilyDecoder[M[K, V]] =
     new FamilyDecoder[M[K, V]] {
       def apply(map: util.NavigableMap[Array[Byte], Array[Byte]]): Either[Throwable, M[K, V]] = {
+        val m = cbf()
         if (map == null)
-          Left(new Exception(s"map is null"))
+          Right(m.result())
         else {
-          val m = cbf()
 
           val f = new BiConsumer[Array[Byte], Array[Byte]] {
             override def accept(t: Array[Byte], u: Array[Byte]): Unit = {
@@ -77,9 +77,8 @@ trait FamilyDecoder1 extends FamilyDecoder2 {
     new FamilyDecoder[FieldType[K, H] :: T] {
       def apply(map: util.NavigableMap[Array[Byte], Array[Byte]])
         : Either[Throwable, FieldType[K, H] :: T] = {
-        val key = K.value.name
-        val v0  = map.get(Bytes.toBytes(key))
-        val h   = field[K](H.decode(v0))
+        val v = map.get(Bytes.toBytes(K.value.name))
+        val h = field[K](H.decode(v))
         T.value(map) match {
           case Right(t) => Right(h :: t)
           case Left(e)  => Left(e)

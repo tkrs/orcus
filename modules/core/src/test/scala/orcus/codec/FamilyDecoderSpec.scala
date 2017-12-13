@@ -24,4 +24,8 @@ class FamilyDecoderSpec extends FunSuite {
     assert(b === Bar("ss"))
   }
 
+  test("It should return empty map when family is null") {
+    val f = FamilyDecoder[Map[String, String]]
+    assert(f(null) === Right(Map.empty[String, String]))
+  }
 }
