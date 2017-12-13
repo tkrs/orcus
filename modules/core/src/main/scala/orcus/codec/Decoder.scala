@@ -6,7 +6,22 @@ import org.apache.hadoop.hbase.util.Bytes
 import shapeless.labelled._
 import shapeless._
 
-trait Decoder[A] {
+trait Decoder[A] { self =>
+
+  def flatMap[B](f: A => Decoder[B]): Decoder[B] = new Decoder[B] {
+    override def apply(result: Result): Either[Throwable, B] = self(result) match {
+      case Right(a)    => f(a)(result)
+      case l @ Left(_) => l.asInstanceOf[Either[Throwable, B]]
+    }
+  }
+
+  def map[B](f: A => B): Decoder[B] = new Decoder[B] {
+    override def apply(result: Result): Either[Throwable, B] = self(result) match {
+      case Right(a)    => Right(f(a))
+      case l @ Left(_) => l.asInstanceOf[Either[Throwable, B]]
+    }
+  }
+
   def apply(result: Result): Either[Throwable, A]
 }
 
