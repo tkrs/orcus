@@ -61,19 +61,11 @@ trait FamilyDecoder1 extends FamilyDecoder2 {
       def apply(map: util.NavigableMap[Array[Byte], Array[Byte]])
         : Either[Throwable, FieldType[K, H] :: T] = {
         val key = K.value.name
-        if (map == null)
-          Left(new Exception(s"map is null"))
-        else {
-          map.get(Bytes.toBytes(key)) match {
-            case null =>
-              Left(new Exception(s"$key is not contains in map: $map"))
-            case v0 =>
-              val h = field[K](H.decode(v0))
-              T.value(map) match {
-                case Right(t) => Right(h :: t)
-                case Left(e)  => Left(e)
-              }
-          }
+        val v0  = map.get(Bytes.toBytes(key))
+        val h   = field[K](H.decode(v0))
+        T.value(map) match {
+          case Right(t) => Right(h :: t)
+          case Left(e)  => Left(e)
         }
       }
     }
@@ -89,15 +81,18 @@ trait FamilyDecoder1 extends FamilyDecoder2 {
 
 trait FamilyDecoder2 {
 
-  implicit def decodeHConsOption[A0](
+  implicit def decodeOption[A0](
       implicit
       A: Lazy[FamilyDecoder[A0]]): FamilyDecoder[Option[A0]] =
     new FamilyDecoder[Option[A0]] {
       def apply(map: util.NavigableMap[Array[Byte], Array[Byte]]): Either[Throwable, Option[A0]] =
-        A.value(map) match {
-          case Right(v) => Right(Some(v))
-          case Left(_)  => Right(None)
-        }
+        if (map == null)
+          Right(None)
+        else
+          A.value(map) match {
+            case Right(v) => Right(Some(v))
+            case Left(e)  => Left(e)
+          }
     }
 
 }

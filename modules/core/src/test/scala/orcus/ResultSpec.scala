@@ -295,25 +295,5 @@ class ResultSpec extends FunSpec with MockitoSugar with Matchers {
 
       assert(v === Foo(bar, Some(quux)))
     }
-    it("should return error when it conversion to failed") {
-      final case class Bar(x: Int, y: String, z: Boolean)
-      final case class Quux(a: Int)
-      final case class Foo(bar: Bar, quuz: Quux)
-
-      val m = mock[Result]
-
-      val map = new util.TreeMap[Array[Byte], Array[Byte]](Bytes.BYTES_COMPARATOR)
-      val bar = Bar(x = Int.MinValue, y = "Johann Carl Friedrich Gauss", z = true)
-
-      map.put(Bytes.toBytes("x"), Bytes.toBytes(bar.x))
-      map.put(Bytes.toBytes("y"), Bytes.toBytes(bar.y))
-      map.put(Bytes.toBytes("z"), Bytes.toBytes(bar.z))
-
-      when(m.getFamilyMap(any[Array[Byte]])).thenReturn(map)
-
-      val v = result.to[Foo, F](m)
-
-      assert(v.isLeft)
-    }
   }
 }

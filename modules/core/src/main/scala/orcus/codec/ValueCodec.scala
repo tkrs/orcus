@@ -55,4 +55,14 @@ object ValueCodec {
     def encode(a: String): Array[Byte]     = Bytes.toBytes(a)
     def decode(bytes: Array[Byte]): String = Bytes.toString(bytes)
   }
+
+  implicit def codecForOption[A](implicit A: ValueCodec[A]): ValueCodec[Option[A]] =
+    new ValueCodec[Option[A]] {
+      override def encode(a: Option[A]): Array[Byte] = a match {
+        case None    => null
+        case Some(v) => A.encode(v)
+      }
+      override def decode(bytes: Array[Byte]): Option[A] =
+        if (bytes == null) None else Some(A.decode(bytes))
+    }
 }

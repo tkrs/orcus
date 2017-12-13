@@ -173,7 +173,7 @@ class ResultSpec extends FunSpec with MockitoSugar with Matchers {
     }
     describe("getFamily") {
       it("should take the value successfully") {
-        case class Foo(x: Int)
+        case class Foo(x: Option[Int], y: Option[Long])
         val m = mock[Result]
 
         val family  = "1"
@@ -188,31 +188,13 @@ class ResultSpec extends FunSpec with MockitoSugar with Matchers {
           .getFamily[Foo](m, _family)
           .foldMap(interpreter[F, Foo])
 
-        assert(v === Foo(x = 1))
-      }
-      it("should return error when it type conversion is failed") {
-        case class Foo(x: Int, y: Int)
-        val m = mock[Result]
-
-        val family  = "1"
-        val value   = new util.TreeMap[Array[Byte], Array[Byte]](Bytes.BYTES_COMPARATOR)
-        val _family = Bytes.toBytes(family)
-
-        value.put(Bytes.toBytes("x"), Bytes.toBytes(1: Int))
-
-        when(m.getFamilyMap(_family)).thenReturn(value)
-
-        val v = ops[ResultOp]
-          .getFamily[Foo](m, _family)
-          .foldMap(interpreter[F, Foo])
-
-        assert(v.isLeft)
+        assert(v === Foo(x = Some(1), None))
       }
     }
     describe("to") {
       it("should take the value successfully") {
-        case class Bar(x: String)
-        case class Foo(a: Bar)
+        case class Bar(x: Option[String], y: Option[Int])
+        case class Foo(a: Option[Bar])
         val m = mock[Result]
 
         val value = new util.TreeMap[Array[Byte], Array[Byte]](Bytes.BYTES_COMPARATOR)
@@ -225,24 +207,7 @@ class ResultSpec extends FunSpec with MockitoSugar with Matchers {
           .to[Foo](m)
           .foldMap(interpreter[F, Foo])
 
-        assert(v === Foo(Bar("*")))
-      }
-      it("should return error when it type conversion is failed") {
-        case class Bar(x: Int, y: Int)
-        case class Foo(a: Bar)
-        val m = mock[Result]
-
-        val value = new util.TreeMap[Array[Byte], Array[Byte]](Bytes.BYTES_COMPARATOR)
-
-        value.put(Bytes.toBytes("x"), Bytes.toBytes(1: Int))
-
-        when(m.getFamilyMap(any[Array[Byte]])).thenReturn(value)
-
-        val v = ops[ResultOp]
-          .to[Foo](m)
-          .foldMap(interpreter[F, Foo])
-
-        assert(v.isLeft)
+        assert(v === Foo(Some(Bar(Some("*"), None))))
       }
     }
   }
