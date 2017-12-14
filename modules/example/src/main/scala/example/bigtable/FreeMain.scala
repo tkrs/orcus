@@ -32,13 +32,13 @@ object FreeMain extends App {
       val ts     = System.currentTimeMillis()
       val rowKey = Bytes.toBytes(s"$prefix#${Long.MaxValue - ts}")
 
-      putTimestamp(rowKey, ts)
-        .withTTL(1800)
-        .withDurability(Durability.ASYNC_WAL)
-        .withColumn(columnFamilyName,
-                    columnName2,
-                    Bytes.toBytes(s"$greeting at ${Instant.ofEpochMilli(ts)}"))
-        .get
+      (for {
+        o <- HPut.withTTL(1800)
+        _ <- HPut.withDurability(Durability.ASYNC_WAL)
+        _ <- HPut.withColumn(columnFamilyName,
+                             columnName2,
+                             Bytes.toBytes(s"$greeting at ${Instant.ofEpochMilli(ts)}"))
+      } yield o).run(new Put(rowKey, ts))
     }
 
     def prog =
@@ -62,12 +62,11 @@ object FreeMain extends App {
       ev1: TableOps[F],
       ev2: ResultScannerOps[F]): Free[F, Seq[Result]] = {
 
-    def mkScan = {
-      scan()
-        .withRowPrefixFilter(Bytes.toBytes(prefix))
-        .withTimeRange(range._1, range._2)
-        .get
-    }
+    def mkScan =
+      (for {
+        o <- HScan.withRowPrefixFilter(Bytes.toBytes(prefix))
+        _ <- HScan.withTimeRange(range._1, range._2)
+      } yield o).run(new Scan())
 
     for {
       _scan <- Free.pure(mkScan)
