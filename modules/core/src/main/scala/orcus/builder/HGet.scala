@@ -28,50 +28,39 @@ object HGet {
                                                        K: ValueCodec[K]): Reader[Get, Get] =
     Reader(_.addColumn(family, K.encode(qualifier)))
 
-  def withCacheBlocks(cacheBlocks: Boolean): Reader[Get, Get] = {
+  def withCacheBlocks(cacheBlocks: Boolean): Reader[Get, Get] =
     Reader(_.setCacheBlocks(cacheBlocks))
-  }
 
-  def withCheckExistenceOnly(checkExistenceOnly: Boolean): Reader[Get, Get] = {
+  def withCheckExistenceOnly(checkExistenceOnly: Boolean): Reader[Get, Get] =
     Reader(_.setCheckExistenceOnly(checkExistenceOnly))
-  }
 
-  def withClosestRowBefore(closestRowBefore: Boolean): Reader[Get, Get] = {
+  def withClosestRowBefore(closestRowBefore: Boolean): Reader[Get, Get] =
     Reader(_.setClosestRowBefore(closestRowBefore))
-  }
 
-  def withConsistency(consistency: Consistency): Reader[Get, Get] = {
+  def withConsistency(consistency: Consistency): Reader[Get, Get] =
     Reader(_.setConsistency(consistency))
-  }
 
-  def withFilter(filter: Filter): Reader[Get, Get] = {
+  def withFilter(filter: Filter): Reader[Get, Get] =
     Reader(_.setFilter(filter))
-  }
 
-  def withIsolationLevel(level: IsolationLevel): Reader[Get, Get] = {
+  def withIsolationLevel(level: IsolationLevel): Reader[Get, Get] =
     Reader(_.setIsolationLevel(level))
-  }
 
-  def withMaxResultsPerColumnFamily(limit: Int): Reader[Get, Get] = {
+  def withMaxResultsPerColumnFamily(limit: Int): Reader[Get, Get] =
     Reader(_.setMaxResultsPerColumnFamily(limit))
-  }
 
-  def withMaxVersions(max: Int = Int.MaxValue): Reader[Get, Get] = {
+  def withMaxVersions(max: Int = Int.MaxValue): Reader[Get, Get] =
     Reader(_.setMaxVersions(max))
-  }
 
-  def withReplicaId(id: Int): Reader[Get, Get] = {
+  def withReplicaId(id: Int): Reader[Get, Get] =
     Reader(_.setReplicaId(id))
-  }
 
   def withRowOffsetPerColumnFamily(offset: Int): Reader[Get, Get] =
     Reader(_.setRowOffsetPerColumnFamily(offset))
 
-  def withTimeRange(min: Long, max: Long): Reader[Get, Get] = {
+  def withTimeRange(min: Long, max: Long): Reader[Get, Get] =
     Reader(_.setTimeRange(min, max))
-  }
 
-  def withTimeStamp(timestamp: Long): Reader[Get, Get] = {
+  def withTimeStamp(timestamp: Long): Reader[Get, Get] =
     Reader(_.setTimeStamp(timestamp))
-  }
 }
