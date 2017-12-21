@@ -12,6 +12,20 @@ trait PutEncoder[A] {
 object PutEncoder extends PutEncoder1 {
 
   def apply[A](implicit A: PutEncoder[A]): PutEncoder[A] = A
+
+  implicit def mapPutEncoder[K, V](
+      implicit
+      K: ValueCodec[K],
+      V: Lazy[PutFamilyEncoder[V]]
+  ): PutEncoder[Map[K, V]] = new PutEncoder[Map[K, V]] {
+    def apply(acc: Put, a: Map[K, V]): Option[Put] = {
+      a.foreach {
+        case (k, v) =>
+          V.value.apply(acc, K.encode(k), v)
+      }
+      if (a.isEmpty) None else Some(acc)
+    }
+  }
 }
 
 trait PutEncoder1 {
@@ -23,7 +37,7 @@ trait PutEncoder1 {
   implicit def hlabelledConsPutEncoder[K <: Symbol, H, T <: HList](
       implicit
       K: Witness.Aux[K],
-      H: Lazy[PutCFEncoder[H]],
+      H: Lazy[PutFamilyEncoder[H]],
       T: Lazy[PutEncoder[T]]
   ): PutEncoder[FieldType[K, H] :: T] = new PutEncoder[::[FieldType[K, H], T]] {
     def apply(acc: Put, a: FieldType[K, H] :: T): Option[Put] = a match {

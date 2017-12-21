@@ -19,5 +19,14 @@ class PutEncoderSpec extends FunSpec {
       assert(p.has(Bytes.toBytes("b"), Bytes.toBytes("y"), Bytes.toBytes("2")))
       assert(p.has(Bytes.toBytes("c"), Bytes.toBytes("z"), Bytes.toBytes(3L)))
     }
+    it("should derive Put from Map") {
+      val row = Bytes.toBytes("row")
+      val p = PutEncoder[Map[String, A]]
+        .apply(new Put(row), Map("a" -> A(1), "b" -> A(2), "c" -> A(3)))
+        .get
+      assert(p.has(Bytes.toBytes("a"), Bytes.toBytes("x"), Bytes.toBytes(1)))
+      assert(p.has(Bytes.toBytes("b"), Bytes.toBytes("x"), Bytes.toBytes(2)))
+      assert(p.has(Bytes.toBytes("c"), Bytes.toBytes("x"), Bytes.toBytes(3)))
+    }
   }
 }

@@ -5,27 +5,41 @@ import org.apache.hadoop.hbase.util.Bytes
 import shapeless._
 import shapeless.labelled.FieldType
 
-trait PutCFEncoder[A] {
+trait PutFamilyEncoder[A] {
   def apply(acc: Put, cf: Array[Byte], a: A): Option[Put]
 }
 
-object PutCFEncoder extends PutCFEncoder1 {
+object PutFamilyEncoder extends PutCFEncoder1 {
 
-  def apply[A](implicit A: PutCFEncoder[A]): PutCFEncoder[A] = A
+  def apply[A](implicit A: PutFamilyEncoder[A]): PutFamilyEncoder[A] = A
+
+  implicit def mapPutFamilyEncoder[K, V](
+      implicit
+      H: ValueCodec[K],
+      V: ValueCodec[V]
+  ): PutFamilyEncoder[Map[K, V]] = new PutFamilyEncoder[Map[K, V]] {
+    def apply(acc: Put, cf: Array[Byte], a: Map[K, V]): Option[Put] = {
+      a.foreach {
+        case (k, v) =>
+          acc.addColumn(cf, H.encode(k), V.encode(v))
+      }
+      if (a.isEmpty) None else Some(acc)
+    }
+  }
 }
 
 trait PutCFEncoder1 {
 
-  implicit val hnilPutEncoder: PutCFEncoder[HNil] = new PutCFEncoder[HNil] {
+  implicit val hnilPutEncoder: PutFamilyEncoder[HNil] = new PutFamilyEncoder[HNil] {
     def apply(acc: Put, cf: Array[Byte], a: HNil): Option[Put] = Some(acc)
   }
 
-  implicit def hlabelledConsPutCFEncoder[K <: Symbol, H, T <: HList](
+  implicit def hlabelledConsPutFamilyEncoder[K <: Symbol, H, T <: HList](
       implicit
       K: Witness.Aux[K],
       H: ValueCodec[H],
-      T: Lazy[PutCFEncoder[T]]
-  ): PutCFEncoder[FieldType[K, H] :: T] = new PutCFEncoder[::[FieldType[K, H], T]] {
+      T: Lazy[PutFamilyEncoder[T]]
+  ): PutFamilyEncoder[FieldType[K, H] :: T] = new PutFamilyEncoder[::[FieldType[K, H], T]] {
     def apply(acc: Put, cf: Array[Byte], a: FieldType[K, H] :: T): Option[Put] = a match {
       case h :: t =>
         for {
@@ -35,11 +49,11 @@ trait PutCFEncoder1 {
     }
   }
 
-  implicit def caseClassPutEncoder[A, R](
+  implicit def caseClassPutFamilyEncoder[A, R](
       implicit
       gen: LabelledGeneric.Aux[A, R],
-      R: Lazy[PutCFEncoder[R]]
-  ): PutCFEncoder[A] = new PutCFEncoder[A] {
+      R: Lazy[PutFamilyEncoder[R]]
+  ): PutFamilyEncoder[A] = new PutFamilyEncoder[A] {
     def apply(acc: Put, cf: Array[Byte], a: A): Option[Put] = {
       R.value(acc, cf, gen.to(a))
     }
