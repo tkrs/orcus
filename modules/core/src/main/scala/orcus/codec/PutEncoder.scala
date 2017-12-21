@@ -6,7 +6,7 @@ import shapeless._
 import shapeless.labelled.FieldType
 
 trait PutEncoder[A] {
-  def apply(acc: Put, a: A): Option[Put]
+  def apply(acc: Put, a: A, ts: Long): Option[Put]
 }
 
 object PutEncoder extends PutEncoder1 {
@@ -18,10 +18,10 @@ object PutEncoder extends PutEncoder1 {
       K: ValueCodec[K],
       V: Lazy[PutFamilyEncoder[V]]
   ): PutEncoder[Map[K, V]] = new PutEncoder[Map[K, V]] {
-    def apply(acc: Put, a: Map[K, V]): Option[Put] = {
+    def apply(acc: Put, a: Map[K, V], ts: Long = Long.MaxValue): Option[Put] = {
       a.foreach {
         case (k, v) =>
-          V.value.apply(acc, K.encode(k), v)
+          V.value.apply(acc, K.encode(k), v, ts)
       }
       if (a.isEmpty) None else Some(acc)
     }
@@ -31,7 +31,7 @@ object PutEncoder extends PutEncoder1 {
 trait PutEncoder1 {
 
   implicit val hnilPutEncoder: PutEncoder[HNil] = new PutEncoder[HNil] {
-    def apply(acc: Put, a: HNil): Option[Put] = Some(acc)
+    def apply(acc: Put, a: HNil, ts: Long): Option[Put] = Some(acc)
   }
 
   implicit def hlabelledConsPutEncoder[K <: Symbol, H, T <: HList](
@@ -40,11 +40,11 @@ trait PutEncoder1 {
       H: Lazy[PutFamilyEncoder[H]],
       T: Lazy[PutEncoder[T]]
   ): PutEncoder[FieldType[K, H] :: T] = new PutEncoder[::[FieldType[K, H], T]] {
-    def apply(acc: Put, a: FieldType[K, H] :: T): Option[Put] = a match {
+    def apply(acc: Put, a: FieldType[K, H] :: T, ts: Long): Option[Put] = a match {
       case h :: t =>
         for {
-          hp <- H.value(acc, Bytes.toBytes(K.value.name), h)
-          tp <- T.value(hp, t)
+          hp <- H.value(acc, Bytes.toBytes(K.value.name), h, ts)
+          tp <- T.value(hp, t, ts)
         } yield tp
     }
   }
@@ -54,8 +54,8 @@ trait PutEncoder1 {
       gen: LabelledGeneric.Aux[A, R],
       R: Lazy[PutEncoder[R]]
   ): PutEncoder[A] = new PutEncoder[A] {
-    def apply(acc: Put, a: A): Option[Put] = {
-      R.value(acc, gen.to(a))
+    def apply(acc: Put, a: A, ts: Long = Long.MaxValue): Option[Put] = {
+      R.value(acc, gen.to(a), ts)
     }
   }
 }
