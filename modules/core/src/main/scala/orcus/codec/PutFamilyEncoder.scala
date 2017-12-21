@@ -9,7 +9,7 @@ trait PutFamilyEncoder[A] {
   def apply(acc: Put, cf: Array[Byte], a: A): Option[Put]
 }
 
-object PutFamilyEncoder extends PutCFEncoder1 {
+object PutFamilyEncoder extends PutFamilyEncoder1 {
 
   def apply[A](implicit A: PutFamilyEncoder[A]): PutFamilyEncoder[A] = A
 
@@ -28,7 +28,7 @@ object PutFamilyEncoder extends PutCFEncoder1 {
   }
 }
 
-trait PutCFEncoder1 {
+trait PutFamilyEncoder1 {
 
   implicit val hnilPutEncoder: PutFamilyEncoder[HNil] = new PutFamilyEncoder[HNil] {
     def apply(acc: Put, cf: Array[Byte], a: HNil): Option[Put] = Some(acc)
