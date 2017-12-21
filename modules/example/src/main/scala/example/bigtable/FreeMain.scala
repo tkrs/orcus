@@ -8,6 +8,7 @@ import cats.implicits._
 import cats.~>
 import com.google.cloud.bigtable.hbase.BigtableConfiguration
 import orcus.builder._
+import orcus.codec.PutEncoder
 import orcus.free._
 import orcus.free.handler.result.{Handler => ResultHandler}
 import orcus.free.handler.resultScanner.{Handler => ResultScannerHandler}
@@ -31,14 +32,14 @@ object FreeMain extends App {
     def mkPut = {
       val ts     = System.currentTimeMillis()
       val rowKey = Bytes.toBytes(s"$prefix#${Long.MaxValue - ts}")
-
-      (for {
+      val hello  = Hello(CF1(Some(s"$greeting at ${Instant.ofEpochMilli(ts)}"), None))
+      val put = for {
         o <- HPut.withTTL(1800)
         _ <- HPut.withDurability(Durability.ASYNC_WAL)
-        _ <- HPut.withColumn(columnFamilyName,
-                             columnName2,
-                             Bytes.toBytes(s"$greeting at ${Instant.ofEpochMilli(ts)}"))
-      } yield o).run(new Put(rowKey, ts))
+      } yield o
+
+      val x = PutEncoder[Hello].apply(new Put(rowKey, ts), hello, Long.MaxValue)
+      put.run(x.get)
     }
 
     def prog =
@@ -69,9 +70,9 @@ object FreeMain extends App {
       } yield o).run(new Scan())
 
     for {
-      _scan <- Free.pure(mkScan)
-      r     <- ev1.getScanner(_scan)
-      xs    <- ev2.next(r, numRecords)
+      sc <- Free.pure(mkScan)
+      r  <- ev1.getScanner(sc)
+      xs <- ev2.next(r, numRecords)
     } yield xs
   }
 
