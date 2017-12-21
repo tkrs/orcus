@@ -36,7 +36,7 @@ class FamilyDecoderSpec extends FunSuite with Matchers {
     assert(b === "10")
   }
 
-  test("It should return left when mapF create the Left") {
+  test("mapF should return left when mapF create the Left") {
     final case class Foo(a: Int)
     val e = new Exception(":)")
     val f = FamilyDecoder[Foo].mapF[String](x => Left(e))
