@@ -39,7 +39,7 @@ object FreeMain extends App {
       } yield o
 
       val x = PutEncoder[Hello].apply(new Put(rowKey, ts), hello, Long.MaxValue)
-      put.run(x.get)
+      put.run(x)
     }
 
     def prog =
