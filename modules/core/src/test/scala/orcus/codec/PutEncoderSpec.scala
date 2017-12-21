@@ -15,7 +15,8 @@ class PutEncoderSpec extends FunSpec {
     it("should derive Put from case class") {
       val row = Bytes.toBytes("row")
       val ts  = Long.MaxValue
-      val p   = PutEncoder[X].apply(new Put(row), X(A(1), B("2"), C(3)), ts).get
+      val x   = X(A(1), B("2"), C(3))
+      val p   = PutEncoder[X].apply(new Put(row), x, ts)
       assert(p.has(Bytes.toBytes("a"), Bytes.toBytes("x"), ts, Bytes.toBytes(1)))
       assert(p.has(Bytes.toBytes("b"), Bytes.toBytes("y"), ts, Bytes.toBytes("2")))
       assert(p.has(Bytes.toBytes("c"), Bytes.toBytes("z"), ts, Bytes.toBytes(3L)))
@@ -23,9 +24,8 @@ class PutEncoderSpec extends FunSpec {
     it("should derive Put from Map") {
       val row = Bytes.toBytes("row")
       val ts  = Long.MaxValue
-      val p = PutEncoder[Map[String, A]]
-        .apply(new Put(row), Map("a" -> A(1), "b" -> A(2), "c" -> A(3)), ts)
-        .get
+      val map = Map("a" -> A(1), "b" -> A(2), "c" -> A(3))
+      val p   = PutEncoder[Map[String, A]].apply(new Put(row), map, ts)
       assert(p.has(Bytes.toBytes("a"), Bytes.toBytes("x"), ts, Bytes.toBytes(1)))
       assert(p.has(Bytes.toBytes("b"), Bytes.toBytes("x"), ts, Bytes.toBytes(2)))
       assert(p.has(Bytes.toBytes("c"), Bytes.toBytes("x"), ts, Bytes.toBytes(3)))
