@@ -110,7 +110,7 @@ trait FamilyDecoder2 extends FamilyDecoder3 {
           val h = field[K](H.decode(v))
           T.value(map) match {
             case Right(t) => Right(h :: t)
-            case Left(e) => Left(e)
+            case Left(e)  => Left(e)
           }
         } catch {
           case NonFatal(e) => Left(e)
