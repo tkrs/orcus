@@ -9,6 +9,7 @@ import shapeless.labelled._
 import shapeless._
 
 import scala.collection.generic.CanBuildFrom
+import scala.util.control.NonFatal
 
 trait FamilyDecoder[A] { self =>
 
@@ -105,10 +106,14 @@ trait FamilyDecoder2 extends FamilyDecoder3 {
       def apply(map: util.NavigableMap[Array[Byte], Array[Byte]])
         : Either[Throwable, FieldType[K, H] :: T] = {
         val v = map.get(Bytes.toBytes(K.value.name))
-        val h = field[K](H.decode(v))
-        T.value(map) match {
-          case Right(t) => Right(h :: t)
-          case Left(e)  => Left(e)
+        try {
+          val h = field[K](H.decode(v))
+          T.value(map) match {
+            case Right(t) => Right(h :: t)
+            case Left(e) => Left(e)
+          }
+        } catch {
+          case NonFatal(e) => Left(e)
         }
       }
     }
@@ -132,7 +137,7 @@ trait FamilyDecoder3 {
       A: Lazy[FamilyDecoder[A0]]): FamilyDecoder[Option[A0]] =
     new FamilyDecoder[Option[A0]] {
       def apply(map: util.NavigableMap[Array[Byte], Array[Byte]]): Either[Throwable, Option[A0]] =
-        if (map == null)
+        if (map == null || map.isEmpty)
           Right(None)
         else
           A.value(map) match {
