@@ -92,12 +92,13 @@ trait Decoder2 {
 
   implicit def decodeOption[A](implicit A: Decoder[A]): Decoder[Option[A]] =
     new Decoder[Option[A]] {
-      override def apply(result: Result): Either[Throwable, Option[A]] = {
+      def apply(result: Result): Either[Throwable, Option[A]] = {
         if (result.isEmpty) Right(None)
-        A.apply(result) match {
-          case Right(v) => Right(Some(v))
-          case Left(e)  => Left(e)
-        }
+        else
+          A.apply(result) match {
+            case Right(v) => Right(Some(v))
+            case Left(e)  => Left(e)
+          }
       }
     }
 }

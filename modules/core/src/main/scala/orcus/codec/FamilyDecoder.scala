@@ -118,7 +118,10 @@ trait FamilyDecoder2 extends FamilyDecoder3 {
                                            A: Lazy[FamilyDecoder[H]]): FamilyDecoder[A0] =
     new FamilyDecoder[A0] {
       def apply(map: util.NavigableMap[Array[Byte], Array[Byte]]): Either[Throwable, A0] =
-        A.value(map) match { case Right(v) => Right(gen.from(v)); case Left(e) => Left(e) }
+        A.value(map) match {
+          case Right(v) => Right(gen.from(v))
+          case Left(e)  => Left(e)
+        }
     }
 }
 
