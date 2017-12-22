@@ -10,7 +10,7 @@ object Dependencies {
     val scalacheck    = "1.13.5"
     val scalatest     = "3.0.4"
     val mockito       = "2.13.0"
-    val kindProjector = "0.9.4"
+    val kindProjector = "0.9.5"
     val hbase         = "1.3.1"
     val bigtable      = "1.0.0-pre3"
     val logback       = "1.2.3"
