@@ -63,8 +63,9 @@ trait Decoder1 extends Decoder2 {
       T: Lazy[Decoder[T]]): Decoder[FieldType[K, H] :: T] =
     new Decoder[FieldType[K, H] :: T] {
       def apply(result: Result): Either[Throwable, FieldType[K, H] :: T] = {
-        type M[A] = Either[Throwable, A]
-        orcus.result.getFamily[H, M](result, Bytes.toBytes(K.value.name)) match {
+        val k = Bytes.toBytes(K.value.name)
+        val h = orcus.result.getFamily[H, Either[Throwable, ?]](result, k)
+        h match {
           case Right(v0) =>
             T.value(result) match {
               case Right(t) => Right(field[K](v0) :: t)
