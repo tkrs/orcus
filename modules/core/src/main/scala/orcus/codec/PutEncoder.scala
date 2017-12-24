@@ -21,7 +21,7 @@ object PutEncoder extends PutEncoder1 {
     def apply(acc: Put, a: Map[K, V], ts: Long = Long.MaxValue): Put = {
       a.foreach {
         case (k, v) =>
-          V.value.apply(acc, K.encode(k), v, ts)
+          V.value.apply(acc, K.encode(Option(k)).orNull, v, ts)
       }
       acc
     }
