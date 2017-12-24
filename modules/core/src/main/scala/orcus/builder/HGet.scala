@@ -1,7 +1,7 @@
 package orcus.builder
 
 import cats.data.Reader
-import orcus.codec.ValueCodec
+import orcus.codec.{empty, ValueCodec}
 import org.apache.hadoop.hbase.client.{Consistency, IsolationLevel, Get}
 import org.apache.hadoop.hbase.filter.Filter
 import org.apache.hadoop.hbase.security.access.Permission
@@ -26,7 +26,7 @@ object HGet {
 
   def withColumn[K](family: Array[Byte], qualifier: K)(implicit
                                                        K: ValueCodec[K]): Reader[Get, Get] =
-    Reader(_.addColumn(family, K.encode(qualifier)))
+    Reader(_.addColumn(family, K.encode(Option(qualifier)).getOrElse(empty)))
 
   def withCacheBlocks(cacheBlocks: Boolean): Reader[Get, Get] =
     Reader(_.setCacheBlocks(cacheBlocks))

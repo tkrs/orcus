@@ -3,7 +3,7 @@ package orcus.builder
 import java.util.UUID
 
 import cats.data.Reader
-import orcus.codec.ValueCodec
+import orcus.codec.{empty, ValueCodec}
 import org.apache.hadoop.hbase.client.{Durability, Append}
 import org.apache.hadoop.hbase.security.access.Permission
 import org.apache.hadoop.hbase.security.visibility.CellVisibility
@@ -37,7 +37,10 @@ object HAppend {
       implicit
       K: ValueCodec[K],
       V: ValueCodec[V]): Reader[Append, Append] =
-    Reader(_.add(family, K.encode(qualifier), V.encode(value)))
+    Reader(
+      _.add(family,
+            K.encode(Option(qualifier)).getOrElse(empty),
+            V.encode(Option(value)).getOrElse(empty)))
 
   def withReturnResults(returnResults: Boolean): Reader[Append, Append] =
     Reader(_.setReturnResults(returnResults))

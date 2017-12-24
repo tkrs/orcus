@@ -3,7 +3,7 @@ package orcus.builder
 import java.util.UUID
 
 import cats.data.Reader
-import orcus.codec.ValueCodec
+import orcus.codec.{empty, ValueCodec}
 import org.apache.hadoop.hbase.client.{Durability, Delete}
 import org.apache.hadoop.hbase.security.access.Permission
 import org.apache.hadoop.hbase.security.visibility.CellVisibility
@@ -42,19 +42,19 @@ object HDelete {
   def withColumnLatest[K](family: Array[Byte], qualifier: K)(
       implicit
       K: ValueCodec[K]): Reader[Delete, Delete] =
-    Reader(_.addColumn(family, K.encode(qualifier)))
+    Reader(_.addColumn(family, K.encode(Option(qualifier)).getOrElse(empty)))
 
   def withColumnVersion[K](family: Array[Byte], qualifier: K, ts: Long)(
       implicit
       K: ValueCodec[K]): Reader[Delete, Delete] =
-    Reader(_.addColumn(family, K.encode(qualifier), ts))
+    Reader(_.addColumn(family, K.encode(Option(qualifier)).getOrElse(empty), ts))
 
   def withColumns[K](family: Array[Byte], qualifier: K)(implicit
                                                         K: ValueCodec[K]): Reader[Delete, Delete] =
-    Reader(_.addColumns(family, K.encode(qualifier)))
+    Reader(_.addColumns(family, K.encode(Option(qualifier)).getOrElse(empty)))
 
   def withColumnsVersion[K](family: Array[Byte], qualifier: K, ts: Long)(
       implicit
       K: ValueCodec[K]): Reader[Delete, Delete] =
-    Reader(_.addColumns(family, K.encode(qualifier), ts))
+    Reader(_.addColumns(family, K.encode(Option(qualifier)).getOrElse(empty), ts))
 }

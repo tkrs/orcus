@@ -3,7 +3,7 @@ package orcus.builder
 import java.util.UUID
 
 import cats.data.Reader
-import orcus.codec.ValueCodec
+import orcus.codec.{empty, ValueCodec}
 import org.apache.hadoop.hbase.client.{Durability, Increment}
 import org.apache.hadoop.hbase.security.access.Permission
 import org.apache.hadoop.hbase.security.visibility.CellVisibility
@@ -36,5 +36,5 @@ object HIncrement {
   def withColumn[K, V](family: Array[Byte], qualifier: K, amount: Long)(
       implicit
       K: ValueCodec[K]): Reader[Increment, Increment] =
-    Reader(_.addColumn(family, K.encode(qualifier), amount))
+    Reader(_.addColumn(family, K.encode(Option(qualifier)).getOrElse(empty), amount))
 }

@@ -3,7 +3,7 @@ package orcus.builder
 import java.util.UUID
 
 import cats.data.Reader
-import orcus.codec.ValueCodec
+import orcus.codec.{empty, ValueCodec}
 import org.apache.hadoop.hbase.client.{Durability, Put}
 import org.apache.hadoop.hbase.security.access.Permission
 import org.apache.hadoop.hbase.security.visibility.CellVisibility
@@ -37,24 +37,38 @@ object HPut {
       implicit
       K: ValueCodec[K],
       V: ValueCodec[V]): Reader[Put, Put] =
-    Reader(_.addColumn(family, K.encode(qualifier), V.encode(value)))
+    Reader(
+      _.addColumn(family,
+                  K.encode(Option(qualifier)).getOrElse(empty),
+                  V.encode(Option(value)).getOrElse(empty)))
 
   def withColumnVersion[K, V](family: Array[Byte], qualifier: K, ts: Long, value: V)(
       implicit
       K: ValueCodec[K],
       V: ValueCodec[V]): Reader[Put, Put] =
-    Reader(_.addColumn(family, K.encode(qualifier), ts, V.encode(value)))
+    Reader(
+      _.addColumn(family,
+                  K.encode(Option(qualifier)).getOrElse(empty),
+                  ts,
+                  V.encode(Option(value)).getOrElse(empty)))
 
   def withImmutable[K, V](family: Array[Byte], qualifier: K, value: V)(
       implicit
       K: ValueCodec[K],
       V: ValueCodec[V]): Reader[Put, Put] =
-    Reader(_.addImmutable(family, K.encode(qualifier), V.encode(value)))
+    Reader(
+      _.addImmutable(family,
+                     K.encode(Option(qualifier)).getOrElse(empty),
+                     V.encode(Option(value)).getOrElse(empty)))
 
   def withImmutableVersion[K, V](family: Array[Byte], qualifier: K, ts: Long, value: V)(
       implicit
       K: ValueCodec[K],
       V: ValueCodec[V]): Reader[Put, Put] =
-    Reader(_.addImmutable(family, K.encode(qualifier), ts, V.encode(value)))
+    Reader(
+      _.addImmutable(family,
+                     K.encode(Option(qualifier)).getOrElse(empty),
+                     ts,
+                     V.encode(Option(value)).getOrElse(empty)))
 
 }
