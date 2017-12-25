@@ -53,6 +53,30 @@ class FamilyDecoderSpec extends FunSuite with Matchers {
     assert(f(null) === Right(Map.empty[String, String]))
   }
 
+  test("It should return map with empty values when column value is empty") {
+    case class All(a: Option[Int] = None,
+                   b: Option[Float] = None,
+                   c: Option[Long] = None,
+                   d: Option[Double] = None,
+                   e: Option[String] = None,
+                   f: Option[Array[Byte]] = None,
+                   g: Option[Boolean] = None,
+                   h: Option[Short] = None,
+                   i: Option[BigDecimal] = None)
+    val f = FamilyDecoder[All]
+    val m = new ju.TreeMap[Array[Byte], Array[Byte]](Bytes.BYTES_COMPARATOR)
+    m.put(Bytes.toBytes("a"), Array.emptyByteArray)
+    m.put(Bytes.toBytes("b"), Array.emptyByteArray)
+    m.put(Bytes.toBytes("c"), Array.emptyByteArray)
+    m.put(Bytes.toBytes("d"), Array.emptyByteArray)
+    m.put(Bytes.toBytes("e"), Array.emptyByteArray)
+    m.put(Bytes.toBytes("f"), Array.emptyByteArray)
+    m.put(Bytes.toBytes("g"), Array.emptyByteArray)
+    m.put(Bytes.toBytes("h"), Array.emptyByteArray)
+    m.put(Bytes.toBytes("i"), Array.emptyByteArray)
+    assert(f(m) === Right(All()))
+  }
+
   test("pure") {
     val m = new ju.TreeMap[Array[Byte], Array[Byte]]()
     val f = FamilyDecoder.pure(10)(m)
