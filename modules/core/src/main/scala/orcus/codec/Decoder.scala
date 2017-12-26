@@ -1,11 +1,15 @@
 package orcus.codec
 
-import cats.Eval
+import cats.{Eval, Foldable}
 import cats.instances.either._
 import org.apache.hadoop.hbase.client.Result
 import org.apache.hadoop.hbase.util.Bytes
 import shapeless.labelled._
 import shapeless._
+
+import scala.collection.generic.CanBuildFrom
+import scala.collection.mutable
+import scala.collection.JavaConverters._
 
 trait Decoder[A] { self =>
 
@@ -48,6 +52,37 @@ object Decoder extends Decoder1 {
   def liftF[A](a: Either[Throwable, A]): Decoder[A] = new Decoder[A] {
     def apply(result: Result): Either[Throwable, A] = a
   }
+
+  implicit def decodeMap[M[_, _] <: Map[String, V], V](
+      implicit
+      V: FamilyDecoder[V],
+      cbf: CanBuildFrom[Nothing, (String, V), M[String, V]]): Decoder[M[String, V]] =
+    new Decoder[M[String, V]] {
+
+      type Out = mutable.Builder[(String, V), M[String, V]]
+
+      def apply(result: Result): Either[Throwable, M[String, V]] = {
+
+        val map  = result.getMap
+        val iter = map.keySet().iterator().asScala
+
+        val r = Foldable.iteratorFoldM[Either[Throwable, ?], Array[Byte], Out](iter, cbf.apply) {
+          case (b, cf) =>
+            val cf0 = Bytes.toString(cf)
+            V.apply(result.getFamilyMap(cf)) match {
+              case Right(v) =>
+                Right(b += cf0 -> v)
+              case Left(e) =>
+                Left(e)
+            }
+        }
+
+        r match {
+          case Right(b) => Right(b.result())
+          case Left(e)  => Left(e)
+        }
+      }
+    }
 }
 
 trait Decoder1 extends Decoder2 {

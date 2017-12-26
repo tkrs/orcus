@@ -3,11 +3,16 @@ package orcus.codec
 import java.{util => ju}
 
 import cats.Eval
+import cats.syntax.option._
+import org.apache.hadoop.hbase.KeyValue.Type
+import org.apache.hadoop.hbase.{Cell, CellUtil}
 import org.apache.hadoop.hbase.client.Result
 import org.apache.hadoop.hbase.util.Bytes
 import org.scalatest.FunSuite
 import org.scalatest.mockito.MockitoSugar
 import org.mockito.Mockito._
+
+import scala.collection.JavaConverters._
 
 class DecoderSpec extends FunSuite with MockitoSugar {
 
@@ -89,5 +94,49 @@ class DecoderSpec extends FunSuite with MockitoSugar {
     val m = mock[Result]
     val f = Decoder.liftF(Right(10))(m)
     assert(f === Right(10))
+  }
+
+  test("It should derive the map") {
+    case class All(a: Option[Int] = None,
+                   b: Option[Float] = None,
+                   c: Option[Long] = None,
+                   d: Option[Double] = None,
+                   e: Option[String] = None,
+                   g: Option[Boolean] = None,
+                   h: Option[Short] = None,
+                   i: Option[BigDecimal] = None)
+    val f   = Decoder[Map[String, All]]
+    val row = Bytes.toBytes("row")
+    val cf1 = Bytes.toBytes("cf1")
+
+    def cell(q: String, v: Array[Byte]): Cell =
+      CellUtil.createCell(row, cf1, Bytes.toBytes(q), Long.MaxValue, Type.Put, v, null)
+
+    val cells = Seq(
+      cell("a", Bytes.toBytes(1)),
+      cell("b", Bytes.toBytes(1.1f)),
+      cell("c", Bytes.toBytes(100L)),
+      cell("d", Bytes.toBytes(1.9)),
+      cell("e", Bytes.toBytes("s")),
+      cell("g", Bytes.toBytes(true)),
+      cell("h", Bytes.toBytes(Short.MaxValue)),
+      cell("i", Bytes.toBytes(BigDecimal(10).bigDecimal))
+    ).asJava
+
+    val result = Result.create(cells)
+    val x      = result.rawCells().toSeq
+    println(x)
+    val expected = Right(
+      Map(
+        "cf1" -> All(1.some,
+                     1.1f.some,
+                     100L.some,
+                     1.9.some,
+                     "s".some,
+                     true.some,
+                     Short.MaxValue.some,
+                     BigDecimal(10).some)))
+
+    assert(f(result) === expected)
   }
 }
