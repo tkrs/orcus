@@ -97,7 +97,7 @@ lazy val core = project.in(file("modules/core"))
     moduleName := "orcus-core",
     name := "core",
     libraryDependencies ++= Seq(
-      Pkg.cats,
+      Pkg.catsCore,
       Pkg.shapeless,
       Pkg.hbase % "provided",
     ).map(_.withSources),
@@ -111,7 +111,7 @@ lazy val free = project.in(file("modules/free"))
     moduleName := "orcus-free",
     name := "free",
     libraryDependencies ++= Seq(
-      Pkg.cats,
+      Pkg.catsFree,
       Pkg.hbase % "provided",
     ).map(_.withSources),
     libraryDependencies ++= Pkg.forTest

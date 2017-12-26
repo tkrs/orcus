@@ -1,6 +1,7 @@
 package orcus.free
 
-import cats.free.{Free, Inject}
+import cats.InjectK
+import cats.free.Free
 import org.apache.hadoop.conf.{Configuration => HConfig}
 import org.apache.hadoop.hbase.{HTableDescriptor, TableName}
 import org.apache.hadoop.hbase.client.{
@@ -48,7 +49,7 @@ object TableOp {
   final case object Close                   extends TableOp[Unit]
 }
 
-final class TableOps[M[_]](implicit inj: Inject[TableOp, M]) extends TableApi[M] {
+final class TableOps[M[_]](implicit inj: InjectK[TableOp, M]) extends TableApi[M] {
   import TableOp._
 
   override def getName: TableF[TableName] =
@@ -90,6 +91,6 @@ final class TableOps[M[_]](implicit inj: Inject[TableOp, M]) extends TableApi[M]
 }
 
 object TableOps {
-  implicit def tableApiOps[M[_]](implicit inj: Inject[TableOp, M]): TableOps[M] =
+  implicit def tableApiOps[M[_]](implicit inj: InjectK[TableOp, M]): TableOps[M] =
     new TableOps
 }
