@@ -2,8 +2,9 @@ package orcus.free
 
 import java.nio.ByteBuffer
 
+import cats.InjectK
 import cats.MonadError
-import cats.free.{Free, Inject}
+import cats.free.Free
 import orcus.codec.{Decoder, FamilyDecoder, ValueCodec}
 import org.apache.hadoop.hbase.Cell
 import org.apache.hadoop.hbase.client.Result
@@ -71,7 +72,7 @@ object ResultOp {
   }
 }
 
-class ResultOps[M[_]](implicit inj: Inject[ResultOp, M]) extends ResultApi[M] {
+class ResultOps[M[_]](implicit inj: InjectK[ResultOp, M]) extends ResultApi[M] {
   import ResultOp._
 
   override def getRow(r: Result): ResultF[Option[Array[Byte]]] =
@@ -117,5 +118,5 @@ class ResultOps[M[_]](implicit inj: Inject[ResultOp, M]) extends ResultApi[M] {
 }
 
 object ResultOps {
-  implicit def resultOps[M[_]](implicit inj: Inject[ResultOp, M]): ResultOps[M] = new ResultOps
+  implicit def resultOps[M[_]](implicit inj: InjectK[ResultOp, M]): ResultOps[M] = new ResultOps
 }

@@ -1,6 +1,7 @@
 package orcus.free
 
-import cats.free.{Free, Inject}
+import cats.InjectK
+import cats.free.Free
 import org.apache.hadoop.hbase.client.{Result, ResultScanner}
 
 trait ResultScannerApi[F[_]] {
@@ -17,7 +18,8 @@ object ResultScannerOp {
   final case class Next(resultScanner: ResultScanner, i: Int) extends ResultScannerOp[Seq[Result]]
 }
 
-class ResultScannerOps[M[_]](implicit inj: Inject[ResultScannerOp, M]) extends ResultScannerApi[M] {
+class ResultScannerOps[M[_]](implicit inj: InjectK[ResultScannerOp, M])
+    extends ResultScannerApi[M] {
   import ResultScannerOp._
 
   override def nextOne(resultScanner: ResultScanner): ResultScannerF[Option[Result]] =
@@ -29,6 +31,6 @@ class ResultScannerOps[M[_]](implicit inj: Inject[ResultScannerOp, M]) extends R
 
 object ResultScannerOps {
   implicit def resultScannerOps[M[_]](
-      implicit inj: Inject[ResultScannerOp, M]): ResultScannerOps[M] =
+      implicit inj: InjectK[ResultScannerOp, M]): ResultScannerOps[M] =
     new ResultScannerOps
 }

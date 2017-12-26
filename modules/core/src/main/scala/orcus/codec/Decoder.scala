@@ -1,15 +1,18 @@
 package orcus.codec
 
+import java.{util => ju}
+
 import cats.{Eval, Foldable}
 import cats.instances.either._
+import cats.syntax.foldable._
 import org.apache.hadoop.hbase.client.Result
 import org.apache.hadoop.hbase.util.Bytes
 import shapeless.labelled._
 import shapeless._
 
+import scala.annotation.tailrec
 import scala.collection.generic.CanBuildFrom
 import scala.collection.mutable
-import scala.collection.JavaConverters._
 
 trait Decoder[A] { self =>
 
@@ -53,6 +56,28 @@ object Decoder extends Decoder1 {
     def apply(result: Result): Either[Throwable, A] = a
   }
 
+  private[this] implicit val foldJavaSet: Foldable[ju.Set] = new Foldable[ju.Set] {
+    def foldLeft[A, B](fa: ju.Set[A], b: B)(f: (B, A) => B): B = {
+      @tailrec def loop(iter: ju.Iterator[A], acc: B): B = {
+        if (!iter.hasNext)
+          acc
+        else
+          loop(iter, f(acc, iter.next()))
+      }
+      loop(fa.iterator(), b)
+    }
+
+    def foldRight[A, B](fa: ju.Set[A], lb: Eval[B])(f: (A, Eval[B]) => Eval[B]): Eval[B] = {
+      def loop(iter: ju.Iterator[A]): Eval[B] = {
+        if (!iter.hasNext)
+          lb
+        else
+          f(iter.next(), Eval.defer(loop(iter)))
+      }
+      loop(fa.iterator())
+    }
+  }
+
   implicit def decodeMap[M[_, _] <: Map[String, V], V](
       implicit
       V: FamilyDecoder[V],
@@ -63,15 +88,15 @@ object Decoder extends Decoder1 {
 
       def apply(result: Result): Either[Throwable, M[String, V]] = {
 
-        val map  = result.getMap
-        val iter = map.keySet().iterator().asScala
+        val map = result.getMap
+        val xs  = map.keySet()
 
-        val r = Foldable.iteratorFoldM[Either[Throwable, ?], Array[Byte], Out](iter, cbf.apply) {
-          case (b, cf) =>
+        val r = xs.foldLeftM[Either[Throwable, ?], Out](cbf.apply) {
+          case (acc, cf) =>
             val cf0 = Bytes.toString(cf)
             V.apply(result.getFamilyMap(cf)) match {
               case Right(v) =>
-                Right(b += cf0 -> v)
+                Right(acc += cf0 -> v)
               case Left(e) =>
                 Left(e)
             }

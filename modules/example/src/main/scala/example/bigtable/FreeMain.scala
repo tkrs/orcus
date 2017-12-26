@@ -2,7 +2,7 @@ package example.bigtable
 
 import java.time.Instant
 
-import cats.data.{Coproduct, Kleisli}
+import cats.data.{EitherK, Kleisli}
 import cats.free.Free
 import cats.implicits._
 import cats.~>
@@ -103,8 +103,8 @@ object FreeMain extends App {
 
   type K[F[_], A] = Kleisli[F, Table, A]
 
-  type Op1[A] = Coproduct[ResultScannerOp, ResultOp, A]
-  type Op[A]  = Coproduct[TableOp, Op1, A]
+  type Op1[A] = EitherK[ResultScannerOp, ResultOp, A]
+  type Op[A]  = EitherK[TableOp, Op1, A]
 
   def interpreter[M[_]](
       implicit
