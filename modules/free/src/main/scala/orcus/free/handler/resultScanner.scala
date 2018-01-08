@@ -11,7 +11,7 @@ object resultScanner {
     import orcus.resultScanner._
     import ResultScannerOp._
 
-    implicit def resultScannerOpHandler[M[_], J](
+    implicit def resultScannerOpHandler[M[_]](
         implicit
         ME: MonadError[M, Throwable]): Handler[M] =
       new Handler[M] {

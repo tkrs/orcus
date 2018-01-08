@@ -18,7 +18,7 @@ object ResultScannerOp {
   final case class Next(resultScanner: ResultScanner, i: Int) extends ResultScannerOp[Seq[Result]]
 }
 
-class ResultScannerOps[M[_]](implicit inj: InjectK[ResultScannerOp, M])
+private[free] abstract class ResultScannerOps0[M[_]](implicit inj: InjectK[ResultScannerOp, M])
     extends ResultScannerApi[M] {
   import ResultScannerOp._
 
@@ -28,6 +28,8 @@ class ResultScannerOps[M[_]](implicit inj: InjectK[ResultScannerOp, M])
   override def next(resultScanner: ResultScanner, i: Int): ResultScannerF[Seq[Result]] =
     Free.inject[ResultScannerOp, M](Next(resultScanner, i))
 }
+
+class ResultScannerOps[M[_]](implicit inj: InjectK[ResultScannerOp, M]) extends ResultScannerOps0[M]
 
 object ResultScannerOps {
   implicit def resultScannerOps[M[_]](

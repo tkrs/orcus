@@ -6,6 +6,7 @@ object Dependencies {
     val `scala2.11`   = "2.11.11"
     val scalafmt      = "1.2.0"
     val cats          = "1.0.0"
+    val iota          = "0.3.4"
     val shapeless     = "2.3.3"
     val scalacheck    = "1.13.5"
     val scalatest     = "3.0.4"
@@ -19,6 +20,7 @@ object Dependencies {
   val Pkg = new {
     lazy val catsCore       = "org.typelevel"             %% "cats-core"         % Ver.cats
     lazy val catsFree       = "org.typelevel"             %% "cats-free"         % Ver.cats
+    lazy val iota           = "io.frees"                  %% "iota-core"         % Ver.iota
     lazy val shapeless      = "com.chuusai"               %% "shapeless"         % Ver.shapeless
     lazy val scalatest      = "org.scalatest"             %% "scalatest"         % Ver.scalatest
     lazy val scalacheck     = "org.scalacheck"            %% "scalacheck"        % Ver.scalacheck

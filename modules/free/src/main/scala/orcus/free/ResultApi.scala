@@ -72,7 +72,8 @@ object ResultOp {
   }
 }
 
-class ResultOps[M[_]](implicit inj: InjectK[ResultOp, M]) extends ResultApi[M] {
+private[free] abstract class ResultOps0[M[_]](implicit inj: InjectK[ResultOp, M])
+    extends ResultApi[M] {
   import ResultOp._
 
   override def getRow(r: Result): ResultF[Option[Array[Byte]]] =
@@ -116,6 +117,8 @@ class ResultOps[M[_]](implicit inj: InjectK[ResultOp, M]) extends ResultApi[M] {
   override def to[A: Decoder](result: Result): ResultF[A] =
     Free.inject[ResultOp, M](To[A](result))
 }
+
+class ResultOps[M[_]](implicit inj: InjectK[ResultOp, M]) extends ResultOps0[M]
 
 object ResultOps {
   implicit def resultOps[M[_]](implicit inj: InjectK[ResultOp, M]): ResultOps[M] = new ResultOps
