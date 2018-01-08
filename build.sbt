@@ -3,8 +3,8 @@ import Dependencies._
 lazy val root = (project in file("."))
   .settings(allSettings)
   .settings(noPublishSettings)
-  .aggregate(core, free, example, benchmark)
-  .dependsOn(core, free, example, benchmark)
+  .aggregate(core, free, iota, example, benchmark)
+  .dependsOn(core, free, iota, example, benchmark)
 
 lazy val allSettings =
   buildSettings ++ baseSettings ++ publishSettings
@@ -123,6 +123,21 @@ lazy val free = project
     libraryDependencies ++= Pkg.forTest
   )
   .dependsOn(core)
+
+lazy val iota = project
+  .in(file("modules/iota"))
+  .settings(allSettings)
+  .settings(
+    description := "orcus iota",
+    moduleName := "orcus-iota",
+    name := "iota",
+    libraryDependencies ++= Seq(
+      Pkg.iota,
+      Pkg.hbase % "provided"
+    ).map(_.withSources),
+    libraryDependencies ++= Pkg.forTest
+  )
+  .dependsOn(free)
 
 lazy val example = project
   .in(file("modules/example"))

@@ -49,7 +49,8 @@ object TableOp {
   final case object Close                   extends TableOp[Unit]
 }
 
-final class TableOps[M[_]](implicit inj: InjectK[TableOp, M]) extends TableApi[M] {
+private[free] abstract class TableOps0[M[_]](implicit inj: InjectK[TableOp, M])
+    extends TableApi[M] {
   import TableOp._
 
   override def getName: TableF[TableName] =
@@ -89,6 +90,8 @@ final class TableOps[M[_]](implicit inj: InjectK[TableOp, M]) extends TableApi[M
   override def close(): TableF[Unit] =
     Free.inject[TableOp, M](Close)
 }
+
+class TableOps[M[_]](implicit inj: InjectK[TableOp, M]) extends TableOps0[M]
 
 object TableOps {
   implicit def tableApiOps[M[_]](implicit inj: InjectK[TableOp, M]): TableOps[M] =

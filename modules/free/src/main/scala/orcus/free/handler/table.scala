@@ -13,7 +13,7 @@ object table {
     import orcus.table._
     import TableOp._
 
-    implicit def tableOpHandler[M[_], J](
+    implicit def tableOpHandler[M[_]](
         implicit
         ME: MonadError[M, Throwable]): Handler[M] =
       new Handler[M] {
