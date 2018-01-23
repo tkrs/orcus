@@ -40,7 +40,7 @@ object result {
       A: ValueCodec[A],
       M: Monad[M]
   ): M[Option[A]] =
-    M.map(getValue[M](r, family, qualifier))(v => A.decode(v))
+    M.map(getValue[M](r, family, qualifier))(_.flatMap(A.decode))
 
   def getValue[M[_]](r: Result, family: Array[Byte], qualifier: Array[Byte])(
       implicit

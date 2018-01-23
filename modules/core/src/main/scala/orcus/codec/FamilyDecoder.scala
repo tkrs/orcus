@@ -73,18 +73,19 @@ trait FamilyDecoder1 extends FamilyDecoder2 {
         if (map == null)
           Right(m.result())
         else {
-
           val f = new BiConsumer[Array[Byte], Array[Byte]] {
             def accept(t: Array[Byte], u: Array[Byte]): Unit = {
-              val k0 = if (t == null || t.isEmpty) None else Some(t)
-              val v0 = if (u == null || u.isEmpty) None else Some(u)
-              val k  = K.decode(k0).getOrElse(null.asInstanceOf[K])
-              val v  = V.decode(v0).getOrElse(null.asInstanceOf[V])
-              m += k -> v
+              val tt = Option(t).orEmpty
+              val uu = Option(u).orEmpty
+              (K.decode(tt), V.decode(uu)) match {
+                case (Some(k), Some(v)) =>
+                  m += k -> v
+                case (_, _) =>
+                  m
+              }
               ()
             }
           }
-
           map.forEach(f)
           Right(m.result())
         }
@@ -107,12 +108,11 @@ trait FamilyDecoder2 extends FamilyDecoder3 {
     new FamilyDecoder[FieldType[K, H] :: T] {
       def apply(map: util.NavigableMap[Array[Byte], Array[Byte]])
         : Either[Throwable, FieldType[K, H] :: T] = {
-        val v = map.get(Bytes.toBytes(K.value.name))
         try {
-          val h0 = if (v == null || v.isEmpty) None else Some(v)
-          val h  = field[K](H.decode(h0).getOrElse(null.asInstanceOf[H]))
+          val h  = Option(map.get(Bytes.toBytes(K.value.name))).orEmpty
+          val h0 = field[K](H.decode(h).getOrElse(null.asInstanceOf[H]))
           T.value(map) match {
-            case Right(t) => Right(h :: t)
+            case Right(t) => Right(h0 :: t)
             case Left(e)  => Left(e)
           }
         } catch {

@@ -45,8 +45,8 @@ class ValueCodecSpec extends FunSuite with Checkers with Matchers {
 
   test("imap") {
     val f        = ValueCodec[Int].imap[String](_.toInt, _.toString)
-    val Some(v0) = f.decode(Some(Bytes.toBytes(10)))
-    val Some(v1) = f.encode(Some("10"))
+    val Some(v0) = f.decode(Bytes.toBytes(10))
+    val v1       = f.encode(Some("10"))
     assert(v0 === "10")
     assert(Bytes.toInt(v1) === 10)
   }
