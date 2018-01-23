@@ -21,7 +21,7 @@ object PutFamilyEncoder extends PutFamilyEncoder1 {
     def apply(acc: Put, cf: Array[Byte], a: Map[K, V], ts: Long = Long.MaxValue): Put = {
       a.foreach {
         case (k, v) =>
-          acc.addColumn(cf, H.encode(Option(k)).orNull, ts, V.encode(Option(v)).orNull)
+          acc.addColumn(cf, H.encode(Option(k)), ts, V.encode(Option(v)))
       }
       acc
     }
@@ -42,7 +42,7 @@ trait PutFamilyEncoder1 {
   ): PutFamilyEncoder[FieldType[K, H] :: T] = new PutFamilyEncoder[::[FieldType[K, H], T]] {
     def apply(acc: Put, cf: Array[Byte], a: FieldType[K, H] :: T, ts: Long): Put = a match {
       case h :: t =>
-        val hp = acc.addColumn(cf, Bytes.toBytes(K.value.name), ts, H.encode(Option(h)).orNull)
+        val hp = acc.addColumn(cf, Bytes.toBytes(K.value.name), ts, H.encode(Option(h)))
         T.value(hp, cf, t, ts)
     }
   }

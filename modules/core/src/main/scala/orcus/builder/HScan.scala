@@ -1,7 +1,7 @@
 package orcus.builder
 
 import cats.data.Reader
-import orcus.codec.{empty, ValueCodec}
+import orcus.codec.ValueCodec
 import org.apache.hadoop.hbase.client.{Consistency, IsolationLevel, Scan}
 import org.apache.hadoop.hbase.filter.Filter
 import org.apache.hadoop.hbase.security.access.Permission
@@ -29,7 +29,7 @@ object HScan {
 
   def withColumn[K](family: Array[Byte], qualifier: K)(implicit
                                                        K: ValueCodec[K]): Reader[Scan, Scan] =
-    Reader(_.addColumn(family, K.encode(Option(qualifier)).getOrElse(empty)))
+    Reader(_.addColumn(family, K.encode(Option(qualifier))))
 
   def withCacheBlocks(cacheBlocks: Boolean): Reader[Scan, Scan] =
     Reader(_.setCacheBlocks(cacheBlocks))

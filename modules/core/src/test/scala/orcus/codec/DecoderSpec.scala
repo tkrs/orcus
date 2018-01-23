@@ -124,8 +124,6 @@ class DecoderSpec extends FunSuite with MockitoSugar {
     ).asJava
 
     val result = Result.create(cells)
-    val x      = result.rawCells().toSeq
-    println(x)
     val expected = Right(
       Map(
         "cf1" -> All(1.some,
@@ -136,6 +134,26 @@ class DecoderSpec extends FunSuite with MockitoSugar {
                      true.some,
                      Short.MaxValue.some,
                      BigDecimal(10).some)))
+
+    assert(f(result) === expected)
+  }
+
+  test("It should derive the nested map") {
+    val f   = Decoder[Map[String, Map[String, String]]]
+    val row = Bytes.toBytes("row")
+    val cf1 = Bytes.toBytes("cf1")
+
+    def cell(q: String, v: Array[Byte]): Cell =
+      CellUtil.createCell(row, cf1, Bytes.toBytes(q), Long.MaxValue, Type.Put, v, null)
+
+    val cells = Seq(
+      cell("a", Bytes.toBytes("a")),
+      cell("b", Bytes.toBytes("")),
+      cell("c", null)
+    ).asJava
+
+    val result   = Result.create(cells)
+    val expected = Right(Map("cf1" -> Map("a" -> "a", "b" -> "", "c" -> "")))
 
     assert(f(result) === expected)
   }

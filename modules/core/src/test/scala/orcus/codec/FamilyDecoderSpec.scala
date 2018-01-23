@@ -53,6 +53,25 @@ class FamilyDecoderSpec extends FunSuite with Matchers {
     assert(f(null) === Right(Map.empty[String, String]))
   }
 
+  test("It should get a null values as empty when its String and column value is absent or empty") {
+    val f = FamilyDecoder[Map[String, String]]
+    val m = new ju.TreeMap[Array[Byte], Array[Byte]](Bytes.BYTES_COMPARATOR)
+    m.put(Bytes.toBytes("a"), null)
+    m.put(Bytes.toBytes("b"), Array.emptyByteArray)
+    m.put(Bytes.toBytes("c"), Bytes.toBytes("d"))
+    assert(f(m) === Right(Map("a" -> "", "b" -> "", "c" -> "d")))
+  }
+
+  test("It should avoid a null values when its column value is null/empty") {
+    val f = FamilyDecoder[Map[String, Boolean]]
+    val m = new ju.TreeMap[Array[Byte], Array[Byte]](Bytes.BYTES_COMPARATOR)
+    m.put(Bytes.toBytes("a"), null)
+    m.put(Bytes.toBytes("b"), Array.emptyByteArray)
+    m.put(Bytes.toBytes("c"), Bytes.toBytes(true))
+    m.put(Bytes.toBytes("d"), Bytes.toBytes(false))
+    assert(f(m) === Right(Map("c" -> true, "d" -> false)))
+  }
+
   test("It should return map with empty values when column value is empty") {
     case class All(a: Option[Int] = None,
                    b: Option[Float] = None,

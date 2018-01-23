@@ -3,7 +3,7 @@ package orcus.builder
 import java.util.UUID
 
 import cats.data.Reader
-import orcus.codec.{empty, ValueCodec}
+import orcus.codec.ValueCodec
 import org.apache.hadoop.hbase.client.{Durability, Put}
 import org.apache.hadoop.hbase.security.access.Permission
 import org.apache.hadoop.hbase.security.visibility.CellVisibility
@@ -37,38 +37,24 @@ object HPut {
       implicit
       K: ValueCodec[K],
       V: ValueCodec[V]): Reader[Put, Put] =
-    Reader(
-      _.addColumn(family,
-                  K.encode(Option(qualifier)).getOrElse(empty),
-                  V.encode(Option(value)).getOrElse(empty)))
+    Reader(_.addColumn(family, K.encode(Option(qualifier)), V.encode(Option(value))))
 
   def withColumnVersion[K, V](family: Array[Byte], qualifier: K, ts: Long, value: V)(
       implicit
       K: ValueCodec[K],
       V: ValueCodec[V]): Reader[Put, Put] =
-    Reader(
-      _.addColumn(family,
-                  K.encode(Option(qualifier)).getOrElse(empty),
-                  ts,
-                  V.encode(Option(value)).getOrElse(empty)))
+    Reader(_.addColumn(family, K.encode(Option(qualifier)), ts, V.encode(Option(value))))
 
   def withImmutable[K, V](family: Array[Byte], qualifier: K, value: V)(
       implicit
       K: ValueCodec[K],
       V: ValueCodec[V]): Reader[Put, Put] =
-    Reader(
-      _.addImmutable(family,
-                     K.encode(Option(qualifier)).getOrElse(empty),
-                     V.encode(Option(value)).getOrElse(empty)))
+    Reader(_.addImmutable(family, K.encode(Option(qualifier)), V.encode(Option(value))))
 
   def withImmutableVersion[K, V](family: Array[Byte], qualifier: K, ts: Long, value: V)(
       implicit
       K: ValueCodec[K],
       V: ValueCodec[V]): Reader[Put, Put] =
-    Reader(
-      _.addImmutable(family,
-                     K.encode(Option(qualifier)).getOrElse(empty),
-                     ts,
-                     V.encode(Option(value)).getOrElse(empty)))
+    Reader(_.addImmutable(family, K.encode(Option(qualifier)), ts, V.encode(Option(value))))
 
 }
