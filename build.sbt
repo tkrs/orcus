@@ -101,12 +101,15 @@ lazy val core = project
     description := "orcus core",
     moduleName := "orcus-core",
     name := "core",
-    libraryDependencies ++= Seq(
-      Pkg.catsCore,
-      Pkg.shapeless,
-      Pkg.hbase % "provided"
+    libraryDependencies ++= Seq.concat(
+      Seq(
+        Pkg.catsCore,
+        Pkg.shapeless,
+        Pkg.java8Compat,
+        Pkg.hbase % "provided"
+      ),
+      Pkg.forTest,
     ).map(_.withSources),
-    libraryDependencies ++= Pkg.forTest
   )
 
 lazy val free = project
@@ -116,11 +119,13 @@ lazy val free = project
     description := "orcus free",
     moduleName := "orcus-free",
     name := "free",
-    libraryDependencies ++= Seq(
-      Pkg.catsFree,
-      Pkg.hbase % "provided"
+    libraryDependencies ++= Seq.concat(
+      Seq(
+        Pkg.catsFree,
+        Pkg.hbase % "provided"
+      ),
+      Pkg.forTest,
     ).map(_.withSources),
-    libraryDependencies ++= Pkg.forTest
   )
   .dependsOn(core)
 
@@ -131,11 +136,13 @@ lazy val iota = project
     description := "orcus iota",
     moduleName := "orcus-iota",
     name := "iota",
-    libraryDependencies ++= Seq(
-      Pkg.iota,
-      Pkg.hbase % "provided"
+    libraryDependencies ++= Seq.concat(
+      Seq(
+        Pkg.iota,
+        Pkg.hbase % "provided",
+      ),
+      Pkg.forTest,
     ).map(_.withSources),
-    libraryDependencies ++= Pkg.forTest
   )
   .dependsOn(free)
 
@@ -149,7 +156,8 @@ lazy val example = project
     name := "example",
     fork := true,
     libraryDependencies ++= Seq(
-      Pkg.bigtable,
+      // Pkg.bigtable,
+      Pkg.hbase,
       Pkg.logbackClassic
     ).map(_.withSources)
   )
@@ -168,6 +176,7 @@ lazy val benchmark = (project in file("modules/benchmark"))
   )
   .settings(
     libraryDependencies ++= Seq(
+      Pkg.java8Compat,
       Pkg.hbase
     )
   )

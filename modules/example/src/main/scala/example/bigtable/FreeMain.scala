@@ -6,7 +6,6 @@ import cats.data.{EitherK, Kleisli}
 import cats.free.Free
 import cats.implicits._
 import cats.~>
-import com.google.cloud.bigtable.hbase.BigtableConfiguration
 import orcus.codec.PutEncoder
 import orcus.free._
 import orcus.free.handler.result.{Handler => ResultHandler}
@@ -15,13 +14,15 @@ import orcus.free.handler.table.{Handler => TableHandler}
 import org.apache.hadoop.hbase.client._
 import org.apache.hadoop.hbase.util.Bytes
 
-import scala.util.Try
+import scala.concurrent.{Await, Future}
+import scala.concurrent.ExecutionContext.Implicits.global
+import scala.concurrent.duration._
 
 final case class CF1(greeting1: Option[String], greeting2: Option[String])
 final case class Hello(cf1: CF1)
 
 object FreeMain extends App {
-  import setup._
+  import Setup._
   import Functions._
 
   def putProgram[F[_]](prefix: String, numRecords: Int)(
@@ -97,7 +98,8 @@ object FreeMain extends App {
     } yield ys
   }
 
-  type K[F[_], A] = Kleisli[F, Table, A]
+  type ATable     = AsyncTable[_ <: ScanResultConsumerBase]
+  type K[F[_], A] = Kleisli[F, ATable, A]
 
   type Op1[A] = EitherK[ResultScannerOp, ResultOp, A]
   type Op[A]  = EitherK[TableOp, Op1, A]
@@ -107,17 +109,19 @@ object FreeMain extends App {
       T: TableHandler[M],
       R: ResultHandler[M],
       RS: ResultScannerHandler[M]
-  ): Op ~> Kleisli[M, Table, ?] =
-    T or (RS.liftF[Table] or R.liftF[Table])
+  ): Op ~> Kleisli[M, ATable, ?] =
+    T or (RS.liftF[ATable] or R.liftF[ATable])
 
-  import cats.instances.try_._
+  type OpK[A] = Kleisli[Future, ATable, A]
 
-  type OpK[A] = Kleisli[Try, Table, A]
+  val resource = Future(ConnectionFactory.createAsyncConnection().join())
 
-  bracket(Try(BigtableConfiguration.connect(config))) { conn =>
+  val f = bracket(resource) { conn =>
     val t            = conn.getTable(tableName)
-    val i: Op ~> OpK = interpreter[Try]
+    val i: Op ~> OpK = interpreter[Future]
     val k            = program[Op].foldMap(i)
     k.run(t).map(_.foreach(println))
-  }.get
+  }
+
+  Await.result(f, 10.seconds)
 }
