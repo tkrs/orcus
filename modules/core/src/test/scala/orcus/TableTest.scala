@@ -4,7 +4,7 @@ import java.io.IOException
 
 import cats.instances.either._
 import org.apache.hadoop.conf.Configuration
-import org.apache.hadoop.hbase.{HTableDescriptor, TableName}
+import org.apache.hadoop.hbase.TableName
 import org.apache.hadoop.hbase.client._
 import org.apache.hadoop.hbase.util.Bytes
 import org.scalatest.{FunSpec, Matchers}
@@ -43,12 +43,12 @@ class TableTest extends FunSpec with MockitoSugar with Matchers {
   describe("getTableDescriptor") {
     it("should return TableDescriptor") {
       val m = mock[Table]
-      val c = new HTableDescriptor(TableName.valueOf("1"))
-      when(m.getTableDescriptor).thenReturn(c)
+      val c = TableDescriptorBuilder.newBuilder(TableName.valueOf("1")).build()
+      when(m.getDescriptor).thenReturn(c)
 
-      val Right(v) = table.getTableDescriptor[F](m)
+      val Right(v) = table.getDescriptor[F](m)
       assert(c === v)
-      verify(m).getTableDescriptor
+      verify(m).getDescriptor
     }
 
     it("should return error when Table.getTableDescriptor throws IOException") {
@@ -56,11 +56,11 @@ class TableTest extends FunSpec with MockitoSugar with Matchers {
 
       val ex = new IOException("Oops")
 
-      when(m.getTableDescriptor).thenThrow(ex)
+      when(m.getDescriptor).thenThrow(ex)
 
-      val Left(e) = table.getTableDescriptor[F](m)
+      val Left(e) = table.getDescriptor[F](m)
       assert(e === ex)
-      verify(m).getTableDescriptor
+      verify(m).getDescriptor
     }
   }
 
@@ -154,7 +154,7 @@ class TableTest extends FunSpec with MockitoSugar with Matchers {
       val m    = mock[Table]
       val n    = "1"
       val rk   = Bytes.toBytes(n)
-      val scan = new Scan(rk)
+      val scan = new Scan().withStartRow(rk)
       val r    = mock[ResultScanner]
 
       when(m.getScanner(scan)).thenReturn(r)
@@ -167,7 +167,7 @@ class TableTest extends FunSpec with MockitoSugar with Matchers {
       val m    = mock[Table]
       val n    = "1"
       val rk   = Bytes.toBytes(n)
-      val scan = new Scan(rk)
+      val scan = new Scan().withStartRow(rk)
 
       val ex = new IOException("Oops")
       when(m.getScanner(scan)).thenThrow(ex)

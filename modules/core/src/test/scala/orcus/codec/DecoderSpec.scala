@@ -4,8 +4,7 @@ import java.{util => ju}
 
 import cats.Eval
 import cats.syntax.option._
-import org.apache.hadoop.hbase.KeyValue.Type
-import org.apache.hadoop.hbase.{Cell, CellUtil}
+import org.apache.hadoop.hbase.{Cell, CellBuilderType, ExtendedCellBuilderFactory}
 import org.apache.hadoop.hbase.client.Result
 import org.apache.hadoop.hbase.util.Bytes
 import org.scalatest.FunSuite
@@ -109,8 +108,17 @@ class DecoderSpec extends FunSuite with MockitoSugar {
     val row = Bytes.toBytes("row")
     val cf1 = Bytes.toBytes("cf1")
 
-    def cell(q: String, v: Array[Byte]): Cell =
-      CellUtil.createCell(row, cf1, Bytes.toBytes(q), Long.MaxValue, Type.Put, v, null)
+    def cell(q: String, v: Array[Byte]): Cell = {
+      val builder = ExtendedCellBuilderFactory.create(CellBuilderType.DEEP_COPY)
+      builder
+        .setRow(row)
+        .setFamily(cf1)
+        .setQualifier(Bytes.toBytes(q))
+        .setTimestamp(Long.MaxValue)
+        .setType(Cell.Type.Put)
+        .setValue(v)
+        .build()
+    }
 
     val cells = Seq(
       cell("a", Bytes.toBytes(1)),
@@ -143,8 +151,17 @@ class DecoderSpec extends FunSuite with MockitoSugar {
     val row = Bytes.toBytes("row")
     val cf1 = Bytes.toBytes("cf1")
 
-    def cell(q: String, v: Array[Byte]): Cell =
-      CellUtil.createCell(row, cf1, Bytes.toBytes(q), Long.MaxValue, Type.Put, v, null)
+    def cell(q: String, v: Array[Byte]): Cell = {
+      val builder = ExtendedCellBuilderFactory.create(CellBuilderType.DEEP_COPY)
+      builder
+        .setRow(row)
+        .setFamily(cf1)
+        .setQualifier(Bytes.toBytes(q))
+        .setTimestamp(Long.MaxValue)
+        .setType(Cell.Type.Put)
+        .setValue(v)
+        .build()
+    }
 
     val cells = Seq(
       cell("a", Bytes.toBytes("a")),
