@@ -6,17 +6,18 @@ import cats.instances.either._
 import orcus.free.{TableOp, TableOps}
 import orcus.free.handler.table.Handler
 import org.apache.hadoop.conf.Configuration
-import org.apache.hadoop.hbase.{HTableDescriptor, TableName}
+import org.apache.hadoop.hbase.TableName
 import org.apache.hadoop.hbase.client.{
   Result,
   ResultScanner,
   Table,
+  TableDescriptorBuilder,
+  Append => HAppend,
   Delete => HDelete,
   Get => HGet,
+  Increment => HIncrement,
   Put => HPut,
-  Scan => HScan,
-  Append => HAppend,
-  Increment => HIncrement
+  Scan => HScan
 }
 import org.apache.hadoop.hbase.util.Bytes
 import org.scalatest.{FunSpec, Matchers}
@@ -64,9 +65,9 @@ class TableSpec extends FunSpec with MockitoSugar with Matchers {
       it("should take the table descriptor successfully") {
         val m = mock[Table]
 
-        val d = new HTableDescriptor(TableName.valueOf("1"))
+        val d = TableDescriptorBuilder.newBuilder(TableName.valueOf("1")).build()
 
-        when(m.getTableDescriptor).thenReturn(d)
+        when(m.getDescriptor).thenReturn(d)
 
         val Right(v) = ops[TableOp].getTableDescriptor.foldMap(interpreter[F, Configuration]).run(m)
 
@@ -122,7 +123,8 @@ class TableSpec extends FunSpec with MockitoSugar with Matchers {
         val m = mock[Table]
         val r = mock[ResultScanner]
 
-        val s = new HScan(Bytes.toBytes("1"))
+        val s = new HScan()
+          .withStartRow(Bytes.toBytes("1"))
 
         when(m.getScanner(s)).thenReturn(r)
 

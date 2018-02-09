@@ -4,6 +4,7 @@ import cats.{Monad, MonadError}
 import cats.data.Kleisli
 import org.apache.hadoop.conf.{Configuration => HConfig}
 import org.apache.hadoop.hbase.client.{
+  TableDescriptor,
   Append => HAppend,
   Delete => HDelete,
   Get => HGet,
@@ -14,7 +15,7 @@ import org.apache.hadoop.hbase.client.{
   Scan => HScan,
   Table => HTable
 }
-import org.apache.hadoop.hbase.{HTableDescriptor, TableName => HTableName}
+import org.apache.hadoop.hbase.{TableName => HTableName}
 
 object table {
 
@@ -30,11 +31,11 @@ object table {
   ): F[HConfig] =
     ME.pure(t.getConfiguration)
 
-  def getTableDescriptor[F[_]](t: HTable)(
+  def getDescriptor[F[_]](t: HTable)(
       implicit
       ME: MonadError[F, Throwable]
-  ): F[HTableDescriptor] =
-    ME.catchNonFatal(t.getTableDescriptor)
+  ): F[TableDescriptor] =
+    ME.catchNonFatal(t.getDescriptor)
 
   def exists[F[_]](t: HTable, get: HGet)(
       implicit

@@ -2,9 +2,8 @@ package orcus.codec.benchmark
 
 import java.{util => ju}
 
-import org.apache.hadoop.hbase.KeyValue.Type
 import org.apache.hadoop.hbase.client.Result
-import org.apache.hadoop.hbase.{Cell, CellUtil}
+import org.apache.hadoop.hbase.{Cell, CellBuilderType, ExtendedCellBuilderFactory}
 import org.apache.hadoop.hbase.util.Bytes
 
 import scala.collection.JavaConverters._
@@ -26,8 +25,17 @@ class TestData {
   val row: Array[Byte] = Bytes.toBytes("row")
   val cf1: Array[Byte] = Bytes.toBytes("cf1")
 
-  def cell(q: String, v: Array[Byte]): Cell =
-    CellUtil.createCell(row, cf1, Bytes.toBytes(q), Long.MaxValue, Type.Put, v, null)
+  def cell(q: String, v: Array[Byte]): Cell = {
+    val builder = ExtendedCellBuilderFactory.create(CellBuilderType.DEEP_COPY)
+    builder
+      .setRow(row)
+      .setFamily(cf1)
+      .setQualifier(Bytes.toBytes(q))
+      .setTimestamp(Long.MaxValue)
+      .setType(Cell.Type.Put)
+      .setValue(v)
+      .build()
+  }
 
   val cells: ju.List[Cell] = Seq(
     cell("a", Bytes.toBytes(1)),
