@@ -2,9 +2,11 @@ package orcus
 
 import cats.{Monad, MonadError}
 import cats.data.Kleisli
+import orcus.async.AsyncContext
 import org.apache.hadoop.conf.{Configuration => HConfig}
 import org.apache.hadoop.hbase.client.{
-  TableDescriptor,
+  AsyncTable,
+  ScanResultConsumerBase,
   Append => HAppend,
   Delete => HDelete,
   Get => HGet,
@@ -12,78 +14,70 @@ import org.apache.hadoop.hbase.client.{
   Put => HPut,
   Result => HResult,
   ResultScanner => HResultScanner,
-  Scan => HScan,
-  Table => HTable
+  Scan => HScan
 }
 import org.apache.hadoop.hbase.{TableName => HTableName}
 
 object table {
 
-  def getName[F[_]](t: HTable)(
+  def getName[F[_]](t: AsyncTable[_ <: ScanResultConsumerBase])(
       implicit
       ME: Monad[F]
   ): F[HTableName] =
     ME.pure(t.getName)
 
-  def getConfiguration[F[_]](t: HTable)(
+  def getConfiguration[F[_]](t: AsyncTable[_ <: ScanResultConsumerBase])(
       implicit
       ME: Monad[F]
   ): F[HConfig] =
     ME.pure(t.getConfiguration)
 
-  def getDescriptor[F[_]](t: HTable)(
+  def exists[F[_]](t: AsyncTable[_ <: ScanResultConsumerBase], get: HGet)(
       implicit
-      ME: MonadError[F, Throwable]
-  ): F[TableDescriptor] =
-    ME.catchNonFatal(t.getDescriptor)
-
-  def exists[F[_]](t: HTable, get: HGet)(
-      implicit
-      ME: MonadError[F, Throwable]
+      ME: MonadError[F, Throwable],
+      AC: AsyncContext[F]
   ): F[Boolean] =
-    ME.catchNonFatal(t.exists(get))
+    ME.map(AC(t.exists(get)))(_.booleanValue())
 
-  def get[F[_]](t: HTable, a: HGet)(
+  def get[F[_]](t: AsyncTable[_ <: ScanResultConsumerBase], a: HGet)(
       implicit
-      ME: MonadError[F, Throwable]
+      AC: AsyncContext[F]
   ): F[HResult] =
-    ME.catchNonFatal(t.get(a))
+    AC(t.get(a))
 
-  def put[F[_]](t: HTable, a: HPut)(
+  def put[F[_]](t: AsyncTable[_ <: ScanResultConsumerBase], a: HPut)(
       implicit
-      ME: MonadError[F, Throwable]
+      ME: MonadError[F, Throwable],
+      AC: AsyncContext[F]
   ): F[Unit] =
-    ME.catchNonFatal(t.put(a))
+    ME.map(AC(t.put(a)))(_ => ())
 
-  def getScanner[F[_]](t: HTable, a: HScan)(
+  def getScanner[F[_]](t: AsyncTable[_ <: ScanResultConsumerBase], a: HScan)(
       implicit
       ME: MonadError[F, Throwable]
   ): F[HResultScanner] =
     ME.catchNonFatal(t.getScanner(a))
 
-  def delete[F[_]](t: HTable, a: HDelete)(
-      implicit ME: MonadError[F, Throwable]
+  def delete[F[_]](t: AsyncTable[_ <: ScanResultConsumerBase], a: HDelete)(
+      implicit
+      ME: MonadError[F, Throwable],
+      AC: AsyncContext[F]
   ): F[Unit] =
-    ME.catchNonFatal(t.delete(a))
+    ME.map(AC(t.delete(a)))(_ => ())
 
-  def append[F[_]](t: HTable, a: HAppend)(
+  def append[F[_]](t: AsyncTable[_ <: ScanResultConsumerBase], a: HAppend)(
       implicit
-      ME: MonadError[F, Throwable]
+      AC: AsyncContext[F]
   ): F[HResult] =
-    ME.catchNonFatal(t.append(a))
+    AC(t.append(a))
 
-  def increment[F[_]](t: HTable, a: HIncrement)(
+  def increment[F[_]](t: AsyncTable[_ <: ScanResultConsumerBase], a: HIncrement)(
       implicit
-      ME: MonadError[F, Throwable]
+      AC: AsyncContext[F]
   ): F[HResult] =
-    ME.catchNonFatal(t.increment(a))
+    AC(t.increment(a))
 
-  def close[F[_]](t: HTable)(
-      implicit
-      ME: MonadError[F, Throwable]
-  ): F[Unit] =
-    ME.catchNonFatal(t.close())
-
-  def kleisli[F[_], A](f: HTable => F[A]): Kleisli[F, HTable, A] =
-    Kleisli[F, HTable, A](f)
+  def kleisli[F[_], A](f: AsyncTable[_ <: ScanResultConsumerBase] => F[A])
+    : Kleisli[F, AsyncTable[_ <: ScanResultConsumerBase], A] =
+    Kleisli[F, AsyncTable[_ <: ScanResultConsumerBase], A](f)
 }

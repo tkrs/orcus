@@ -104,6 +104,7 @@ lazy val core = project
     libraryDependencies ++= Seq(
       Pkg.catsCore,
       Pkg.shapeless,
+      Pkg.java8Compat,
       Pkg.hbase % "provided"
     ).map(_.withSources),
     libraryDependencies ++= Pkg.forTest
@@ -149,7 +150,8 @@ lazy val example = project
     name := "example",
     fork := true,
     libraryDependencies ++= Seq(
-      Pkg.bigtable,
+      // Pkg.bigtable,
+      Pkg.hbase,
       Pkg.logbackClassic
     ).map(_.withSources)
   )
