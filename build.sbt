@@ -166,8 +166,13 @@ lazy val benchmark = (project in file("modules/benchmark"))
     moduleName := "orcus-benchmark",
     name := "benchmark"
   )
+  .settings(
+    libraryDependencies ++= Seq(
+      Pkg.hbase
+    )
+  )
   .enablePlugins(JmhPlugin)
-  .dependsOn(free)
+  .dependsOn(iota % "test->test")
 
 lazy val compilerOptions = Seq(
   "-deprecation", // Emit warning and location for usages of deprecated APIs.
