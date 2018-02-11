@@ -3,8 +3,8 @@ import Dependencies._
 lazy val root = (project in file("."))
   .settings(allSettings)
   .settings(noPublishSettings)
-  .aggregate(core, monix, `twitter-util`, free, iota, example, benchmark)
-  .dependsOn(core, monix, `twitter-util`, free, iota, example, benchmark)
+  .aggregate(core, monix, `twitter-util`, `cats-effect`, free, iota, example, benchmark)
+  .dependsOn(core, monix, `twitter-util`, `cats-effect`, free, iota, example, benchmark)
 
 lazy val allSettings =
   buildSettings ++ baseSettings ++ publishSettings
@@ -133,6 +133,20 @@ lazy val `twitter-util` = project
     name := "twitter-util",
     libraryDependencies ++= Seq(
       Pkg.twitterUtil
+    ).map(_.withSources),
+    libraryDependencies ++= Pkg.forTest
+  )
+  .dependsOn(core)
+
+lazy val `cats-effect` = project
+  .in(file("modules/cats-effect"))
+  .settings(allSettings)
+  .settings(
+    description := "orcus cats-effect",
+    moduleName := "orcus-cats-effect",
+    name := "cats-effect",
+    libraryDependencies ++= Seq(
+      Pkg.catsEffect
     ).map(_.withSources),
     libraryDependencies ++= Pkg.forTest
   )
