@@ -174,4 +174,11 @@ class DecoderSpec extends FunSuite with MockitoSugar {
 
     assert(f(result) === expected)
   }
+
+  test("It should return empty map when cells is empty") {
+    val f      = Decoder[Map[String, Map[String, String]]]
+    val cells  = new ju.ArrayList[Cell]()
+    val result = Result.create(cells)
+    assert(f(result) === Right(Map.empty))
+  }
 }
