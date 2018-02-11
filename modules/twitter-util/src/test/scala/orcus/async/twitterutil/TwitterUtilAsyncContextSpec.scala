@@ -6,7 +6,7 @@ import java.util.function.Supplier
 import com.twitter.util.{Await, Future}
 import orcus.async.AsyncContext
 
-class TwitterUtilAsyncContextInstancesSpec extends org.scalatest.FunSpec {
+class TwitterUtilAsyncContextSpec extends org.scalatest.FunSpec {
 
   implicit val executorService: ExecutorService =
     Executors.newSingleThreadExecutor()
