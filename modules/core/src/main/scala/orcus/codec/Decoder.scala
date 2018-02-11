@@ -87,24 +87,25 @@ object Decoder extends Decoder1 {
       type Out = mutable.Builder[(String, V), M[String, V]]
 
       def apply(result: Result): Either[Throwable, M[String, V]] = {
-
-        val map = result.getMap
-        val xs  = map.keySet()
-
-        val r = xs.foldLeftM[Either[Throwable, ?], Out](cbf.apply) {
-          case (acc, cf) =>
-            val cf0 = Bytes.toString(cf)
-            V.apply(result.getFamilyMap(cf)) match {
-              case Right(v) =>
-                Right(acc += cf0 -> v)
-              case Left(e) =>
-                Left(e)
-            }
-        }
-
-        r match {
-          case Right(b) => Right(b.result())
-          case Left(e)  => Left(e)
+        val builder = cbf.apply
+        val map     = result.getMap
+        if (map == null) Right(builder.result())
+        else {
+          val xs = map.keySet()
+          val ys = xs.foldLeftM[Either[Throwable, ?], Out](builder) {
+            case (acc, cf) =>
+              val cf0 = Bytes.toString(cf)
+              V.apply(result.getFamilyMap(cf)) match {
+                case Right(v) =>
+                  Right(acc += cf0 -> v)
+                case Left(e) =>
+                  Left(e)
+              }
+          }
+          ys match {
+            case Right(b) => Right(b.result())
+            case Left(e)  => Left(e)
+          }
         }
       }
     }
