@@ -3,8 +3,8 @@ import Dependencies._
 lazy val root = (project in file("."))
   .settings(allSettings)
   .settings(noPublishSettings)
-  .aggregate(core, monix, free, iota, example, benchmark)
-  .dependsOn(core, monix, free, iota, example, benchmark)
+  .aggregate(core, monix, `twitter-util`, free, iota, example, benchmark)
+  .dependsOn(core, monix, `twitter-util`, free, iota, example, benchmark)
 
 lazy val allSettings =
   buildSettings ++ baseSettings ++ publishSettings
@@ -125,6 +125,20 @@ lazy val monix = project
       ),
       Pkg.forTest,
     ).map(_.withSources),
+  )
+  .dependsOn(core)
+
+lazy val `twitter-util` = project
+  .in(file("modules/twitter-util"))
+  .settings(allSettings)
+  .settings(
+    description := "orcus twitter-util",
+    moduleName := "orcus-twitter-util",
+    name := "twitter-util",
+    libraryDependencies ++= Seq(
+      Pkg.twitterUtil
+    ).map(_.withSources),
+    libraryDependencies ++= Pkg.forTest
   )
   .dependsOn(core)
 
