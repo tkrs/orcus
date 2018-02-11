@@ -3,8 +3,8 @@ import Dependencies._
 lazy val root = (project in file("."))
   .settings(allSettings)
   .settings(noPublishSettings)
-  .aggregate(core, free, iota, example, benchmark)
-  .dependsOn(core, free, iota, example, benchmark)
+  .aggregate(core, monix, free, iota, example, benchmark)
+  .dependsOn(core, monix, free, iota, example, benchmark)
 
 lazy val allSettings =
   buildSettings ++ baseSettings ++ publishSettings
@@ -109,6 +109,20 @@ lazy val core = project
     ).map(_.withSources),
     libraryDependencies ++= Pkg.forTest
   )
+
+lazy val monix = project
+  .in(file("modules/monix"))
+  .settings(allSettings)
+  .settings(
+    description := "orcus monix",
+    moduleName := "orcus-monix",
+    name := "monix",
+    libraryDependencies ++= Seq(
+      Pkg.monixEval
+    ).map(_.withSources),
+    libraryDependencies ++= Pkg.forTest
+  )
+  .dependsOn(core)
 
 lazy val free = project
   .in(file("modules/free"))
