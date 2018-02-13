@@ -1,7 +1,7 @@
 package orcus.async.monix
 
 import java.util.concurrent.{CompletableFuture, Executor}
-import java.util.function.BiFunction
+import java.util.function.BiConsumer
 
 import monix.eval.Task
 import monix.execution.Cancelable
@@ -11,9 +11,9 @@ trait MonixAsyncContextInstances {
 
   implicit val monixTaskAsyncContext: AsyncContext[Task] = new AsyncContext[Task] {
     def apply[A](f: CompletableFuture[A]): Task[A] = Task.async { (scheduler, cb) =>
-      val _: CompletableFuture[Unit] = f.handleAsync(
-        new BiFunction[A, Throwable, Unit] {
-          def apply(t: A, u: Throwable): Unit = {
+      val _ = f.whenCompleteAsync(
+        new BiConsumer[A, Throwable] {
+          def accept(t: A, u: Throwable): Unit = {
             if (u != null) cb.onError(u)
             else cb.onSuccess(t)
           }
