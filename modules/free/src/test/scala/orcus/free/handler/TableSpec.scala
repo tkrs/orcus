@@ -6,6 +6,7 @@ import java.util.concurrent.CompletableFuture
 import cats.~>
 import cats.data.Kleisli
 import cats.instances.future._
+import orcus.{table => ot}
 import orcus.free.{TableOp, TableOps}
 import orcus.free.handler.table.Handler
 import org.apache.hadoop.conf.Configuration
@@ -15,7 +16,6 @@ import org.apache.hadoop.hbase.client.{
   Result,
   ResultScanner,
   ScanResultConsumer,
-  ScanResultConsumerBase,
   Append => HAppend,
   Delete => HDelete,
   Get => HGet,
@@ -36,8 +36,7 @@ class TableSpec extends FunSpec with MockitoSugar with Matchers {
 
   type F[A] = Future[A]
 
-  def interpreter[M[_], A](
-      implicit H: Handler[M]): TableOp ~> Kleisli[M, AsyncTable[_ <: ScanResultConsumerBase], ?] = H
+  def interpreter[M[_], A](implicit H: Handler[M]): TableOp ~> Kleisli[M, ot.AsyncTableT, ?] = H
 
   def ops[M[_]](implicit T: TableOps[M]): TableOps[M] = T
 
