@@ -6,8 +6,8 @@ import _root_.iota.{CopK, TNilK}
 import cats.data.Kleisli
 import cats.instances.future._
 import cats.~>
+import orcus.{table => ot}
 import orcus.free.handler.table
-import org.apache.hadoop.hbase.client.{AsyncTable, ScanResultConsumerBase}
 import org.scalatest.FunSuite
 
 import scala.concurrent.Future
@@ -17,10 +17,9 @@ class TableOpsSpec extends FunSuite {
 
   type Algebra[A] = CopK[TableOp ::: TNilK, A]
 
-  def handler[F[_]: table.Handler]
-    : Algebra ~> Kleisli[F, AsyncTable[_ <: ScanResultConsumerBase], ?] = CopK.FunctionK.summon
+  def handler[F[_]: table.Handler]: Algebra ~> Kleisli[F, ot.AsyncTableT, ?] = CopK.FunctionK.summon
 
-  implicit val _handler: Algebra ~> Kleisli[Future, AsyncTable[_ <: ScanResultConsumerBase], ?] =
+  implicit val _handler: Algebra ~> Kleisli[Future, ot.AsyncTableT, ?] =
     handler[Future]
 
   def ops[F[A] <: CopK[_, A]](implicit F: TableOps[F]): TableOps[F] = F

@@ -98,8 +98,7 @@ object FreeMain extends App {
     } yield ys
   }
 
-  type ATable     = AsyncTable[_ <: ScanResultConsumerBase]
-  type K[F[_], A] = Kleisli[F, ATable, A]
+  type K[F[_], A] = Kleisli[F, orcus.table.AsyncTableT, A]
 
   type Op1[A] = EitherK[ResultScannerOp, ResultOp, A]
   type Op[A]  = EitherK[TableOp, Op1, A]
@@ -109,10 +108,10 @@ object FreeMain extends App {
       T: TableHandler[M],
       R: ResultHandler[M],
       RS: ResultScannerHandler[M]
-  ): Op ~> Kleisli[M, ATable, ?] =
-    T or (RS.liftF[ATable] or R.liftF[ATable])
+  ): Op ~> Kleisli[M, orcus.table.AsyncTableT, ?] =
+    T or (RS.liftF[orcus.table.AsyncTableT] or R.liftF[orcus.table.AsyncTableT])
 
-  type OpK[A] = Kleisli[Future, ATable, A]
+  type OpK[A] = Kleisli[Future, orcus.table.AsyncTableT, A]
 
   val resource = Future(ConnectionFactory.createAsyncConnection().join())
 
