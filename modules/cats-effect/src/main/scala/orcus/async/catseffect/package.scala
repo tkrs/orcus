@@ -1,3 +1,3 @@
 package orcus.async
 
-package object catseffect extends CatsEffectIOAsyncContextInstances
+package object catseffect extends CatsEffectAsyncHandlerInstances

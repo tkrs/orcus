@@ -1,3 +1,3 @@
 package orcus.async
 
-package object twitterutil extends TwitterUtilAsyncConversionInstances
+package object twitterutil extends TwitterUtilAsyncHandlerInstances

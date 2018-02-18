@@ -11,6 +11,7 @@ import org.apache.hadoop.hbase.util.Bytes
 import org.scalatest.{FunSpec, Matchers}
 import org.scalatest.mockito.MockitoSugar
 import org.mockito.Mockito._
+import orcus.async._
 
 import scala.concurrent.{Await, Future}
 import scala.concurrent.ExecutionContext.Implicits.global
