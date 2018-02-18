@@ -4,12 +4,12 @@ import java.util.concurrent.{CompletableFuture, Executor}
 import java.util.function.BiConsumer
 
 import com.twitter.util.{Future, Promise}
-import orcus.async.AsyncContext
+import orcus.async.AsyncConversion
 
-trait TwitterUtilAsyncContextInstances {
+trait TwitterUtilAsyncConversionInstances {
 
-  implicit def twitterUtilFutureAsyncContext(implicit e: Executor): AsyncContext[Future] =
-    new AsyncContext[Future] {
+  implicit def twitterUtilFutureAsyncConversion(implicit e: Executor): AsyncConversion[Future] =
+    new AsyncConversion[Future] {
       def apply[A](f: CompletableFuture[A]): Future[A] = {
         val p = Promise[A]
         val _ = f.whenCompleteAsync(

@@ -4,14 +4,14 @@ import java.util.concurrent.{CompletableFuture, Executor}
 import java.util.function.BiConsumer
 
 import cats.effect.IO
-import orcus.async.AsyncContext
+import orcus.async.AsyncConversion
 
 import scala.concurrent.ExecutionContext
 
 trait CatsEffectIOAsyncContextInstances {
 
-  implicit def catsEffectIOAsyncContext(implicit ec: ExecutionContext): AsyncContext[IO] =
-    new AsyncContext[IO] {
+  implicit def catsEffectIOAsyncConversion(implicit ec: ExecutionContext): AsyncConversion[IO] =
+    new AsyncConversion[IO] {
       def apply[A](f: CompletableFuture[A]): IO[A] = IO.async { cb =>
         val _ = f.whenCompleteAsync(
           new BiConsumer[A, Throwable] {

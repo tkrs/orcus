@@ -2,7 +2,7 @@ package orcus.free.handler
 
 import cats.{MonadError, ~>}
 import cats.data.Kleisli
-import orcus.async.AsyncContext
+import orcus.async.AsyncConversion
 import orcus.free.TableOp
 import org.apache.hadoop.hbase.client.{AsyncTable, ScanResultConsumerBase}
 
@@ -16,7 +16,7 @@ object table {
 
     implicit def tableOpHandler[M[_]](implicit
                                       ME: MonadError[M, Throwable],
-                                      AC: AsyncContext[M]): Handler[M] =
+                                      AC: AsyncConversion[M]): Handler[M] =
       new Handler[M] {
         override def apply[A](
             fa: TableOp[A]): Kleisli[M, AsyncTable[_ <: ScanResultConsumerBase], A] = fa match {
