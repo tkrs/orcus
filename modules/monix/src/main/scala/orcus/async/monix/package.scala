@@ -1,3 +1,3 @@
 package orcus.async
 
-package object monix extends MonixAsyncContextInstances
+package object monix extends MonixAsynConversionInstances
