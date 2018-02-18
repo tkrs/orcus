@@ -1,28 +1,29 @@
 package orcus.async
-package catseffect
+package twitterutil
 
 import java.util.concurrent.{CompletableFuture, CompletionException}
 import java.util.function.Supplier
 
-import cats.effect.IO
 import cats.~>
+import com.twitter.util.{Await, Future}
+import org.scalatest.FunSpec
 
-import scala.concurrent.duration._
+class TwitterUtilAsyncHandlerSpec extends FunSpec {
 
-class CatsEffectIOAsyncConversionSpec extends org.scalatest.FunSpec {
-
-  describe("AsyncContext[Task]") {
+  describe("AsyncContext[Future]") {
     it("should get a value as-is when its CompletableFuture is succeed") {
-      def run(implicit f: CompletableFuture ~> IO) =
+      def run(implicit f: CompletableFuture ~> Future) =
         f(CompletableFuture.completedFuture(10))
-      assert(10 === run.unsafeRunTimed(3.seconds).get)
+
+      assert(10 === Await.result(run))
     }
     it("should throw CompletionException as-is when its CompletableFuture is fail") {
-      def run(implicit f: CompletableFuture ~> IO) =
+      def run(implicit f: CompletableFuture ~> Future) =
         f(CompletableFuture.supplyAsync(new Supplier[Int] {
           def get(): Int = throw new Exception
         }))
-      assertThrows[CompletionException](run.unsafeRunTimed(3.seconds))
+
+      assertThrows[CompletionException](Await.result(run))
     }
   }
 }

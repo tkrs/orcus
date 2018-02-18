@@ -1,8 +1,9 @@
 package orcus
 
-import cats.{Monad, MonadError}
+import java.util.concurrent.CompletableFuture
+
+import cats.{Monad, MonadError, ~>}
 import cats.data.Kleisli
-import orcus.async.AsyncConversion
 import org.apache.hadoop.conf.{Configuration => HConfig}
 import org.apache.hadoop.hbase.client.{
   AsyncTable,
@@ -37,22 +38,22 @@ object table {
   def exists[F[_]](t: AsyncTableT, get: HGet)(
       implicit
       ME: MonadError[F, Throwable],
-      AC: AsyncConversion[F]
+      F: CompletableFuture ~> F
   ): F[Boolean] =
-    ME.map(AC(t.exists(get)))(_.booleanValue())
+    ME.map(F(t.exists(get)))(_.booleanValue())
 
   def get[F[_]](t: AsyncTableT, a: HGet)(
       implicit
-      AC: AsyncConversion[F]
+      F: CompletableFuture ~> F
   ): F[HResult] =
-    AC(t.get(a))
+    F(t.get(a))
 
   def put[F[_]](t: AsyncTableT, a: HPut)(
       implicit
       ME: MonadError[F, Throwable],
-      AC: AsyncConversion[F]
+      F: CompletableFuture ~> F
   ): F[Unit] =
-    ME.map(AC(t.put(a)))(_ => ())
+    ME.map(F(t.put(a)))(_ => ())
 
   def getScanner[F[_]](t: AsyncTableT, a: HScan)(
       implicit
@@ -63,21 +64,21 @@ object table {
   def delete[F[_]](t: AsyncTableT, a: HDelete)(
       implicit
       ME: MonadError[F, Throwable],
-      AC: AsyncConversion[F]
+      F: CompletableFuture ~> F
   ): F[Unit] =
-    ME.map(AC(t.delete(a)))(_ => ())
+    ME.map(F(t.delete(a)))(_ => ())
 
   def append[F[_]](t: AsyncTableT, a: HAppend)(
       implicit
-      AC: AsyncConversion[F]
+      F: CompletableFuture ~> F
   ): F[HResult] =
-    AC(t.append(a))
+    F(t.append(a))
 
   def increment[F[_]](t: AsyncTableT, a: HIncrement)(
       implicit
-      AC: AsyncConversion[F]
+      F: CompletableFuture ~> F
   ): F[HResult] =
-    AC(t.increment(a))
+    F(t.increment(a))
 
   def kleisli[F[_], A](f: AsyncTableT => F[A]): Kleisli[F, AsyncTableT, A] =
     Kleisli[F, AsyncTableT, A](f)

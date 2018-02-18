@@ -2,13 +2,13 @@ package orcus.free.handler
 
 import cats.{MonadError, ~>}
 import cats.data.Kleisli
-import orcus.async.AsyncConversion
+import orcus.async._
 import orcus.free.TableOp
-import org.apache.hadoop.hbase.client.{AsyncTable, ScanResultConsumerBase}
+import orcus.table.AsyncTableT
 
 object table {
 
-  trait Handler[M[_]] extends (TableOp ~> Kleisli[M, AsyncTable[_ <: ScanResultConsumerBase], ?])
+  trait Handler[M[_]] extends (TableOp ~> Kleisli[M, AsyncTableT, ?])
 
   object Handler {
     import orcus.table._
@@ -16,10 +16,9 @@ object table {
 
     implicit def tableOpHandler[M[_]](implicit
                                       ME: MonadError[M, Throwable],
-                                      AC: AsyncConversion[M]): Handler[M] =
+                                      AC: AsyncHandler[M]): Handler[M] =
       new Handler[M] {
-        override def apply[A](
-            fa: TableOp[A]): Kleisli[M, AsyncTable[_ <: ScanResultConsumerBase], A] = fa match {
+        override def apply[A](fa: TableOp[A]): Kleisli[M, AsyncTableT, A] = fa match {
           case GetName          => kleisli(getName[M])
           case GetConfiguration => kleisli(getConfiguration[M])
           case Exists(a)        => kleisli(exists[M](_, a))
