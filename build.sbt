@@ -105,7 +105,6 @@ lazy val core = project
       Seq(
         Pkg.catsCore,
         Pkg.shapeless,
-        Pkg.java8Compat,
         Pkg.hbase % "provided"
       ),
       Pkg.forTest,
@@ -135,10 +134,12 @@ lazy val `twitter-util` = project
     description := "orcus twitter-util",
     moduleName := "orcus-twitter-util",
     name := "twitter-util",
-    libraryDependencies ++= Seq(
-      Pkg.twitterUtil
+    libraryDependencies ++= Seq.concat(
+      Seq(
+      Pkg.twitterUtil,
+      ),
+      Pkg.forTest,
     ).map(_.withSources),
-    libraryDependencies ++= Pkg.forTest
   )
   .dependsOn(core)
 
@@ -149,10 +150,12 @@ lazy val `cats-effect` = project
     description := "orcus cats-effect",
     moduleName := "orcus-cats-effect",
     name := "cats-effect",
-    libraryDependencies ++= Seq(
-      Pkg.catsEffect
+    libraryDependencies ++= Seq.concat(
+      Seq(
+      Pkg.catsEffect,
+      ),
+      Pkg.forTest,
     ).map(_.withSources),
-    libraryDependencies ++= Pkg.forTest
   )
   .dependsOn(core)
 
@@ -229,8 +232,7 @@ lazy val benchmark = (project in file("modules/benchmark"))
 
 lazy val compilerOptions = Seq(
   "-deprecation", // Emit warning and location for usages of deprecated APIs.
-  "-encoding",
-  "utf-8", // Specify character encoding used by source files.
+  "-encoding", "utf-8", // Specify character encoding used by source files.
   "-explaintypes", // Explain type errors in more detail.
   "-feature", // Emit warning and location for usages of features that should be imported explicitly.
   "-language:existentials", // Existential types (besides wildcard types) can be written and inferred
