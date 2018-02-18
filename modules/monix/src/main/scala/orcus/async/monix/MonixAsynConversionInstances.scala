@@ -5,11 +5,11 @@ import java.util.function.BiConsumer
 
 import monix.eval.Task
 import monix.execution.Cancelable
-import orcus.async.AsyncContext
+import orcus.async.AsyncConversion
 
-trait MonixAsyncContextInstances {
+trait MonixAsynConversionInstances {
 
-  implicit val monixTaskAsyncContext: AsyncContext[Task] = new AsyncContext[Task] {
+  implicit val monixTaskAsyncConversion: AsyncConversion[Task] = new AsyncConversion[Task] {
     def apply[A](f: CompletableFuture[A]): Task[A] = Task.async { (scheduler, cb) =>
       val _ = f.whenCompleteAsync(
         new BiConsumer[A, Throwable] {

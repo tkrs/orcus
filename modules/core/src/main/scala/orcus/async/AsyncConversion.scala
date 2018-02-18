@@ -4,17 +4,17 @@ import java.util.concurrent.CompletableFuture
 
 import scala.concurrent.Future
 
-trait AsyncContext[F[_]] {
+trait AsyncConversion[F[_]] {
   def apply[A](f: CompletableFuture[A]): F[A]
 }
 
-object AsyncContext {
+object AsyncConversion {
   import scala.compat.java8.FutureConverters._
 
-  def apply[F[_]](implicit F: AsyncContext[F]): AsyncContext[F] = F
+  def apply[F[_]](implicit F: AsyncConversion[F]): AsyncConversion[F] = F
 
-  implicit lazy val scalaFutureAsyncContext: AsyncContext[Future] =
-    new AsyncContext[Future] {
+  implicit lazy val scalaFutureAsyncContext: AsyncConversion[Future] =
+    new AsyncConversion[Future] {
       def apply[A](f: CompletableFuture[A]): Future[A] = f.toScala
     }
 }

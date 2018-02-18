@@ -4,20 +4,20 @@ import java.util.concurrent.{CompletableFuture, CompletionException, ExecutorSer
 import java.util.function.Supplier
 
 import com.twitter.util.{Await, Future}
-import orcus.async.AsyncContext
+import orcus.async.AsyncConversion
 
-class TwitterUtilAsyncContextSpec extends org.scalatest.FunSpec {
+class TwitterUtilAsyncConversionSpec extends org.scalatest.FunSpec {
 
   implicit val executorService: ExecutorService =
     Executors.newSingleThreadExecutor()
 
   describe("AsyncContext[Future]") {
     it("should get a value as-is when its CompletableFuture is succeed") {
-      val f = AsyncContext[Future].apply(CompletableFuture.completedFuture(10))
+      val f = AsyncConversion[Future].apply(CompletableFuture.completedFuture(10))
       assert(10 === Await.result(f))
     }
     it("should throw CompletionException as-is when its CompletableFuture is fail") {
-      val f = AsyncContext[Future]
+      val f = AsyncConversion[Future]
         .apply(CompletableFuture.supplyAsync(new Supplier[Int] {
           def get(): Int = throw new Exception
         }))
