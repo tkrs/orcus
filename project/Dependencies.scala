@@ -26,6 +26,7 @@ object Dependencies {
     lazy val catsFree       = "org.typelevel"             %% "cats-free"          % Ver.cats
     lazy val monixEval      = "io.monix"                  %% "monix-eval"         % Ver.monix
     lazy val twitterUtil    = "com.twitter"               %% "util-core"          % Ver.twitterUtil
+    lazy val catbirdUtil    = "io.catbird"                %% "catbird-util"       % Ver.twitterUtil
     lazy val catsEffect     = "org.typelevel"             %% "cats-effect"        % Ver.catsEffect
     lazy val iota           = "io.frees"                  %% "iota-core"          % Ver.iota
     lazy val shapeless      = "com.chuusai"               %% "shapeless"          % Ver.shapeless

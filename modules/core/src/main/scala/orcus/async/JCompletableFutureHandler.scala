@@ -10,19 +10,19 @@ trait JCompletableFutureHandler {
   implicit def handleJavaCompletableFuture[F[_]](
       implicit F: AsyncHandler[F]): CompletableFuture ~> F = {
 
-    def f[A](cf: CompletableFuture[A])(implicit F: AsyncHandler[F]): F[A] =
+    def toF[A](cf: CompletableFuture[A])(implicit F: AsyncHandler[F]): F[A] =
       F.handle[A](
         { cb =>
-          val _ = cf.whenComplete(new BiConsumer[A, Throwable] {
+          val f = new BiConsumer[A, Throwable] {
             def accept(t: A, u: Throwable): Unit =
               if (u != null) cb(Left(u)) else cb(Right(t))
-          })
-          ()
+          }
+          val _ = cf.whenComplete(f)
         }, {
           val _ = cf.cancel(true)
         }
       )
 
-    λ[CompletableFuture ~> F](f(_))
+    λ[CompletableFuture ~> F](toF(_))
   }
 }
