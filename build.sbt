@@ -101,6 +101,8 @@ lazy val core = project
     description := "orcus core",
     moduleName := "orcus-core",
     name := "core",
+  )
+  .settings(
     libraryDependencies ++= Seq.concat(
       Seq(
         Pkg.catsCore,
@@ -118,6 +120,8 @@ lazy val monix = project
     description := "orcus monix",
     moduleName := "orcus-monix",
     name := "monix",
+  )
+  .settings(
     libraryDependencies ++= Seq.concat(
       Seq(
         Pkg.monixEval,
@@ -134,6 +138,8 @@ lazy val `twitter-util` = project
     description := "orcus twitter-util",
     moduleName := "orcus-twitter-util",
     name := "twitter-util",
+  )
+  .settings(
     libraryDependencies ++= Seq.concat(
       Seq(
       Pkg.twitterUtil,
@@ -150,6 +156,8 @@ lazy val `cats-effect` = project
     description := "orcus cats-effect",
     moduleName := "orcus-cats-effect",
     name := "cats-effect",
+  )
+  .settings(
     libraryDependencies ++= Seq.concat(
       Seq(
       Pkg.catsEffect,
@@ -166,6 +174,8 @@ lazy val free = project
     description := "orcus free",
     moduleName := "orcus-free",
     name := "free",
+  )
+  .settings(
     libraryDependencies ++= Seq.concat(
       Seq(
         Pkg.catsFree,
@@ -183,6 +193,8 @@ lazy val iota = project
     description := "orcus iota",
     moduleName := "orcus-iota",
     name := "iota",
+  )
+  .settings(
     libraryDependencies ++= Seq.concat(
       Seq(
         Pkg.iota,
@@ -201,7 +213,8 @@ lazy val example = project
     description := "orcus example",
     moduleName := "orcus-example",
     name := "example",
-    fork := true,
+  )
+  .settings(
     libraryDependencies ++= Seq(
       // Pkg.bigtable,
       Pkg.hbase,
@@ -209,6 +222,7 @@ lazy val example = project
     ).map(_.withSources)
   )
   .settings(
+    fork := true,
     coverageEnabled := false
   )
   .dependsOn(free)
@@ -224,11 +238,17 @@ lazy val benchmark = (project in file("modules/benchmark"))
   .settings(
     libraryDependencies ++= Seq(
       Pkg.java8Compat,
-      Pkg.hbase
+      Pkg.hbase,
+      Pkg.catbirdUtil,
     )
   )
   .enablePlugins(JmhPlugin)
-  .dependsOn(iota % "test->test")
+  .dependsOn(
+    iota % "test->test",
+    `twitter-util` % "test->test",
+    `cats-effect` % "test->test",
+    monix % "test->test",
+  )
 
 lazy val compilerOptions = Seq(
   "-deprecation", // Emit warning and location for usages of deprecated APIs.
