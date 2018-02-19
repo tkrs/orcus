@@ -7,7 +7,6 @@ import cats.~>
 import org.scalatest.FunSpec
 
 import scala.concurrent.{Await, Future}
-import scala.concurrent.ExecutionContext.Implicits.global
 import scala.concurrent.duration._
 
 class ScalaFutureAsyncHandlerSpec extends FunSpec {

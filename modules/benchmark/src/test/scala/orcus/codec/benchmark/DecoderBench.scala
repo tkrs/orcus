@@ -8,7 +8,7 @@ import org.openjdk.jmh.annotations._
 @State(Scope.Thread)
 @BenchmarkMode(Array(Mode.Throughput))
 @Warmup(iterations = 10, time = 1)
-@Measurement(iterations = 10, time = 2)
+@Measurement(iterations = 10, time = 1)
 @Threads(1)
 @Fork(2)
 @OutputTimeUnit(TimeUnit.MILLISECONDS)

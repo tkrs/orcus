@@ -211,11 +211,18 @@ lazy val benchmark = (project in file("modules/benchmark"))
   )
   .settings(
     libraryDependencies ++= Seq(
-      Pkg.hbase
+      Pkg.hbase,
+      Pkg.catbirdUtil,
+      Pkg.java8Compat
     )
   )
   .enablePlugins(JmhPlugin)
-  .dependsOn(iota % "test->test")
+  .dependsOn(
+    iota % "test->test",
+    `twitter-util` % "test->test",
+    `cats-effect` % "test->test",
+    monix % "test->test",
+  )
 
 lazy val compilerOptions = Seq(
   "-deprecation", // Emit warning and location for usages of deprecated APIs.
