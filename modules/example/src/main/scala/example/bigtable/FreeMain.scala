@@ -2,12 +2,15 @@ package example.bigtable
 
 import java.time.Instant
 
-import cats.data.{EitherK, Kleisli}
+import cats.data.Kleisli
 import cats.free.Free
 import cats.implicits._
 import cats.~>
+import iota.{CopK, TNilK}
+import iota.TListK.:::
 import orcus.codec.PutEncoder
-import orcus.free._
+import orcus.free.{ResultOp, ResultScannerOp, TableOp}
+import orcus.free.iota._
 import orcus.free.handler.result.{Handler => ResultHandler}
 import orcus.free.handler.resultScanner.{Handler => ResultScannerHandler}
 import orcus.free.handler.table.{Handler => TableHandler}
@@ -25,7 +28,7 @@ object FreeMain extends App {
   import Setup._
   import Functions._
 
-  def putProgram[F[_]](prefix: String, numRecords: Int)(
+  def putProgram[F[a] <: CopK[_, a]](prefix: String, numRecords: Int)(
       implicit
       ev1: TableOps[F]): Free[F, Vector[(Array[Byte], Long)]] = {
 
@@ -56,7 +59,7 @@ object FreeMain extends App {
       .sequence[Free[F, ?], (Array[Byte], Long)]
   }
 
-  def scanProgram[F[_]](prefix: String, numRecords: Int, range: (Long, Long))(
+  def scanProgram[F[a] <: CopK[_, a]](prefix: String, numRecords: Int, range: (Long, Long))(
       implicit
       ev1: TableOps[F],
       ev2: ResultScannerOps[F]): Free[F, Seq[Result]] = {
@@ -73,7 +76,7 @@ object FreeMain extends App {
     } yield xs
   }
 
-  def resultProgram[F[_]](results: Seq[Result])(
+  def resultProgram[F[a] <: CopK[_, a]](results: Seq[Result])(
       implicit
       ev1: ResultOps[F]): Free[F, Vector[Option[Hello]]] = {
     for {
@@ -83,7 +86,10 @@ object FreeMain extends App {
     } yield ys
   }
 
-  def program[F[_]](implicit T: TableOps[F], R: ResultOps[F], RS: ResultScannerOps[F]) = {
+  def program[F[a] <: CopK[_, a]](implicit
+                                  T: TableOps[F],
+                                  R: ResultOps[F],
+                                  RS: ResultScannerOps[F]): Free[F, Vector[Option[Hello]]] = {
     val rowKey     = "greeting"
     val numRecords = 100
 
@@ -100,25 +106,27 @@ object FreeMain extends App {
 
   type K[F[_], A] = Kleisli[F, orcus.table.AsyncTableT, A]
 
-  type Op1[A] = EitherK[ResultScannerOp, ResultOp, A]
-  type Op[A]  = EitherK[TableOp, Op1, A]
+  type Algebra[A]      = CopK[TableOp ::: ResultOp ::: ResultScannerOp ::: TNilK, A]
+  type TableK[F[_], A] = Kleisli[F, orcus.table.AsyncTableT, A]
 
   def interpreter[M[_]](
       implicit
       T: TableHandler[M],
       R: ResultHandler[M],
       RS: ResultScannerHandler[M]
-  ): Op ~> Kleisli[M, orcus.table.AsyncTableT, ?] =
-    T or (RS.liftF[orcus.table.AsyncTableT] or R.liftF[orcus.table.AsyncTableT])
-
-  type OpK[A] = Kleisli[Future, orcus.table.AsyncTableT, A]
+  ): Algebra ~> TableK[M, ?] = {
+    val t: TableOp ~> TableK[M, ?]          = T
+    val r: ResultOp ~> TableK[M, ?]         = R.liftF
+    val rs: ResultScannerOp ~> TableK[M, ?] = RS.liftF
+    CopK.FunctionK.of[Algebra, TableK[M, ?]](t, r, rs)
+  }
 
   val resource = Future(ConnectionFactory.createAsyncConnection().join())
 
   val f = bracket(resource) { conn =>
-    val t            = conn.getTable(tableName)
-    val i: Op ~> OpK = interpreter[Future]
-    val k            = program[Op].foldMap(i)
+    val i: Algebra ~> TableK[Future, ?]           = interpreter[Future]
+    val k: TableK[Future, Vector[Option[Hello]]]  = program[Algebra].foldMap(i)
+    val t: AsyncTable[AdvancedScanResultConsumer] = conn.getTable(tableName)
     k.run(t).map(_.foreach(println))
   }
 
