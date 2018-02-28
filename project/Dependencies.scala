@@ -6,7 +6,7 @@ object Dependencies {
     val `scala2.11`   = "2.11.12"
     val scalafmt      = "1.2.0"
     val cats          = "1.0.1"
-    val iota          = "0.3.4"
+    val iota          = "0.3.6"
     val shapeless     = "2.3.3"
     val scalacheck    = "1.13.5"
     val scalatest     = "3.0.4"
