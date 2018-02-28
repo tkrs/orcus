@@ -18,7 +18,7 @@ class ResultOpsSpec extends FunSuite {
 
   implicit val _handler: Algebra ~> Try = handler[Try]
 
-  def ops[F[_] <: CopK[_, _]](implicit F: ResultOps[F]): ResultOps[F] = F
+  def ops[F[A] <: CopK[_, A]](implicit F: ResultOps[F]): ResultOps[F] = F
 
   test("ResultOps[Algebra]")(ops[Algebra])
 }

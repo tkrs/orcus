@@ -20,7 +20,7 @@ class TableOpsSpec extends FunSuite {
 
   implicit val _handler: Algebra ~> Kleisli[Try, Table, ?] = handler[Try]
 
-  def ops[F[_] <: CopK[_, _]](implicit F: TableOps[F]): TableOps[F] = F
+  def ops[F[A] <: CopK[_, A]](implicit F: TableOps[F]): TableOps[F] = F
 
   test("TableOps[Algebra]")(ops[Algebra])
 }
