@@ -38,8 +38,10 @@ lazy val baseSettings = Seq(
           "-Ywarn-unused:patvars", // Warn if a variable bound in a pattern is unused.
           "-Ywarn-unused:privates" // Warn if a private member is unused.
         )
-      case Some((2, p)) if p >= 11 => compilerOptions
-      case _                       => Nil
+      case Some((2, p)) if p >= 11 =>
+        compilerOptions
+      case _                       =>
+        Nil
     }
   },
   scalacOptions in (Compile, console) --= Seq("-Ywarn-unused:imports", "-Xfatal-warnings")
@@ -52,9 +54,7 @@ lazy val publishSettings = Seq(
   licenses := Seq("MIT License" -> url("http://www.opensource.org/licenses/mit-license.php")),
   publishMavenStyle := true,
   publishArtifact in Test := false,
-  pomIncludeRepository := { _ =>
-    false
-  },
+  pomIncludeRepository := { _ => false },
   publishTo := {
     val nexus = "https://oss.sonatype.org/"
     if (isSnapshot.value)
@@ -142,7 +142,7 @@ lazy val `twitter-util` = project
   .settings(
     libraryDependencies ++= Seq.concat(
       Seq(
-      Pkg.twitterUtil,
+        Pkg.twitterUtil,
       ),
       Pkg.forTest,
     ).map(_.withSources),
@@ -216,8 +216,7 @@ lazy val example = project
   )
   .settings(
     libraryDependencies ++= Seq(
-      // Pkg.bigtable,
-      Pkg.hbase,
+      Pkg.bigtable,
       Pkg.logbackClassic
     ).map(_.withSources)
   )

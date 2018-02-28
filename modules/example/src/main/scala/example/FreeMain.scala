@@ -1,6 +1,10 @@
-package example.bigtable
+package example
 
+trait FreeMain
+
+/*
 import java.time.Instant
+import java.util.function.BiConsumer
 
 import cats.data.Kleisli
 import cats.free.Free
@@ -14,17 +18,18 @@ import orcus.free.iota._
 import orcus.free.handler.result.{Handler => ResultHandler}
 import orcus.free.handler.resultScanner.{Handler => ResultScannerHandler}
 import orcus.free.handler.table.{Handler => TableHandler}
+import orcus.table.AsyncTableT
 import org.apache.hadoop.hbase.client._
 import org.apache.hadoop.hbase.util.Bytes
 
-import scala.concurrent.{Await, Future}
+import scala.concurrent.{Await, Future, Promise}
 import scala.concurrent.ExecutionContext.Implicits.global
 import scala.concurrent.duration._
 
 final case class CF1(greeting1: Option[String], greeting2: Option[String])
 final case class Hello(cf1: CF1)
 
-object FreeMain extends App {
+trait FreeMain extends App {
   import Setup._
   import Functions._
 
@@ -104,12 +109,12 @@ object FreeMain extends App {
     } yield ys
   }
 
-  type K[F[_], A] = Kleisli[F, orcus.table.AsyncTableT, A]
+  type K[F[_], A] = Kleisli[F, AsyncTableT, A]
 
   type Algebra[A]      = CopK[TableOp ::: ResultOp ::: ResultScannerOp ::: TNilK, A]
-  type TableK[F[_], A] = Kleisli[F, orcus.table.AsyncTableT, A]
+  type TableK[F[_], A] = Kleisli[F, AsyncTableT, A]
 
-  def interpreter[M[_]](
+  def interpreter[M[A] <: CopK[_, A]](
       implicit
       T: TableHandler[M],
       R: ResultHandler[M],
@@ -121,14 +126,36 @@ object FreeMain extends App {
     CopK.FunctionK.of[Algebra, TableK[M, ?]](t, r, rs)
   }
 
-  val resource = Future(ConnectionFactory.createAsyncConnection().join())
+  def getConnection: Future[AsyncConnection]
 
-  val f = bracket(resource) { conn =>
-    val i: Algebra ~> TableK[Future, ?]           = interpreter[Future]
-    val k: TableK[Future, Vector[Option[Hello]]]  = program[Algebra].foldMap(i)
-    val t: AsyncTable[AdvancedScanResultConsumer] = conn.getTable(tableName)
+  val f = bracket(getConnection) { conn =>
+    val i: Algebra ~> TableK[Future, ?]          = interpreter[Future]
+    val k: TableK[Future, Vector[Option[Hello]]] = program[Algebra].foldMap(i)
+    val t: AsyncTableT                           = conn.getTableBuilder(tableName).build()
     k.run(t).map(_.foreach(println))
   }
 
   Await.result(f, 10.seconds)
 }
+
+object HBaseMain extends FreeMain {
+  def getConnection: Future[AsyncConnection] = {
+    val p = Promise[AsyncConnection]
+    ConnectionFactory
+      .createAsyncConnection()
+      .whenComplete(new BiConsumer[AsyncConnection, Throwable] {
+        def accept(t: AsyncConnection, u: Throwable): Unit =
+          if (u != null) p.failure(u) else p.success(t)
+      })
+
+    p.future
+  }
+}
+
+object BigtableMain extends FreeMain {
+  def getConnection: Future[AsyncConnection] = {
+    val p = Promise[AsyncConnection]
+    p.future
+  }
+}
+ */

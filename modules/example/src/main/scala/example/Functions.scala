@@ -1,4 +1,4 @@
-package example.bigtable
+package example
 
 import java.io.Closeable
 
@@ -16,7 +16,7 @@ object Functions {
         case NonFatal(e) =>
           try r.close()
           catch {
-            case NonFatal(_) =>
+            case NonFatal(_) => ()
           }
           F.raiseError(e)
       }

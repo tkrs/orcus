@@ -16,7 +16,7 @@ object Dependencies {
     val mockito          = "2.13.0"
     val kindProjector    = "0.9.6"
     val hbase            = "2.0.0-beta-1"
-    val bigtable         = "1.1.0"
+    val bigtable         = "1.2.0"
     val logback          = "1.2.3"
     val scalaJava8Compat = "0.8.0"
   }
@@ -36,7 +36,7 @@ object Dependencies {
     lazy val mockito        = "org.mockito"               % "mockito-core"        % Ver.mockito
     lazy val kindProjector  = "org.spire-math"            %% "kind-projector"     % Ver.kindProjector
     lazy val hbase          = "org.apache.hbase"          % "hbase-client"        % Ver.hbase
-    lazy val bigtable       = "com.google.cloud.bigtable" % "bigtable-hbase-1.x"  % Ver.bigtable
+    lazy val bigtable       = "com.google.cloud.bigtable" % "bigtable-hbase-2.x"  % Ver.bigtable
     lazy val logbackClassic = "ch.qos.logback"            % "logback-classic"     % Ver.logback
 
     lazy val forTest = Seq(scalatest, scalacheck, mockito).map(_ % "test")

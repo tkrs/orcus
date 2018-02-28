@@ -1,4 +1,4 @@
-package example.bigtable
+package example
 
 import org.apache.hadoop.hbase.util.Bytes
 import org.apache.hadoop.hbase.TableName
