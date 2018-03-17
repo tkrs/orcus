@@ -10,7 +10,7 @@ import org.scalatest.FunSpec
 
 class TwitterUtilAsyncHandlerSpec extends FunSpec {
 
-  describe("AsyncContext[Future]") {
+  describe("AsyncHandler[Future]") {
     it("should get a value as-is when its CompletableFuture is succeed") {
       def run(implicit f: CompletableFuture ~> Future) =
         f(CompletableFuture.completedFuture(10))

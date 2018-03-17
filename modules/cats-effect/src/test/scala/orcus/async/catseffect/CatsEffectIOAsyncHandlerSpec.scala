@@ -9,9 +9,9 @@ import cats.~>
 
 import scala.concurrent.duration._
 
-class CatsEffectIOAsyncConversionSpec extends org.scalatest.FunSpec {
+class CatsEffectIOAsyncHandlerSpec extends org.scalatest.FunSpec {
 
-  describe("AsyncContext[Task]") {
+  describe("AsyncHandler[Task]") {
     it("should get a value as-is when its CompletableFuture is succeed") {
       def run(implicit f: CompletableFuture ~> IO) =
         f(CompletableFuture.completedFuture(10))
