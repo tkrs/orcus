@@ -10,7 +10,7 @@ trait JCompletableFutureHandler {
   implicit def handleJavaCompletableFuture[F[_]](
       implicit F: AsyncHandler[F]): CompletableFuture ~> F = {
 
-    def toF[A](cf: CompletableFuture[A])(implicit F: AsyncHandler[F]): F[A] =
+    def toF[A](cf: CompletableFuture[A]): F[A] =
       F.handle[A](
         { cb =>
           val f = new BiConsumer[A, Throwable] {
