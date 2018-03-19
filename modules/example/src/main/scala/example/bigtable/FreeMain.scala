@@ -38,7 +38,7 @@ object FreeMain extends App {
         _ <- HPut.withDurability(Durability.ASYNC_WAL)
       } yield o
 
-      val x = PutEncoder[Hello].apply(new Put(rowKey, ts), hello, Long.MaxValue)
+      val x = PutEncoder[Hello].apply(new Put(rowKey, ts), hello)
       put.run(x)
     }
 
