@@ -14,7 +14,7 @@ class PutFamilyEncoderSpec extends FunSpec {
       val cf  = Bytes.toBytes("cf")
       val ts  = 1L
       val a   = A(1, "2", 3.0)
-      val p   = PutFamilyEncoder[A].apply(new Put(row), cf, a, ts)
+      val p   = PutFamilyEncoder[A].apply(new Put(row, ts), cf, a)
       assert(p.has(cf, Bytes.toBytes("a"), ts, Bytes.toBytes(1)))
       assert(p.has(cf, Bytes.toBytes("b"), ts, Bytes.toBytes("2")))
       assert(p.has(cf, Bytes.toBytes("c"), ts, Bytes.toBytes(3.0)))
@@ -24,7 +24,7 @@ class PutFamilyEncoderSpec extends FunSpec {
       val cf  = Bytes.toBytes("cf")
       val ts  = 1L
       val map = Map("a" -> 1, "b" -> 2, "c" -> 3)
-      val p   = PutFamilyEncoder[Map[String, Int]].apply(new Put(row), cf, map, ts)
+      val p   = PutFamilyEncoder[Map[String, Int]].apply(new Put(row, ts), cf, map)
       assert(p.has(cf, Bytes.toBytes("a"), ts, Bytes.toBytes(1)))
       assert(p.has(cf, Bytes.toBytes("b"), ts, Bytes.toBytes(2)))
       assert(p.has(cf, Bytes.toBytes("c"), ts, Bytes.toBytes(3)))

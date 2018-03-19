@@ -6,7 +6,7 @@ import shapeless._
 import shapeless.labelled.FieldType
 
 trait PutFamilyEncoder[A] {
-  def apply(acc: Put, cf: Array[Byte], a: A, ts: Long): Put
+  def apply(acc: Put, cf: Array[Byte], a: A): Put
 }
 
 object PutFamilyEncoder extends PutFamilyEncoder1 {
@@ -18,10 +18,10 @@ object PutFamilyEncoder extends PutFamilyEncoder1 {
       H: ValueCodec[K],
       V: ValueCodec[V]
   ): PutFamilyEncoder[Map[K, V]] = new PutFamilyEncoder[Map[K, V]] {
-    def apply(acc: Put, cf: Array[Byte], a: Map[K, V], ts: Long = Long.MaxValue): Put = {
+    def apply(acc: Put, cf: Array[Byte], a: Map[K, V]): Put = {
       a.foreach {
         case (k, v) =>
-          acc.addColumn(cf, H.encode(Option(k)), ts, V.encode(Option(v)))
+          acc.addColumn(cf, H.encode(Option(k)), V.encode(Option(v)))
       }
       acc
     }
@@ -31,7 +31,7 @@ object PutFamilyEncoder extends PutFamilyEncoder1 {
 trait PutFamilyEncoder1 {
 
   implicit val hnilPutEncoder: PutFamilyEncoder[HNil] = new PutFamilyEncoder[HNil] {
-    def apply(acc: Put, cf: Array[Byte], a: HNil, ts: Long): Put = acc
+    def apply(acc: Put, cf: Array[Byte], a: HNil): Put = acc
   }
 
   implicit def hlabelledConsPutFamilyEncoder[K <: Symbol, H, T <: HList](
@@ -40,10 +40,10 @@ trait PutFamilyEncoder1 {
       H: ValueCodec[H],
       T: Lazy[PutFamilyEncoder[T]]
   ): PutFamilyEncoder[FieldType[K, H] :: T] = new PutFamilyEncoder[::[FieldType[K, H], T]] {
-    def apply(acc: Put, cf: Array[Byte], a: FieldType[K, H] :: T, ts: Long): Put = a match {
+    def apply(acc: Put, cf: Array[Byte], a: FieldType[K, H] :: T): Put = a match {
       case h :: t =>
-        val hp = acc.addColumn(cf, Bytes.toBytes(K.value.name), ts, H.encode(Option(h)))
-        T.value(hp, cf, t, ts)
+        val hp = acc.addColumn(cf, Bytes.toBytes(K.value.name), H.encode(Option(h)))
+        T.value(hp, cf, t)
     }
   }
 
@@ -52,8 +52,8 @@ trait PutFamilyEncoder1 {
       gen: LabelledGeneric.Aux[A, R],
       R: Lazy[PutFamilyEncoder[R]]
   ): PutFamilyEncoder[A] = new PutFamilyEncoder[A] {
-    def apply(acc: Put, cf: Array[Byte], a: A, ts: Long = Long.MaxValue): Put = {
-      R.value(acc, cf, gen.to(a), ts)
+    def apply(acc: Put, cf: Array[Byte], a: A): Put = {
+      R.value(acc, cf, gen.to(a))
     }
   }
 }
