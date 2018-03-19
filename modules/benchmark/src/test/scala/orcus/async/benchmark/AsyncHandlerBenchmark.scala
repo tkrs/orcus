@@ -47,7 +47,7 @@ abstract class AsyncHandlerBenchmark {
       backgroundService = Executors.newFixedThreadPool(threads, daemonThreadFactory)
   }
 
-  final def compute: CompletableFuture[Int] =
+  @inline final def compute: CompletableFuture[Int] =
     CompletableFuture.supplyAsync(new Supplier[Int] {
       def get(): Int = {
         TimeUnit.MILLISECONDS.sleep(10)
