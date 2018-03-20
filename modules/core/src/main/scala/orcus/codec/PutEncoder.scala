@@ -34,12 +34,12 @@ trait PutEncoder1 {
     def apply(acc: Put, a: HNil): Put = acc
   }
 
-  implicit def hlabelledConsPutEncoder[K <: Symbol, H, T <: HList](
+  implicit def labelledHConsPutEncoder[K <: Symbol, H, T <: HList](
       implicit
       K: Witness.Aux[K],
       H: Lazy[PutFamilyEncoder[H]],
       T: Lazy[PutEncoder[T]]
-  ): PutEncoder[FieldType[K, H] :: T] = new PutEncoder[::[FieldType[K, H], T]] {
+  ): PutEncoder[FieldType[K, H] :: T] = new PutEncoder[FieldType[K, H] :: T] {
     def apply(acc: Put, a: FieldType[K, H] :: T): Put = a match {
       case h :: t =>
         val hp = H.value(acc, Bytes.toBytes(K.value.name), h)

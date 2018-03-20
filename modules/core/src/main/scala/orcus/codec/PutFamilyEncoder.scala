@@ -34,12 +34,12 @@ trait PutFamilyEncoder1 {
     def apply(acc: Put, cf: Array[Byte], a: HNil): Put = acc
   }
 
-  implicit def hlabelledConsPutFamilyEncoder[K <: Symbol, H, T <: HList](
+  implicit def labelledHConsPutFamilyEncoder[K <: Symbol, H, T <: HList](
       implicit
       K: Witness.Aux[K],
       H: ValueCodec[H],
       T: Lazy[PutFamilyEncoder[T]]
-  ): PutFamilyEncoder[FieldType[K, H] :: T] = new PutFamilyEncoder[::[FieldType[K, H], T]] {
+  ): PutFamilyEncoder[FieldType[K, H] :: T] = new PutFamilyEncoder[FieldType[K, H] :: T] {
     def apply(acc: Put, cf: Array[Byte], a: FieldType[K, H] :: T): Put = a match {
       case h :: t =>
         val hp = acc.addColumn(cf, Bytes.toBytes(K.value.name), H.encode(Option(h)))
