@@ -9,8 +9,8 @@ import org.apache.hadoop.hbase.util.Bytes
 
 import scala.collection.JavaConverters._
 
-final case class Table(
-    cf1: Columns
+final case class Table[A](
+    cf1: A
 )
 
 final case class Columns(a: Option[Int] = None,
@@ -40,5 +40,5 @@ class TestData {
     cell("i", Bytes.toBytes(BigDecimal(10).bigDecimal))
   ).asJava
 
-  val result: Result = Result.create(cells)
+  def resultForColumns: Result = Result.create(cells)
 }
