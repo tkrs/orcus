@@ -32,14 +32,14 @@ script:
     else
       sbt ++$TRAVIS_SCALA_VERSION clean test
     fi
-  - |
-    if [[ "$TRAVIS_BRANCH" = "master" && $(cat version.sbt) =~ "-SNAPSHOT" ]]; then
-      gpg_key_path=$HOME/.gnupg
-      mkdir -p $gpg_key_path
-      echo $GPG_KEY | base64 --decode > $gpg_key_path/secring.gpg
-      export PGP_SECRET_RING=$gpg_key_path/secring.gpg
-      sbt ++$TRAVIS_SCALA_VERSION publishSigned
-    fi
+  # - |
+    # if [[ "$TRAVIS_BRANCH" = "master" && $(cat version.sbt) =~ "-SNAPSHOT" ]]; then
+      # gpg_key_path=$HOME/.gnupg
+      # mkdir -p $gpg_key_path
+      # echo $GPG_KEY | base64 --decode > $gpg_key_path/secring.gpg
+      # export PGP_SECRET_RING=$gpg_key_path/secring.gpg
+      # sbt ++$TRAVIS_SCALA_VERSION publishSigned
+    # fi
 
 after_script:
   # See http://www.scala-sbt.org/1.x/docs/Travis-CI-with-sbt.html
