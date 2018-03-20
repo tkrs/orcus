@@ -4,7 +4,7 @@ object Dependencies {
   val Ver = new {
     val `scala2.12`   = "2.12.4"
     val `scala2.11`   = "2.11.12"
-    val scalafmt      = "1.2.0"
+    val scalafmt      = "1.3.0"
     val cats          = "1.1.0"
     val iota          = "0.3.6"
     val shapeless     = "2.3.3"
