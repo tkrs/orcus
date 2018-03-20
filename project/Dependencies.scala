@@ -9,7 +9,7 @@ object Dependencies {
     val iota          = "0.3.6"
     val shapeless     = "2.3.3"
     val scalacheck    = "1.13.5"
-    val scalatest     = "3.0.4"
+    val scalatest     = "3.0.5"
     val mockito       = "2.13.0"
     val kindProjector = "0.9.6"
     val hbase         = "1.3.1"
