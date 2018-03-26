@@ -242,12 +242,12 @@ lazy val benchmark = (project in file("modules/benchmark"))
     )
   )
   .enablePlugins(JmhPlugin)
-  .dependsOn(
-    iota % "test->test",
-    `twitter-util` % "test->test",
-    `cats-effect` % "test->test",
-    monix % "test->test",
-  )
+  .dependsOn(Seq(
+    iota,
+    `twitter-util`,
+    `cats-effect`,
+    monix,
+  ).map(_ % "test->test"): _*)
 
 lazy val compilerOptions = Seq(
   "-deprecation", // Emit warning and location for usages of deprecated APIs.
