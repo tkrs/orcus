@@ -1,8 +1,5 @@
 package example
 
-trait FreeMain
-
-/*
 import java.time.Instant
 import java.util.function.BiConsumer
 
@@ -10,6 +7,7 @@ import cats.data.Kleisli
 import cats.free.Free
 import cats.implicits._
 import cats.~>
+import com.google.cloud.bigtable.hbase.BigtableConfiguration
 import iota.{CopK, TNilK}
 import iota.TListK.:::
 import orcus.codec.PutEncoder
@@ -25,6 +23,7 @@ import org.apache.hadoop.hbase.util.Bytes
 import scala.concurrent.{Await, Future, Promise}
 import scala.concurrent.ExecutionContext.Implicits.global
 import scala.concurrent.duration._
+import scala.util.control.NonFatal
 
 final case class CF1(greeting1: Option[String], greeting2: Option[String])
 final case class Hello(cf1: CF1)
@@ -114,7 +113,7 @@ trait FreeMain extends App {
   type Algebra[A]      = CopK[TableOp ::: ResultOp ::: ResultScannerOp ::: TNilK, A]
   type TableK[F[_], A] = Kleisli[F, AsyncTableT, A]
 
-  def interpreter[M[A] <: CopK[_, A]](
+  def interpreter[M[_]](
       implicit
       T: TableHandler[M],
       R: ResultHandler[M],
@@ -144,8 +143,9 @@ object HBaseMain extends FreeMain {
     ConnectionFactory
       .createAsyncConnection()
       .whenComplete(new BiConsumer[AsyncConnection, Throwable] {
-        def accept(t: AsyncConnection, u: Throwable): Unit =
-          if (u != null) p.failure(u) else p.success(t)
+        def accept(t: AsyncConnection, u: Throwable): Unit = {
+          val _ = if (u != null) p.failure(u) else p.success(t)
+        }
       })
 
     p.future
@@ -154,8 +154,12 @@ object HBaseMain extends FreeMain {
 
 object BigtableMain extends FreeMain {
   def getConnection: Future[AsyncConnection] = {
-    val p = Promise[AsyncConnection]
-    p.future
+    val projectId  = sys.props.getOrElse("bigtable.project-id", "fake")
+    val instanceId = sys.props.getOrElse("bigtable.instance-id", "fake")
+    val c          = BigtableConfiguration.configure(projectId, instanceId)
+    try Future.successful(new BigtableAsyncConnection(c))
+    catch {
+      case NonFatal(e) => Future.failed(e)
+    }
   }
 }
- */
