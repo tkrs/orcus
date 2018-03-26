@@ -12,7 +12,7 @@ Add to your build.sbt
 
 ```
 libraryDependencies ++= Seq(
-  "org.apache.hbase" % "hbase-client" % "1.3.1",
+  "org.apache.hbase" % "hbase-client" % "2.0.0-beta-2",
   "com.github.tkrs" %% "orcus-core" % "x.y.z"
 )
 ```
@@ -21,7 +21,7 @@ If you are using `Free`, you can also use the following module.
 
 ```
 libraryDependencies ++= Seq(
-  "org.apache.hbase" % "hbase-client" % "1.3.1",
+  "org.apache.hbase" % "hbase-client" % "2.0.0-beta-2",
   "com.github.tkrs" %% "orcus-free" % "x.y.z"
 )
 ```
