@@ -4,7 +4,7 @@
 [![codecov](https://codecov.io/gh/tkrs/orcus/branch/master/graph/badge.svg)](https://codecov.io/gh/tkrs/orcus)
 [![Maven Central](https://maven-badges.herokuapp.com/maven-central/com.github.tkrs/orcus-core_2.12/badge.svg)](https://maven-badges.herokuapp.com/maven-central/com.github.tkrs/orcus-core_2.12)
 
-orcus is a library to interact with HBase built atop Cats, Shapeless, and [HBase Java Client](https://hbase.apache.org/apidocs/index.html) for connecting to an HBase instance.
+orcus is a library to interact with HBase built atop Cats, Shapeless, and [HBase Java Client](https://github.com/apache/hbase/tree/rel/2.0.0-beta-1) for connecting to an HBase instance.
 
 ## How to use it
 

@@ -3,8 +3,8 @@ import Dependencies._
 lazy val root = (project in file("."))
   .settings(allSettings)
   .settings(noPublishSettings)
-  .aggregate(core, free, iota, example, benchmark)
-  .dependsOn(core, free, iota, example, benchmark)
+  .aggregate(core, monix, `twitter-util`, `cats-effect`, free, iota, example, benchmark)
+  .dependsOn(core, monix, `twitter-util`, `cats-effect`, free, iota, example, benchmark)
 
 lazy val allSettings =
   buildSettings ++ baseSettings ++ publishSettings
@@ -38,8 +38,10 @@ lazy val baseSettings = Seq(
           "-Ywarn-unused:patvars", // Warn if a variable bound in a pattern is unused.
           "-Ywarn-unused:privates" // Warn if a private member is unused.
         )
-      case Some((2, p)) if p >= 11 => compilerOptions
-      case _                       => Nil
+      case Some((2, p)) if p >= 11 =>
+        compilerOptions
+      case _                       =>
+        Nil
     }
   },
   scalacOptions in (Compile, console) --= Seq("-Ywarn-unused:imports", "-Xfatal-warnings")
@@ -52,9 +54,7 @@ lazy val publishSettings = Seq(
   licenses := Seq("MIT License" -> url("http://www.opensource.org/licenses/mit-license.php")),
   publishMavenStyle := true,
   publishArtifact in Test := false,
-  pomIncludeRepository := { _ =>
-    false
-  },
+  pomIncludeRepository := { _ => false },
   publishTo := {
     val nexus = "https://oss.sonatype.org/"
     if (isSnapshot.value)
@@ -101,13 +101,71 @@ lazy val core = project
     description := "orcus core",
     moduleName := "orcus-core",
     name := "core",
-    libraryDependencies ++= Seq(
-      Pkg.catsCore,
-      Pkg.shapeless,
-      Pkg.hbase % "provided"
-    ).map(_.withSources),
-    libraryDependencies ++= Pkg.forTest
   )
+  .settings(
+    libraryDependencies ++= Seq.concat(
+      Seq(
+        Pkg.catsCore,
+        Pkg.shapeless,
+        Pkg.hbase % "provided"
+      ),
+      Pkg.forTest,
+    ).map(_.withSources),
+  )
+
+lazy val monix = project
+  .in(file("modules/monix"))
+  .settings(allSettings)
+  .settings(
+    description := "orcus monix",
+    moduleName := "orcus-monix",
+    name := "monix",
+  )
+  .settings(
+    libraryDependencies ++= Seq.concat(
+      Seq(
+        Pkg.monixEval,
+      ),
+      Pkg.forTest,
+    ).map(_.withSources),
+  )
+  .dependsOn(core)
+
+lazy val `twitter-util` = project
+  .in(file("modules/twitter-util"))
+  .settings(allSettings)
+  .settings(
+    description := "orcus twitter-util",
+    moduleName := "orcus-twitter-util",
+    name := "twitter-util",
+  )
+  .settings(
+    libraryDependencies ++= Seq.concat(
+      Seq(
+        Pkg.twitterUtil,
+      ),
+      Pkg.forTest,
+    ).map(_.withSources),
+  )
+  .dependsOn(core)
+
+lazy val `cats-effect` = project
+  .in(file("modules/cats-effect"))
+  .settings(allSettings)
+  .settings(
+    description := "orcus cats-effect",
+    moduleName := "orcus-cats-effect",
+    name := "cats-effect",
+  )
+  .settings(
+    libraryDependencies ++= Seq.concat(
+      Seq(
+      Pkg.catsEffect,
+      ),
+      Pkg.forTest,
+    ).map(_.withSources),
+  )
+  .dependsOn(core)
 
 lazy val free = project
   .in(file("modules/free"))
@@ -116,11 +174,15 @@ lazy val free = project
     description := "orcus free",
     moduleName := "orcus-free",
     name := "free",
-    libraryDependencies ++= Seq(
-      Pkg.catsFree,
-      Pkg.hbase % "provided"
+  )
+  .settings(
+    libraryDependencies ++= Seq.concat(
+      Seq(
+        Pkg.catsFree,
+        Pkg.hbase % "provided"
+      ),
+      Pkg.forTest,
     ).map(_.withSources),
-    libraryDependencies ++= Pkg.forTest
   )
   .dependsOn(core)
 
@@ -131,11 +193,15 @@ lazy val iota = project
     description := "orcus iota",
     moduleName := "orcus-iota",
     name := "iota",
-    libraryDependencies ++= Seq(
-      Pkg.iota,
-      Pkg.hbase % "provided"
+  )
+  .settings(
+    libraryDependencies ++= Seq.concat(
+      Seq(
+        Pkg.iota,
+        Pkg.hbase % "provided",
+      ),
+      Pkg.forTest,
     ).map(_.withSources),
-    libraryDependencies ++= Pkg.forTest
   )
   .dependsOn(free)
 
@@ -147,16 +213,18 @@ lazy val example = project
     description := "orcus example",
     moduleName := "orcus-example",
     name := "example",
-    fork := true,
+  )
+  .settings(
     libraryDependencies ++= Seq(
       Pkg.bigtable,
       Pkg.logbackClassic
     ).map(_.withSources)
   )
   .settings(
+    fork := true,
     coverageEnabled := false
   )
-  .dependsOn(free)
+  .dependsOn(iota)
 
 lazy val benchmark = (project in file("modules/benchmark"))
   .settings(allSettings)
@@ -168,16 +236,22 @@ lazy val benchmark = (project in file("modules/benchmark"))
   )
   .settings(
     libraryDependencies ++= Seq(
-      Pkg.hbase
+      Pkg.java8Compat,
+      Pkg.hbase,
+      Pkg.catbirdUtil,
     )
   )
   .enablePlugins(JmhPlugin)
-  .dependsOn(iota % "test->test")
+  .dependsOn(
+    iota % "test->test",
+    `twitter-util` % "test->test",
+    `cats-effect` % "test->test",
+    monix % "test->test",
+  )
 
 lazy val compilerOptions = Seq(
   "-deprecation", // Emit warning and location for usages of deprecated APIs.
-  "-encoding",
-  "utf-8", // Specify character encoding used by source files.
+  "-encoding", "utf-8", // Specify character encoding used by source files.
   "-explaintypes", // Explain type errors in more detail.
   "-feature", // Emit warning and location for usages of features that should be imported explicitly.
   "-language:existentials", // Existential types (besides wildcard types) can be written and inferred
