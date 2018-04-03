@@ -9,22 +9,25 @@ orcus is a library to interact with HBase built atop Cats, Shapeless, and [HBase
 
 ## How to use it
 
-Add to your build.sbt
+Firstly, this library depends on "provided" HBase client on your project. Thus, you must to add an HBase client to your `build.sbt` in addition to `orcus-core`. For example:
 
 ```
-libraryDependencies ++= Seq(
-  "org.apache.hbase" % "hbase-client" % "2.0.0-beta-2",
-  "com.github.tkrs" %% "orcus-core" % "x.y.z"
+libraryDependencies += Seq(
+  "com.github.tkrs" %% "orcus-core" % "x.y.z",
+  "org.apache.hbase" % "hbase-client" % "2.0.0-beta-2"
 )
 ```
 
-If you are using `Free`, you can also use the following module.
+If you are using `cats-free`, you can also use the following module.
 
 ```
-libraryDependencies ++= Seq(
-  "org.apache.hbase" % "hbase-client" % "2.0.0-beta-2",
-  "com.github.tkrs" %% "orcus-free" % "x.y.z"
-)
+libraryDependencies += "com.github.tkrs" %% "orcus-free" % "x.y.z"
+```
+
+One more thing, we supported `iota`. If you want to use it you can use as follows:
+
+```
+libraryDependencies += "com.github.tkrs" %% "orcus-iota" % "x.y.z"
 ```
 
 And, so look at this [example](https://github.com/tkrs/orcus/tree/master/modules/example/src/main/scala/example/bigtable)
