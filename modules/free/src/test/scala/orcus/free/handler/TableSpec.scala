@@ -28,6 +28,7 @@ import org.scalatest.{FunSpec, Matchers}
 import org.scalatest.mockito.MockitoSugar
 import org.mockito.Mockito._
 
+import scala.collection.JavaConverters._
 import scala.concurrent.{Await, Future}
 import scala.concurrent.ExecutionContext.Implicits.global
 import scala.concurrent.duration._
@@ -178,6 +179,50 @@ class TableSpec extends FunSpec with MockitoSugar with Matchers {
         val v = Await.result(f, 3.seconds)
 
         assert(r === v)
+      }
+    }
+
+    describe("batchS") {
+      it("should take the row successfully") {
+        val m = mock[AsyncTable[ScanResultConsumer]]
+
+        val a = Seq(
+          new HIncrement(Bytes.toBytes("1")),
+          new HIncrement(Bytes.toBytes("2")),
+          new HIncrement(Bytes.toBytes("3")),
+          new HIncrement(Bytes.toBytes("4"))
+        )
+        val expected = a.map(Option.apply).toVector
+
+        when(m.batch[HIncrement](a.asJava))
+          .thenReturn(a.map(r => CompletableFuture.completedFuture(r)).asJava)
+
+        val f = ops[TableOp].batchS(a).foldMap(interpreter[F, Vector[Option[HIncrement]]]).run(m)
+        val v = Await.result(f, 3.seconds)
+
+        assert(v === expected)
+      }
+    }
+
+    describe("batchT") {
+      it("should take the row successfully") {
+        val m = mock[AsyncTable[ScanResultConsumer]]
+
+        val a = Seq(
+          new HIncrement(Bytes.toBytes("1")),
+          new HIncrement(Bytes.toBytes("2")),
+          new HIncrement(Bytes.toBytes("3")),
+          new HIncrement(Bytes.toBytes("4"))
+        )
+        val expected = a.map(Option.apply).toVector
+
+        when(m.batch[HIncrement](a.asJava))
+          .thenReturn(a.map(r => CompletableFuture.completedFuture(r)).asJava)
+
+        val f = ops[TableOp].batchT(a).foldMap(interpreter[F, Vector[Option[HIncrement]]]).run(m)
+        val v = Await.result(f, 3.seconds)
+
+        assert(v === expected)
       }
     }
   }
