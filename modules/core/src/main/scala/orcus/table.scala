@@ -85,29 +85,29 @@ object table {
   ): F[HResult] =
     F(t.increment(a))
 
-  def batch[T <: HRow](t: AsyncTableT, as: Seq[T]): Iterator[CompletableFuture[T]] =
-    t.batch[T](as.asJava).iterator().asScala
+  def batch[T <: HRow](t: AsyncTableT, as: Seq[T]): Iterator[CompletableFuture[HResult]] =
+    t.batch[HResult](as.asJava).iterator().asScala
 
   def batchS[F[_]: Applicative, T <: HRow](t: AsyncTableT, as: Seq[T])(
       implicit
       ME: MonadError[F, Throwable],
       F: CompletableFuture ~> F
-  ): F[Vector[Option[T]]] =
-    batch[T](t, as).map(a => ME.map(F(a))(Option.apply)).toVector.sequence[F, Option[T]]
+  ): F[Vector[Option[HResult]]] =
+    batch[T](t, as).map(a => ME.map(F(a))(Option.apply)).toVector.sequence[F, Option[HResult]]
 
   def batchT[F[_], T <: HRow](t: AsyncTableT, as: Seq[T])(
       implicit
       ME: MonadError[F, Throwable],
       F: CompletableFuture ~> F
-  ): F[Vector[Option[T]]] =
+  ): F[Vector[Option[HResult]]] =
     batch[T](t, as).toVector.traverse(a => ME.map(F(a))(Option.apply))
 
   def batchAll[F[_], T <: HRow](t: AsyncTableT, as: Seq[T])(
       implicit
       ME: MonadError[F, Throwable],
       F: CompletableFuture ~> F
-  ): F[Vector[Option[T]]] =
-    ME.map(F(t.batchAll[T](as.asJava)))(_.iterator().asScala.map(Option.apply).toVector)
+  ): F[Vector[Option[HResult]]] =
+    ME.map(F(t.batchAll[HResult](as.asJava)))(_.iterator().asScala.map(Option.apply).toVector)
 
   def kleisli[F[_], A](f: AsyncTableT => F[A]): Kleisli[F, AsyncTableT, A] =
     Kleisli[F, AsyncTableT, A](f)
