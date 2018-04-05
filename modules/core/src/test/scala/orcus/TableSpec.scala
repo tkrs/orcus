@@ -4,8 +4,6 @@ import java.{lang => jl}
 import java.util.concurrent.CompletableFuture
 
 import cats.instances.future._
-import cats.instances.vector._
-import cats.syntax.traverse._
 import org.apache.hadoop.conf.Configuration
 import org.apache.hadoop.hbase.TableName
 import org.apache.hadoop.hbase.client._
@@ -171,28 +169,9 @@ class TableSpec extends FunSpec with MockitoSugar with Matchers {
       when(m.batch[Row](any[java.util.List[Row]]))
         .thenReturn(rows.map(a => CompletableFuture.completedFuture(a)).asJava)
 
-      val v = Await.result(table.batch[Future, Row](m, rows).toVector.sequence, 3.seconds)
+      val v = table.batch[Row](m, rows).map(_.get).toSeq
       assert(v === rows)
       verify(m).batch[Row](rows.asJava)
-    }
-  }
-
-  describe("batchAll") {
-    it("should return obtained values as Vector[Row] from Table.batchAll(List[Row]) as-is") {
-      val m  = mock[AsyncTable[ScanResultConsumer]]
-      val n  = "1"
-      val rk = Bytes.toBytes(n)
-      val rows: Seq[Mutation] = Seq(
-        new Increment(rk),
-        new Put(rk)
-      )
-
-      when(m.batchAll[Mutation](any[java.util.List[Row]]))
-        .thenReturn(CompletableFuture.completedFuture(rows.asJava))
-
-      val v = Await.result(table.batchAll[Future, Mutation](m, rows), 3.seconds)
-      assert(v === rows)
-      verify(m).batchAll[Mutation](rows.asJava)
     }
   }
 
@@ -205,12 +184,19 @@ class TableSpec extends FunSpec with MockitoSugar with Matchers {
         new Increment(rk),
         new Put(rk)
       )
+      val returns: Seq[Mutation] = Seq(
+        new Increment(rk),
+        new Put(rk),
+        null.asInstanceOf[Mutation]
+      )
+      val expected: Seq[Option[Mutation]] =
+        returns.map(Option.apply)
 
       when(m.batch[Mutation](any[java.util.List[Row]]))
-        .thenReturn(rows.map(a => CompletableFuture.completedFuture(a)).asJava)
+        .thenReturn(returns.map(a => CompletableFuture.completedFuture(a)).asJava)
 
-      val v = Await.result(table.batchAllS[Future, Mutation](m, rows), 3.seconds)
-      assert(v === rows)
+      val v = Await.result(table.batchS[Future, Mutation](m, rows), 3.seconds)
+      assert(v === expected)
       verify(m).batch[Mutation](rows.asJava)
     }
   }
@@ -224,13 +210,47 @@ class TableSpec extends FunSpec with MockitoSugar with Matchers {
         new Append(rk),
         new Delete(rk)
       )
+      val returns: Seq[Mutation] = Seq(
+        null.asInstanceOf[Mutation],
+        new Append(rk),
+        new Delete(rk)
+      )
+      val expected: Seq[Option[Mutation]] =
+        returns.map(Option.apply)
 
       when(m.batch[Mutation](any[java.util.List[Row]]))
-        .thenReturn(rows.map(a => CompletableFuture.completedFuture(a)).asJava)
+        .thenReturn(returns.map(a => CompletableFuture.completedFuture(a)).asJava)
 
-      val v = Await.result(table.batchAllT[Future, Mutation](m, rows), 3.seconds)
-      assert(v === rows)
+      val v = Await.result(table.batchT[Future, Mutation](m, rows), 3.seconds)
+      assert(v === expected)
       verify(m).batch[Mutation](rows.asJava)
     }
   }
+
+  describe("batchAll") {
+    it("should return obtained values as Vector[Row] from Table.batchAll(List[Row]) as-is") {
+      val m  = mock[AsyncTable[ScanResultConsumer]]
+      val n  = "1"
+      val rk = Bytes.toBytes(n)
+      val rows: Seq[Mutation] = Seq(
+        new Increment(rk),
+        new Put(rk)
+      )
+      val returns: Seq[Mutation] = Seq(
+        new Increment(rk),
+        null.asInstanceOf[Mutation],
+        new Put(rk)
+      )
+      val expected: Seq[Option[Mutation]] =
+        returns.map(Option.apply)
+
+      when(m.batchAll[Mutation](any[java.util.List[Row]]))
+        .thenReturn(CompletableFuture.completedFuture(returns.asJava))
+
+      val v = Await.result(table.batchAll[Future, Mutation](m, rows), 3.seconds)
+      assert(v === expected)
+      verify(m).batchAll[Mutation](rows.asJava)
+    }
+  }
+
 }
