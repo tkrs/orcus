@@ -1,10 +1,14 @@
 package orcus.free
 
-import cats.InjectK
+import java.util.concurrent.CompletableFuture
+
+import cats.{InjectK, MonadError, ~>}
 import cats.free.Free
+import orcus.table.AsyncTableT
 import org.apache.hadoop.conf.{Configuration => HConfig}
 import org.apache.hadoop.hbase.TableName
 import org.apache.hadoop.hbase.client.{
+  Row,
   Append => HAppend,
   Delete => HDelete,
   Get => HGet,
@@ -21,14 +25,15 @@ trait TableApi[F[_]] {
   def getName: TableF[TableName]
   def getConfiguration: TableF[HConfig]
   def exists(get: HGet): TableF[Boolean]
-  // def existsAll(gets: Seq[Get]): TableF[Seq[Boolean]]
-  // def batch[A](actions: Seq[Row]): TableF[Seq[A]]
   def get(a: HGet): TableF[HResult]
   def put(a: HPut): TableF[Unit]
   def getScanner(a: HScan): TableF[HResultScanner]
   def delete(a: HDelete): TableF[Unit]
   def append(a: HAppend): TableF[HResult]
   def increment(a: HIncrement): TableF[HResult]
+  def batchS[A <: Row](actions: Seq[A]): TableF[Vector[Option[A]]]
+  def batchT[A <: Row](actions: Seq[A]): TableF[Vector[Option[A]]]
+  // def existsAll(gets: Seq[Get]): TableF[Seq[Boolean]]
 }
 
 sealed trait TableOp[A]
@@ -43,6 +48,19 @@ object TableOp {
   final case class Delete(a: HDelete)       extends TableOp[Unit]
   final case class Append(a: HAppend)       extends TableOp[HResult]
   final case class Increment(a: HIncrement) extends TableOp[HResult]
+  final case class BatchS[A <: Row](a: Seq[A]) extends TableOp[Vector[Option[A]]] {
+    def run[M[_]](t: AsyncTableT)(implicit
+                                  ME: MonadError[M, Throwable],
+                                  cf: CompletableFuture ~> M): M[Vector[Option[A]]] =
+      orcus.table.batchS[M, A](t, a)
+  }
+
+  final case class BatchT[A <: Row](a: Seq[A]) extends TableOp[Vector[Option[A]]] {
+    def run[M[_]](t: AsyncTableT)(implicit
+                                  ME: MonadError[M, Throwable],
+                                  cf: CompletableFuture ~> M): M[Vector[Option[A]]] =
+      orcus.table.batchT[M, A](t, a)
+  }
 }
 
 private[free] abstract class TableOps0[M[_]](implicit inj: InjectK[TableOp, M])
@@ -57,10 +75,6 @@ private[free] abstract class TableOps0[M[_]](implicit inj: InjectK[TableOp, M])
 
   override def exists(a: HGet): TableF[Boolean] =
     Free.inject[TableOp, M](Exists(a))
-
-  // override def existsAll(gets: Seq[Get]): TableF[Seq[Boolean]] = ???
-
-  // override def batch[A](actions: Seq[Row]): TableF[Seq[A]] = ???
 
   override def get(a: HGet): TableF[HResult] =
     Free.inject[TableOp, M](Get(a))
@@ -79,6 +93,14 @@ private[free] abstract class TableOps0[M[_]](implicit inj: InjectK[TableOp, M])
 
   override def increment(a: HIncrement): TableF[HResult] =
     Free.inject[TableOp, M](Increment(a))
+
+  override def batchS[A <: Row](actions: Seq[A]): TableF[Vector[Option[A]]] =
+    Free.inject[TableOp, M](BatchS(actions))
+
+  override def batchT[A <: Row](actions: Seq[A]): TableF[Vector[Option[A]]] =
+    Free.inject[TableOp, M](BatchT(actions))
+
+  // override def existsAll(gets: Seq[Get]): TableF[Seq[Boolean]] = ???
 }
 
 class TableOps[M[_]](implicit inj: InjectK[TableOp, M]) extends TableOps0[M]
