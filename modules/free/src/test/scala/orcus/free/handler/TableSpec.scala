@@ -192,10 +192,16 @@ class TableSpec extends FunSpec with MockitoSugar with Matchers {
           new HIncrement(Bytes.toBytes("3")),
           new HIncrement(Bytes.toBytes("4"))
         )
-        val expected = a.map(Option.apply).toVector
+        val returns = Seq(
+          mock[Result],
+          mock[Result],
+          mock[Result],
+          mock[Result]
+        ).toVector
+        val expected = returns.map(Option.apply)
 
-        when(m.batch[HIncrement](a.asJava))
-          .thenReturn(a.map(r => CompletableFuture.completedFuture(r)).asJava)
+        when(m.batch[Result](a.asJava))
+          .thenReturn(returns.map(r => CompletableFuture.completedFuture(r)).asJava)
 
         val f = ops[TableOp].batchS(a).foldMap(interpreter[F, Vector[Option[HIncrement]]]).run(m)
         val v = Await.result(f, 3.seconds)
@@ -214,12 +220,18 @@ class TableSpec extends FunSpec with MockitoSugar with Matchers {
           new HIncrement(Bytes.toBytes("3")),
           new HIncrement(Bytes.toBytes("4"))
         )
-        val expected = a.map(Option.apply).toVector
+        val returns = Seq(
+          mock[Result],
+          mock[Result],
+          mock[Result],
+          mock[Result]
+        ).toVector
+        val expected = returns.map(Option.apply)
 
-        when(m.batch[HIncrement](a.asJava))
-          .thenReturn(a.map(r => CompletableFuture.completedFuture(r)).asJava)
+        when(m.batch[Result](a.asJava))
+          .thenReturn(returns.map(r => CompletableFuture.completedFuture(r)).asJava)
 
-        val f = ops[TableOp].batchT(a).foldMap(interpreter[F, Vector[Option[HIncrement]]]).run(m)
+        val f = ops[TableOp].batchT(a).foldMap(interpreter[F, Vector[Option[Result]]]).run(m)
         val v = Await.result(f, 3.seconds)
 
         assert(v === expected)
