@@ -38,40 +38,41 @@ class DecoderSpec extends FunSpec with MockitoSugar {
       val Right(b) = f(m)
       assert(b === Bar(Wuu(10)))
     }
-    it("should return Left when its second decoding is failed") {
-      case class Quux(b: String)
-      case class Wuu(a: Int)
-      case class Foo(b: Quux)
-      case class Bar(b: Wuu)
+    describe("flatMap") {
+      it("should return Left when its decoding is failed") {
+        case class Quux(b: Int)
+        case class Foo(b: Quux)
 
-      val m = mock[Result]
+        val m = mock[Result]
 
-      val t = new ju.TreeMap[Array[Byte], Array[Byte]](Bytes.BYTES_COMPARATOR)
-      t.put(Bytes.toBytes("a"), Bytes.toBytes(10))
-      t.put(Bytes.toBytes("b"), Bytes.toBytes("ss"))
+        val t = new ju.TreeMap[Array[Byte], Array[Byte]](Bytes.BYTES_COMPARATOR)
+        t.put(Bytes.toBytes("b"), Bytes.toBytes("ss"))
 
-      when(m.getFamilyMap(Bytes.toBytes("b"))).thenReturn(t)
+        when(m.getFamilyMap(Bytes.toBytes("b"))).thenReturn(t)
 
-      val f = Decoder[Foo].flatMap(_ => Decoder.liftF[Bar](Left(new Exception)))
+        val f = Decoder[Foo].flatMap(_ => fail())
 
-      val b = f(m)
-      assert(b.isLeft)
+        val b = f(m)
+        assert(b.isLeft)
+      }
     }
-    it("should return Left when its decoding is failed") {
-      case class Quux(b: Int)
-      case class Foo(b: Quux)
+    describe("map") {
+      it("should return Left when its decoding is failed") {
+        case class Quux(b: Int)
+        case class Foo(b: Quux)
 
-      val m = mock[Result]
+        val m = mock[Result]
 
-      val t = new ju.TreeMap[Array[Byte], Array[Byte]](Bytes.BYTES_COMPARATOR)
-      t.put(Bytes.toBytes("b"), Bytes.toBytes("100"))
+        val t = new ju.TreeMap[Array[Byte], Array[Byte]](Bytes.BYTES_COMPARATOR)
+        t.put(Bytes.toBytes("b"), Bytes.toBytes("100"))
 
-      when(m.getFamilyMap(Bytes.toBytes("b"))).thenReturn(t)
+        when(m.getFamilyMap(Bytes.toBytes("b"))).thenReturn(t)
 
-      val f = Decoder[Foo].map(a => fail())
+        val f = Decoder[Foo].map(a => fail())
 
-      val b = f(m)
-      assert(b.isLeft)
+        val b = f(m)
+        assert(b.isLeft)
+      }
     }
   }
 
