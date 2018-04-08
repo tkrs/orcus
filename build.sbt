@@ -107,6 +107,7 @@ lazy val core = project
       Seq(
         Pkg.catsCore,
         Pkg.shapeless,
+        Pkg.java8Compat,
         Pkg.hbase % "provided"
       ),
       Pkg.forTest,
