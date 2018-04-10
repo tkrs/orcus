@@ -225,7 +225,7 @@ lazy val example = project
     fork := true,
     coverageEnabled := false
   )
-  .dependsOn(iota)
+  .dependsOn(iota, `cats-effect`)
 
 lazy val benchmark = (project in file("modules/benchmark"))
   .settings(allSettings)
