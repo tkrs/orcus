@@ -28,6 +28,7 @@ trait TableApi[F[_]] {
   def get(a: HGet): TableF[HResult]
   def put(a: HPut): TableF[Unit]
   def getScanner(a: HScan): TableF[HResultScanner]
+  def scanAll(a: HScan): TableF[Seq[HResult]]
   def delete(a: HDelete): TableF[Unit]
   def append(a: HAppend): TableF[HResult]
   def increment(a: HIncrement): TableF[HResult]
@@ -44,7 +45,8 @@ object TableOp {
   final case class Exists(a: HGet)          extends TableOp[Boolean]
   final case class Get(a: HGet)             extends TableOp[HResult]
   final case class Put(a: HPut)             extends TableOp[Unit]
-  final case class Scan(a: HScan)           extends TableOp[HResultScanner]
+  final case class GetScanner(a: HScan)     extends TableOp[HResultScanner]
+  final case class ScanAll(a: HScan)        extends TableOp[Seq[HResult]]
   final case class Delete(a: HDelete)       extends TableOp[Unit]
   final case class Append(a: HAppend)       extends TableOp[HResult]
   final case class Increment(a: HIncrement) extends TableOp[HResult]
@@ -83,7 +85,10 @@ private[free] abstract class TableOps0[M[_]](implicit inj: InjectK[TableOp, M])
     Free.inject[TableOp, M](Put(a))
 
   override def getScanner(a: HScan): TableF[HResultScanner] =
-    Free.inject[TableOp, M](Scan(a))
+    Free.inject[TableOp, M](GetScanner(a))
+
+  override def scanAll(a: HScan): TableF[Seq[HResult]] =
+    Free.inject[TableOp, M](ScanAll(a))
 
   override def delete(a: HDelete): TableF[Unit] =
     Free.inject[TableOp, M](Delete(a))
