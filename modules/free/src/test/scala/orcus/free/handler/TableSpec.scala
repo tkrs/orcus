@@ -118,6 +118,25 @@ class TableSpec extends FunSpec with MockitoSugar with Matchers {
       }
     }
 
+    describe("scanAll") {
+      it("should call scanAll successfully") {
+        val m = mock[AsyncTable[ScanResultConsumer]]
+
+        val scan = new HScan()
+        val expected = Seq(
+          mock[Result],
+          mock[Result]
+        )
+
+        when(m.scanAll(scan)).thenReturn(CompletableFuture.completedFuture(expected.asJava))
+
+        val f = ops[TableOp].scanAll(scan).foldMap(interpreter[F, Unit]).run(m)
+        val v = Await.result(f, 3.seconds)
+
+        assert(v === expected)
+      }
+    }
+
     describe("getScanner") {
       it("should take the scan result successfully") {
         val m = mock[AsyncTable[ScanResultConsumer]]
