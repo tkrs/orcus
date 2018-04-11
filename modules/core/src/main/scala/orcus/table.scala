@@ -60,6 +60,13 @@ object table {
   ): F[Unit] =
     ME.map(F(t.put(a)))(_ => ())
 
+  def scanAll[F[_]](t: AsyncTableT, a: HScan)(
+      implicit
+      ME: MonadError[F, Throwable],
+      F: CompletableFuture ~> F
+  ): F[Seq[HResult]] =
+    ME.map(F(t.scanAll(a)))(_.asScala)
+
   def getScanner[F[_]](t: AsyncTableT, a: HScan)(
       implicit
       ME: MonadError[F, Throwable]
