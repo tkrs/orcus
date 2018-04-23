@@ -11,7 +11,7 @@ object Dependencies {
     val catsEffect       = "0.10"
     val iota             = "0.3.6"
     val shapeless        = "2.3.3"
-    val scalacheck       = "1.13.5"
+    val scalacheck       = "1.14.0"
     val scalatest        = "3.0.5"
     val mockito          = "2.13.0"
     val kindProjector    = "0.9.6"
