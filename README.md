@@ -30,7 +30,7 @@ One more thing, we supported `iota`. If you want to use it you can use as follow
 libraryDependencies += "com.github.tkrs" %% "orcus-iota" % "x.y.z"
 ```
 
-And, so look at this [example](https://github.com/tkrs/orcus/tree/master/modules/example/src/main/scala/example/bigtable)
+And, so look at this [example](https://github.com/tkrs/orcus/blob/master/modules/example/src/main/scala/example/FreeMain.scala)
 
 LICENSE
 
