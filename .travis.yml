@@ -11,9 +11,14 @@ jdk:
 matrix:
   include:
     - scala: 2.12.6
+      jdk: oraclejdk9
+    - scala: 2.12.6
       jdk: oraclejdk8
     - scala: 2.11.12
       jdk: oraclejdk8
+  allow_failures:
+    - scala: 2.12.6
+      jdk: oraclejdk9
 
 cache:
   directories:
@@ -27,13 +32,13 @@ install:
 
 script:
   - |
-    if [[ "$TRAVIS_SCALA_VERSION" = 2.12.* ]]; then
+    if [[ "$TRAVIS_JDK_VERSION" = "oraclejdk8" && "$TRAVIS_SCALA_VERSION" = 2.12.* ]]; then
       sbt ++$TRAVIS_SCALA_VERSION clean coverage compile test:compile test coverageReport coverageOff && codecov
     else
       sbt ++$TRAVIS_SCALA_VERSION clean compile test:compile test
     fi
   - |
-    if [[ "$TRAVIS_BRANCH" = "master" && $(cat version.sbt) =~ "-SNAPSHOT" ]]; then
+    if [[ "$TRAVIS_JDK_VERSION" = "oraclejdk8" && "$TRAVIS_BRANCH" = "master" && $(cat version.sbt) =~ "-SNAPSHOT" ]]; then
       gpg_key_path=$HOME/.gnupg
       mkdir -p $gpg_key_path
       echo $GPG_KEY | base64 --decode > $gpg_key_path/secring.gpg
