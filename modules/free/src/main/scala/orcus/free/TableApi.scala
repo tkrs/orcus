@@ -50,18 +50,18 @@ object TableOp {
   final case class Delete(a: HDelete)       extends TableOp[Unit]
   final case class Append(a: HAppend)       extends TableOp[HResult]
   final case class Increment(a: HIncrement) extends TableOp[HResult]
-  final case class BatchS[A <: Row](a: Seq[A]) extends TableOp[Vector[Option[HResult]]] {
+  final case class BatchS(a: Seq[_ <: Row]) extends TableOp[Vector[Option[HResult]]] {
     def run[M[_]](t: AsyncTableT)(implicit
                                   ME: MonadError[M, Throwable],
                                   cf: CompletableFuture ~> M): M[Vector[Option[HResult]]] =
-      orcus.table.batchS[M, A](t, a)
+      orcus.table.batchS[M](t, a)
   }
 
-  final case class BatchT[A <: Row](a: Seq[A]) extends TableOp[Vector[Option[HResult]]] {
+  final case class BatchT(a: Seq[_ <: Row]) extends TableOp[Vector[Option[HResult]]] {
     def run[M[_]](t: AsyncTableT)(implicit
                                   ME: MonadError[M, Throwable],
                                   cf: CompletableFuture ~> M): M[Vector[Option[HResult]]] =
-      orcus.table.batchT[M, A](t, a)
+      orcus.table.batchT[M](t, a)
   }
 }
 
