@@ -48,7 +48,7 @@ class TableSpec extends FunSpec with MockitoSugar with Matchers {
   }
 
   describe("exists") {
-    it("should return value obtained from Table.exists(Get) as-is") {
+    it("should return value obtained from exists(Get) as-is") {
       val m   = mock[AsyncTable[ScanResultConsumer]]
       val n   = "1"
       val rk  = Bytes.toBytes(n)
@@ -63,7 +63,7 @@ class TableSpec extends FunSpec with MockitoSugar with Matchers {
   }
 
   describe("get") {
-    it("should return value obtained from Table.get(Get) as-is") {
+    it("should return value obtained from get(Get) as-is") {
       val m   = mock[AsyncTable[ScanResultConsumer]]
       val n   = "1"
       val rk  = Bytes.toBytes(n)
@@ -79,7 +79,7 @@ class TableSpec extends FunSpec with MockitoSugar with Matchers {
   }
 
   describe("put") {
-    it("should return Unit obtained from Table.put(Put) as-is") {
+    it("should return Unit obtained from put(Put) as-is") {
       val m   = mock[AsyncTable[ScanResultConsumer]]
       val n   = "1"
       val rk  = Bytes.toBytes(n)
@@ -94,7 +94,7 @@ class TableSpec extends FunSpec with MockitoSugar with Matchers {
   }
 
   describe("scanAll") {
-    it("should return Unit obtained from Table.scanAll(Scan) as-is") {
+    it("should return Unit obtained from scanAll(Scan) as-is") {
       val m    = mock[AsyncTable[ScanResultConsumer]]
       val scan = new Scan()
       val expected = Seq(
@@ -111,7 +111,7 @@ class TableSpec extends FunSpec with MockitoSugar with Matchers {
   }
 
   describe("getScanner") {
-    it("should return ResultScanner obtained from Table.getScanner(Scan) as-is") {
+    it("should return ResultScanner obtained from getScanner(Scan) as-is") {
       val m    = mock[AsyncTable[ScanResultConsumer]]
       val n    = "1"
       val rk   = Bytes.toBytes(n)
@@ -127,7 +127,7 @@ class TableSpec extends FunSpec with MockitoSugar with Matchers {
   }
 
   describe("delete") {
-    it("should return Unit obtained from Table.delete(Delete) as-is") {
+    it("should return Unit obtained from delete(Delete) as-is") {
       val m      = mock[AsyncTable[ScanResultConsumer]]
       val n      = "1"
       val rk     = Bytes.toBytes(n)
@@ -142,7 +142,7 @@ class TableSpec extends FunSpec with MockitoSugar with Matchers {
   }
 
   describe("append") {
-    it("should return Result obtained from Table.append(Append) as-is") {
+    it("should return Result obtained from append(Append) as-is") {
       val m      = mock[AsyncTable[ScanResultConsumer]]
       val n      = "1"
       val rk     = Bytes.toBytes(n)
@@ -158,7 +158,7 @@ class TableSpec extends FunSpec with MockitoSugar with Matchers {
   }
 
   describe("increment") {
-    it("should return Result obtained from Table.increment(Increment) as-is") {
+    it("should return Result obtained from increment(Increment) as-is") {
       val m         = mock[AsyncTable[ScanResultConsumer]]
       val n         = "1"
       val rk        = Bytes.toBytes(n)
@@ -174,31 +174,32 @@ class TableSpec extends FunSpec with MockitoSugar with Matchers {
   }
 
   describe("batch") {
-    it(
-      "should return obtained values as Iterator[CompletableFuture[Result]] from Table.batch(List[Row])") {
+    it("should return obtained values as Iterator[CompletableFuture[Result]] from batch(List[Row])") {
       val m  = mock[AsyncTable[ScanResultConsumer]]
       val n  = "1"
       val rk = Bytes.toBytes(n)
       val rows: Seq[Row] = Seq(
         new Increment(rk),
-        new Get(rk)
+        new Get(rk),
+        new Delete(rk)
       )
-      val returns: Seq[Result] = Seq(
+      val returns: Seq[Object] = Seq(
         mock[Result],
-        mock[Result]
+        mock[Result],
+        null.asInstanceOf[Void]
       )
 
-      when(m.batch[Result](any[java.util.List[Row]]))
+      when(m.batch[Object](any[java.util.List[Row]]))
         .thenReturn(returns.map(a => CompletableFuture.completedFuture(a)).asJava)
 
-      val v = table.batch[Row](m, rows).map(_.get).toSeq
+      val v = table.batch[Future, Object](m, rows).map(fo => Await.result(fo, 3.seconds)).toSeq
       assert(v === returns)
-      verify(m).batch[Result](rows.asJava)
+      verify(m).batch[Object](rows.asJava)
     }
   }
 
-  describe("batchAllS") {
-    it("should return obtained values as Vector[Option[Result]] from Table.batch(List[Row])") {
+  describe("batchS") {
+    it("should return obtained values as Vector[Option[Result]] from batch(List[Row])") {
       val m  = mock[AsyncTable[ScanResultConsumer]]
       val n  = "1"
       val rk = Bytes.toBytes(n)
@@ -216,14 +217,14 @@ class TableSpec extends FunSpec with MockitoSugar with Matchers {
       when(m.batch[Result](any[java.util.List[Row]]))
         .thenReturn(returns.map(a => CompletableFuture.completedFuture(a)).asJava)
 
-      val v = Await.result(table.batchS[Future, Mutation](m, rows), 3.seconds)
+      val v = Await.result(table.batchS[Future](m, rows), 3.seconds)
       assert(v === expected)
-      verify(m).batch[Mutation](rows.asJava)
+      verify(m).batch[Object](rows.asJava)
     }
   }
 
-  describe("batchAllT") {
-    it("should return obtained values as Vector[Option[Result]] from Table.batch(List[Row])") {
+  describe("batchT") {
+    it("should return obtained values as Vector[Option[Result]] from batch(List[Row])") {
       val m  = mock[AsyncTable[ScanResultConsumer]]
       val n  = "1"
       val rk = Bytes.toBytes(n)
@@ -231,24 +232,24 @@ class TableSpec extends FunSpec with MockitoSugar with Matchers {
         new Append(rk),
         new Delete(rk)
       )
-      val returns: Seq[Result] = Seq(
+      val returns: Seq[Object] = Seq(
         null.asInstanceOf[Result],
         mock[Result],
-        mock[Result]
+        null.asInstanceOf[Void]
       )
       val expected = returns.map(Option.apply)
 
-      when(m.batch[Result](any[java.util.List[Row]]))
+      when(m.batch[Object](any[java.util.List[Row]]))
         .thenReturn(returns.map(a => CompletableFuture.completedFuture(a)).asJava)
 
-      val v = Await.result(table.batchT[Future, Mutation](m, rows), 3.seconds)
+      val v = Await.result(table.batchT[Future](m, rows), 3.seconds)
       assert(v === expected)
-      verify(m).batch[Mutation](rows.asJava)
+      verify(m).batch[Object](rows.asJava)
     }
   }
 
   describe("batchAll") {
-    it("should return obtained values as Vector[Option[Result]] from Table.batchAll(List[Row])") {
+    it("should return obtained values as Vector[Option[Result]] from batchAll(List[Row])") {
       val m  = mock[AsyncTable[ScanResultConsumer]]
       val n  = "1"
       val rk = Bytes.toBytes(n)
@@ -266,7 +267,7 @@ class TableSpec extends FunSpec with MockitoSugar with Matchers {
       when(m.batchAll[Result](any[java.util.List[Row]]))
         .thenReturn(CompletableFuture.completedFuture(returns.asJava))
 
-      val v = Await.result(table.batchAll[Future, Mutation](m, rows), 3.seconds)
+      val v = Await.result(table.batchAll[Future, Seq](m, rows), 3.seconds)
       assert(v === expected)
       verify(m).batchAll[Result](rows.asJava)
     }

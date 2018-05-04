@@ -4,7 +4,7 @@ import java.util.concurrent.CompletableFuture
 
 import cats.instances.vector._
 import cats.syntax.traverse._
-import cats.{Applicative, Monad, MonadError, ~>}
+import cats.{Monad, MonadError, ~>}
 import cats.data.Kleisli
 import org.apache.hadoop.conf.{Configuration => HConfig}
 import org.apache.hadoop.hbase.client.{
@@ -23,6 +23,7 @@ import org.apache.hadoop.hbase.client.{
 import org.apache.hadoop.hbase.{TableName => HTableName}
 
 import scala.collection.JavaConverters._
+import scala.collection.generic.CanBuildFrom
 
 object table {
 
@@ -92,29 +93,44 @@ object table {
   ): F[HResult] =
     F(t.increment(a))
 
-  def batch[T <: HRow](t: AsyncTableT, as: Seq[T]): Iterator[CompletableFuture[HResult]] =
-    t.batch[HResult](as.asJava).iterator().asScala
+  def batch[F[_], T](t: AsyncTableT, as: Seq[_ <: HRow])(
+      implicit
+      F: CompletableFuture ~> F
+  ): Iterator[F[T]] =
+    t.batch[T](as.asJava).iterator.asScala.map(F.apply)
 
-  def batchS[F[_]: Applicative, T <: HRow](t: AsyncTableT, as: Seq[T])(
+  def batchS[F[_]](t: AsyncTableT, as: Seq[_ <: HRow])(
+      implicit
+      ME: MonadError[F, Throwable],
+      F: CompletableFuture ~> F
+  ): F[Vector[Option[HResult]]] = {
+    batch[F, Object](t, as)
+      .map(fo => ME.map(fo) { case r: HResult => Option(r); case null => None })
+      .toVector
+      .sequence[F, Option[HResult]]
+  }
+
+  def batchT[F[_]](t: AsyncTableT, as: Seq[_ <: HRow])(
       implicit
       ME: MonadError[F, Throwable],
       F: CompletableFuture ~> F
   ): F[Vector[Option[HResult]]] =
-    batch[T](t, as).map(a => ME.map(F(a))(Option.apply)).toVector.sequence[F, Option[HResult]]
+    batch[F, Object](t, as).toVector.traverse(fo =>
+      ME.map(fo) { case r: HResult => Option(r); case null => None })
 
-  def batchT[F[_], T <: HRow](t: AsyncTableT, as: Seq[T])(
+  def batchAll[F[_], C[_]](t: AsyncTableT, as: Seq[_ <: HRow])(
       implicit
       ME: MonadError[F, Throwable],
-      F: CompletableFuture ~> F
-  ): F[Vector[Option[HResult]]] =
-    batch[T](t, as).toVector.traverse(a => ME.map(F(a))(Option.apply))
-
-  def batchAll[F[_], T <: HRow](t: AsyncTableT, as: Seq[T])(
-      implicit
-      ME: MonadError[F, Throwable],
-      F: CompletableFuture ~> F
-  ): F[Vector[Option[HResult]]] =
-    ME.map(F(t.batchAll[HResult](as.asJava)))(_.iterator().asScala.map(Option.apply).toVector)
+      F: CompletableFuture ~> F,
+      C: CanBuildFrom[Nothing, Option[HResult], C[Option[HResult]]]
+  ): F[C[Option[HResult]]] = {
+    ME.map(F(t.batchAll[Object](as.asJava))) { xs =>
+      val it = xs.iterator
+      val c  = C.apply
+      while (it.hasNext) c += (it.next match { case r: HResult => Option(r); case null => None })
+      c.result
+    }
+  }
 
   def kleisli[F[_], A](f: AsyncTableT => F[A]): Kleisli[F, AsyncTableT, A] =
     Kleisli[F, AsyncTableT, A](f)
