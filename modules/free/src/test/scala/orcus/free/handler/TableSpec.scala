@@ -6,7 +6,7 @@ import java.util.concurrent.CompletableFuture
 import cats.~>
 import cats.data.Kleisli
 import cats.instances.future._
-import orcus.{table => ot}
+import orcus.{BatchResult, table => ot}
 import orcus.free.{TableOp, TableOps}
 import orcus.free.handler.table.Handler
 import org.apache.hadoop.conf.Configuration
@@ -15,6 +15,7 @@ import org.apache.hadoop.hbase.client.{
   AsyncTable,
   Result,
   ResultScanner,
+  RowMutations,
   ScanResultConsumer,
   Append => HAppend,
   Delete => HDelete,
@@ -201,56 +202,62 @@ class TableSpec extends FunSpec with MockitoSugar with Matchers {
       }
     }
 
-    describe("batchS") {
+    describe("batch") {
       it("should take the row successfully") {
         val m = mock[AsyncTable[ScanResultConsumer]]
 
         val a = Seq(
           new HIncrement(Bytes.toBytes("1")),
-          new HIncrement(Bytes.toBytes("2")),
-          new HIncrement(Bytes.toBytes("3")),
-          new HIncrement(Bytes.toBytes("4"))
+          new HDelete(Bytes.toBytes("2")),
+          new HGet(Bytes.toBytes("3")),
+          new HGet(Bytes.toBytes("error")),
+          new HAppend(Bytes.toBytes("1")),
+          new HPut(Bytes.toBytes("3")),
+          new HIncrement(Bytes.toBytes("4")),
+          new RowMutations(Bytes.toBytes("s")),
+          new HGet(Bytes.toBytes("error"))
         )
-        val returns = Seq(
-          mock[Result],
-          mock[Result],
-          mock[Result],
-          mock[Result]
-        ).toVector
-        val expected = returns.map(Option.apply)
-
-        when(m.batch[Result](a.asJava))
-          .thenReturn(returns.map(r => CompletableFuture.completedFuture(r)).asJava)
-
-        val f = ops[TableOp].batchS(a).foldMap(interpreter[F, Vector[Option[HIncrement]]]).run(m)
-        val v = Await.result(f, 3.seconds)
-
-        assert(v === expected)
-      }
-    }
-
-    describe("batchT") {
-      it("should take the row successfully") {
-        val m = mock[AsyncTable[ScanResultConsumer]]
-
-        val a = Seq(
-          new HIncrement(Bytes.toBytes("1")),
-          new HIncrement(Bytes.toBytes("2")),
-          new HIncrement(Bytes.toBytes("3")),
-          new HIncrement(Bytes.toBytes("4"))
+        val r1 = mock[Result]
+        val r2 = mock[Result]
+        val r3 = mock[Result]
+        val r4 = mock[Result]
+        val ex = new Exception("Oops")
+        val returns: Seq[Object] = Seq(
+          r1,
+          null.asInstanceOf[Void],
+          null.asInstanceOf[Result],
+          ex,
+          r2,
+          null.asInstanceOf[Void],
+          r3,
+          r4,
+          ""
         )
-        val returns = Seq(
-          mock[Result],
-          mock[Result],
-          mock[Result],
-          mock[Result]
-        ).toVector
-        val expected = returns.map(Option.apply)
+        val expected = Vector(
+          BatchResult.Mutate(Some(r1)),
+          BatchResult.VoidMutate,
+          BatchResult.Mutate(None),
+          BatchResult.Error(ex, new HGet(Bytes.toBytes("error"))),
+          BatchResult.Mutate(Some(r2)),
+          BatchResult.VoidMutate,
+          BatchResult.Mutate(Some(r3)),
+          BatchResult.Mutate(Some(r4)),
+          BatchResult.Error(new Exception("Unexpected class returned: String"),
+                            new HGet(Bytes.toBytes("error")))
+        )
 
-        when(m.batch[Result](a.asJava))
-          .thenReturn(returns.map(r => CompletableFuture.completedFuture(r)).asJava)
+        when(m.batch[Object](a.asJava))
+          .thenReturn(returns.map {
+            case r: Exception =>
+              val cf = new CompletableFuture[Object]
+              cf.completeExceptionally(r)
+              cf
+            case r =>
+              CompletableFuture.completedFuture(r)
+          }.asJava)
 
-        val f = ops[TableOp].batchT(a).foldMap(interpreter[F, Vector[Option[Result]]]).run(m)
+        val f =
+          ops[TableOp].batch[Vector](a).foldMap(interpreter[F, Vector[Option[HIncrement]]]).run(m)
         val v = Await.result(f, 3.seconds)
 
         assert(v === expected)
