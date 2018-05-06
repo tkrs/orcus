@@ -4,6 +4,7 @@ import java.util.concurrent.CompletableFuture
 
 import cats.{InjectK, MonadError, ~>}
 import cats.free.Free
+import orcus.BatchResult
 import orcus.table.AsyncTableT
 import org.apache.hadoop.conf.{Configuration => HConfig}
 import org.apache.hadoop.hbase.TableName
@@ -19,6 +20,8 @@ import org.apache.hadoop.hbase.client.{
   Scan => HScan
 }
 
+import scala.collection.generic.CanBuildFrom
+
 trait TableApi[F[_]] {
   type TableF[A] = Free[F, A]
 
@@ -32,8 +35,7 @@ trait TableApi[F[_]] {
   def delete(a: HDelete): TableF[Unit]
   def append(a: HAppend): TableF[HResult]
   def increment(a: HIncrement): TableF[HResult]
-  def batchS[A <: Row](actions: Seq[A]): TableF[Vector[Option[HResult]]]
-  def batchT[A <: Row](actions: Seq[A]): TableF[Vector[Option[HResult]]]
+  def batch[C[_]](actions: Seq[_ <: Row]): TableF[C[BatchResult]]
   // def existsAll(gets: Seq[Get]): TableF[Seq[Boolean]]
 }
 
@@ -50,18 +52,13 @@ object TableOp {
   final case class Delete(a: HDelete)       extends TableOp[Unit]
   final case class Append(a: HAppend)       extends TableOp[HResult]
   final case class Increment(a: HIncrement) extends TableOp[HResult]
-  final case class BatchS(a: Seq[_ <: Row]) extends TableOp[Vector[Option[HResult]]] {
-    def run[M[_]](t: AsyncTableT)(implicit
-                                  ME: MonadError[M, Throwable],
-                                  cf: CompletableFuture ~> M): M[Vector[Option[HResult]]] =
-      orcus.table.batchS[M](t, a)
-  }
-
-  final case class BatchT(a: Seq[_ <: Row]) extends TableOp[Vector[Option[HResult]]] {
-    def run[M[_]](t: AsyncTableT)(implicit
-                                  ME: MonadError[M, Throwable],
-                                  cf: CompletableFuture ~> M): M[Vector[Option[HResult]]] =
-      orcus.table.batchT[M](t, a)
+  final case class Batch[C[_]](a: Seq[_ <: Row]) extends TableOp[C[BatchResult]] {
+    def run[M[_]](t: AsyncTableT)(
+        implicit
+        ME: MonadError[M, Throwable],
+        cf: CompletableFuture ~> M,
+        cbf: CanBuildFrom[Nothing, BatchResult, C[BatchResult]]): M[C[BatchResult]] =
+      orcus.table.batch[M, C](t, a)
   }
 }
 
@@ -99,11 +96,8 @@ private[free] abstract class TableOps0[M[_]](implicit inj: InjectK[TableOp, M])
   override def increment(a: HIncrement): TableF[HResult] =
     Free.inject[TableOp, M](Increment(a))
 
-  override def batchS[A <: Row](actions: Seq[A]): TableF[Vector[Option[HResult]]] =
-    Free.inject[TableOp, M](BatchS(actions))
-
-  override def batchT[A <: Row](actions: Seq[A]): TableF[Vector[Option[HResult]]] =
-    Free.inject[TableOp, M](BatchT(actions))
+  override def batch[C[_]](actions: Seq[_ <: Row]): TableF[C[BatchResult]] =
+    Free.inject[TableOp, M](Batch[C](actions))
 
   // override def existsAll(gets: Seq[Get]): TableF[Seq[Boolean]] = ???
 }

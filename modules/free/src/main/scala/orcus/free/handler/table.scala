@@ -19,18 +19,17 @@ object table {
                                       AC: AsyncHandler[M]): Handler[M] =
       new Handler[M] {
         override def apply[A](fa: TableOp[A]): Kleisli[M, AsyncTableT, A] = fa match {
-          case GetName           => kleisli(getName[M])
-          case GetConfiguration  => kleisli(getConfiguration[M])
-          case Exists(a)         => kleisli(exists[M](_, a))
-          case Get(a)            => kleisli(get[M](_, a))
-          case Put(a)            => kleisli(put[M](_, a))
-          case GetScanner(a)     => kleisli(getScanner[M](_, a))
-          case ScanAll(a)        => kleisli(scanAll[M](_, a))
-          case Delete(a)         => kleisli(delete[M](_, a))
-          case Append(a)         => kleisli(append[M](_, a))
-          case Increment(a)      => kleisli(increment[M](_, a))
-          case batch @ BatchS(_) => kleisli(batch.run[M])
-          case batch @ BatchT(_) => kleisli(batch.run[M])
+          case GetName          => kleisli(getName[M])
+          case GetConfiguration => kleisli(getConfiguration[M])
+          case Exists(a)        => kleisli(exists[M](_, a))
+          case Get(a)           => kleisli(get[M](_, a))
+          case Put(a)           => kleisli(put[M](_, a))
+          case GetScanner(a)    => kleisli(getScanner[M](_, a))
+          case ScanAll(a)       => kleisli(scanAll[M](_, a))
+          case Delete(a)        => kleisli(delete[M](_, a))
+          case Append(a)        => kleisli(append[M](_, a))
+          case Increment(a)     => kleisli(increment[M](_, a))
+          case batch @ Batch(_) => kleisli(batch.run[M])
         }
       }
   }

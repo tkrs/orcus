@@ -2,13 +2,12 @@ package orcus
 
 import java.util.concurrent.CompletableFuture
 
-import cats.instances.vector._
-import cats.syntax.traverse._
 import cats.{Monad, MonadError, ~>}
 import cats.data.Kleisli
 import org.apache.hadoop.conf.{Configuration => HConfig}
 import org.apache.hadoop.hbase.client.{
   AsyncTable,
+  RowMutations,
   ScanResultConsumerBase,
   Append => HAppend,
   Delete => HDelete,
@@ -93,30 +92,44 @@ object table {
   ): F[HResult] =
     F(t.increment(a))
 
-  def batch[F[_], T](t: AsyncTableT, as: Seq[_ <: HRow])(
-      implicit
-      F: CompletableFuture ~> F
-  ): Iterator[F[T]] =
-    t.batch[T](as.asJava).iterator.asScala.map(F.apply)
-
-  def batchS[F[_]](t: AsyncTableT, as: Seq[_ <: HRow])(
+  def batch[F[_], C[_]](t: AsyncTableT, as: Seq[_ <: HRow])(
       implicit
       ME: MonadError[F, Throwable],
-      F: CompletableFuture ~> F
-  ): F[Vector[Option[HResult]]] = {
-    batch[F, Object](t, as)
-      .map(fo => ME.map(fo) { case r: HResult => Option(r); case null => None })
-      .toVector
-      .sequence[F, Option[HResult]]
+      F: CompletableFuture ~> F,
+      cbf: CanBuildFrom[Nothing, BatchResult, C[BatchResult]]
+  ): F[C[BatchResult]] = {
+    val itr   = as.iterator
+    val itcfo = t.batch[Object](as.asJava).iterator.asScala
+    val itfb = itr
+      .zip(itcfo.map(F.apply))
+      .map {
+        case (a, fo) =>
+          val f = ME.flatMap[Object, BatchResult](fo) {
+            case r: HResult =>
+              ME.pure(BatchResult.Mutate(Some(r)))
+            case null =>
+              a match {
+                case _: HGet | _: HAppend | _: HIncrement | _: RowMutations =>
+                  ME.pure(BatchResult.Mutate(None))
+                case _ => // Delete or Put
+                  ME.pure(BatchResult.VoidMutate)
+              }
+            case other =>
+              ME.pure(
+                BatchResult.Error(
+                  new Exception(s"Unexpected class returned: ${other.getClass.getSimpleName}"),
+                  a))
+          }
+          ME.recover(f) {
+            case t: Throwable =>
+              BatchResult.Error(t, a)
+          }
+      }
+    val fbb = itfb.foldLeft(ME.pure(cbf.apply)) {
+      case (acc, fb) => ME.map2(fb, acc)((a, b) => b += a)
+    }
+    ME.map(fbb)(_.result)
   }
-
-  def batchT[F[_]](t: AsyncTableT, as: Seq[_ <: HRow])(
-      implicit
-      ME: MonadError[F, Throwable],
-      F: CompletableFuture ~> F
-  ): F[Vector[Option[HResult]]] =
-    batch[F, Object](t, as).toVector.traverse(fo =>
-      ME.map(fo) { case r: HResult => Option(r); case null => None })
 
   def batchAll[F[_], C[_]](t: AsyncTableT, as: Seq[_ <: HRow])(
       implicit
