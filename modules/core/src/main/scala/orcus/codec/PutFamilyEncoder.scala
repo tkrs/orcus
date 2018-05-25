@@ -38,12 +38,12 @@ trait PutFamilyEncoder1 {
       implicit
       K: Witness.Aux[K],
       H: ValueCodec[H],
-      T: Lazy[PutFamilyEncoder[T]]
+      T: PutFamilyEncoder[T]
   ): PutFamilyEncoder[FieldType[K, H] :: T] = new PutFamilyEncoder[FieldType[K, H] :: T] {
     def apply(acc: Put, cf: Array[Byte], a: FieldType[K, H] :: T): Put = a match {
       case h :: t =>
         val hp = acc.addColumn(cf, Bytes.toBytes(K.value.name), H.encode(Option(h)))
-        T.value(hp, cf, t)
+        T(hp, cf, t)
     }
   }
 
