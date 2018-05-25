@@ -14,7 +14,7 @@ import scala.collection.mutable
 @Measurement(iterations = 10, time = 1)
 @Threads(1)
 @Fork(2)
-@OutputTimeUnit(TimeUnit.MILLISECONDS)
+@OutputTimeUnit(TimeUnit.SECONDS)
 class DecoderBench {
   import States._
 
