@@ -1,22 +1,22 @@
 package orcus.codec
 
-import java.util
-import java.util.function.BiConsumer
+import java.util.{NavigableMap => NMap}
 
 import cats.Eval
 import org.apache.hadoop.hbase.util.Bytes
 import shapeless.labelled._
 import shapeless._
 
+import scala.annotation.tailrec
 import scala.collection.generic.CanBuildFrom
-import scala.util.control.NonFatal
+import scala.collection.mutable
 
 trait FamilyDecoder[A] { self =>
 
-  def apply(map: util.NavigableMap[Array[Byte], Array[Byte]]): Either[Throwable, A]
+  def apply(map: NMap[Array[Byte], Array[Byte]]): Either[Throwable, A]
 
   def flatMap[B](f: A => FamilyDecoder[B]): FamilyDecoder[B] = new FamilyDecoder[B] {
-    def apply(map: util.NavigableMap[Array[Byte], Array[Byte]]): Either[Throwable, B] = {
+    def apply(map: NMap[Array[Byte], Array[Byte]]): Either[Throwable, B] = {
       self(map) match {
         case Right(a)    => f(a)(map)
         case l @ Left(_) => l.asInstanceOf[Either[Throwable, B]]
@@ -25,7 +25,7 @@ trait FamilyDecoder[A] { self =>
   }
 
   def map[B](f: A => B): FamilyDecoder[B] = new FamilyDecoder[B] {
-    def apply(map: util.NavigableMap[Array[Byte], Array[Byte]]): Either[Throwable, B] =
+    def apply(map: NMap[Array[Byte], Array[Byte]]): Either[Throwable, B] =
       self(map) match {
         case Right(a)    => Right(f(a))
         case l @ Left(_) => l.asInstanceOf[Either[Throwable, B]]
@@ -33,7 +33,7 @@ trait FamilyDecoder[A] { self =>
   }
 
   def mapF[B](f: A => Either[Throwable, B]): FamilyDecoder[B] = new FamilyDecoder[B] {
-    def apply(map: util.NavigableMap[Array[Byte], Array[Byte]]): Either[Throwable, B] =
+    def apply(map: NMap[Array[Byte], Array[Byte]]): Either[Throwable, B] =
       self(map) match {
         case Right(a)    => f(a)
         case l @ Left(_) => l.asInstanceOf[Either[Throwable, B]]
@@ -46,86 +46,97 @@ object FamilyDecoder extends FamilyDecoder1 {
   def apply[A](implicit A: FamilyDecoder[A]): FamilyDecoder[A] = A
 
   def pure[A](a: A): FamilyDecoder[A] = new FamilyDecoder[A] {
-    def apply(map: util.NavigableMap[Array[Byte], Array[Byte]]): Either[Throwable, A] =
+    def apply(map: NMap[Array[Byte], Array[Byte]]): Either[Throwable, A] =
       Right(a)
   }
 
   def eval[A](a: Eval[A]): FamilyDecoder[A] = new FamilyDecoder[A] {
-    def apply(map: util.NavigableMap[Array[Byte], Array[Byte]]): Either[Throwable, A] =
+    def apply(map: NMap[Array[Byte], Array[Byte]]): Either[Throwable, A] =
       Right(a.value)
   }
 
   def liftF[A](a: Either[Throwable, A]): FamilyDecoder[A] = new FamilyDecoder[A] {
-    def apply(map: util.NavigableMap[Array[Byte], Array[Byte]]): Either[Throwable, A] = a
+    def apply(map: NMap[Array[Byte], Array[Byte]]): Either[Throwable, A] = a
   }
 }
 
-trait FamilyDecoder1 extends FamilyDecoder2 {
+private[codec] trait FamilyDecoder1 extends FamilyDecoder2 {
 
-  implicit def decodeMap[M[_, _] <: Map[K, V], K, V](
+  implicit def decodeMapLike[M[_, _] <: Map[K, V], K, V](
       implicit
       K: ValueCodec[K],
       V: ValueCodec[V],
       cbf: CanBuildFrom[Nothing, (K, V), M[K, V]]): FamilyDecoder[M[K, V]] =
     new FamilyDecoder[M[K, V]] {
-      def apply(map: util.NavigableMap[Array[Byte], Array[Byte]]): Either[Throwable, M[K, V]] = {
-        val m = cbf()
+
+      type Out = mutable.Builder[(K, V), M[K, V]]
+
+      def apply(map: NMap[Array[Byte], Array[Byte]]): Either[Throwable, M[K, V]] = {
+        val builder = cbf()
         if (map == null)
-          Right(m.result())
+          Right(builder.result())
         else {
-          val f = new BiConsumer[Array[Byte], Array[Byte]] {
-            def accept(t: Array[Byte], u: Array[Byte]): Unit = {
-              val tt = Option(t).orEmpty
-              val uu = Option(u).orEmpty
-              (K.decode(tt), V.decode(uu)) match {
-                case (Some(k), Some(v)) =>
-                  m += k -> v
-                case (_, _) =>
-                  m
+          val entries = map.entrySet().iterator()
+
+          @tailrec def loop(acc: Either[Throwable, Out]): Either[Throwable, Out] = {
+            if (!entries.hasNext) acc
+            else {
+              val entry = entries.next()
+              val key   = entry.getKey
+              val value = entry.getValue
+
+              K.decode(key) match {
+                case Left(e) => Left(e)
+                case Right(k) =>
+                  V.decode(value) match {
+                    case Right(v) =>
+                      loop(if (v == null) Right(builder) else Right(builder += k -> v))
+                    case Left(_) =>
+                      loop(Right(builder))
+                  }
               }
-              ()
             }
           }
-          map.forEach(f)
-          Right(m.result())
+
+          loop(Right(builder)) match {
+            case Right(b) => Right(b.result())
+            case Left(e)  => Left(e)
+          }
         }
       }
     }
 }
 
-trait FamilyDecoder2 extends FamilyDecoder3 {
+private[codec] trait FamilyDecoder2 extends FamilyDecoder3 {
 
-  implicit def decodeHNil: FamilyDecoder[HNil] = new FamilyDecoder[HNil] {
-    def apply(map: util.NavigableMap[Array[Byte], Array[Byte]]): Either[Throwable, HNil] =
-      Right(HNil)
+  implicit val decodeHNil: FamilyDecoder[HNil] = new FamilyDecoder[HNil] {
+    def apply(map: NMap[Array[Byte], Array[Byte]]): Either[Throwable, HNil] = Right(HNil)
   }
 
-  implicit def decodeLabelledHList[K <: Symbol, H, T <: HList](
+  implicit def decodeLabelledHCons[K <: Symbol, H, T <: HList](
       implicit
       K: Witness.Aux[K],
       H: ValueCodec[H],
       T: FamilyDecoder[T]): FamilyDecoder[FieldType[K, H] :: T] =
     new FamilyDecoder[FieldType[K, H] :: T] {
-      def apply(map: util.NavigableMap[Array[Byte], Array[Byte]])
-        : Either[Throwable, FieldType[K, H] :: T] = {
-        try {
-          val h  = Option(map.get(Bytes.toBytes(K.value.name))).orEmpty
-          val h0 = field[K](H.decode(h).getOrElse(null.asInstanceOf[H]))
-          T(map) match {
-            case Right(t) => Right(h0 :: t)
-            case Left(e)  => Left(e)
-          }
-        } catch {
-          case NonFatal(e) => Left(e)
+      def apply(map: NMap[Array[Byte], Array[Byte]]): Either[Throwable, FieldType[K, H] :: T] = {
+        val k = map.get(Bytes.toBytes(K.value.name))
+        H.decode(k) match {
+          case Left(e) => Left(e)
+          case Right(h) =>
+            T(map) match {
+              case Left(e)  => Left(e)
+              case Right(t) => Right(field[K](h) :: t)
+            }
         }
       }
     }
 
-  implicit def decodeHCons[H <: HList, A0](implicit
-                                           gen: LabelledGeneric.Aux[A0, H],
-                                           A: Lazy[FamilyDecoder[H]]): FamilyDecoder[A0] =
-    new FamilyDecoder[A0] {
-      def apply(map: util.NavigableMap[Array[Byte], Array[Byte]]): Either[Throwable, A0] =
+  implicit def decodeCaseClass[H <: HList, A](implicit
+                                              gen: LabelledGeneric.Aux[A, H],
+                                              A: Lazy[FamilyDecoder[H]]): FamilyDecoder[A] =
+    new FamilyDecoder[A] {
+      def apply(map: NMap[Array[Byte], Array[Byte]]): Either[Throwable, A] =
         A.value(map) match {
           case Right(v) => Right(gen.from(v))
           case Left(e)  => Left(e)
@@ -133,13 +144,13 @@ trait FamilyDecoder2 extends FamilyDecoder3 {
     }
 }
 
-trait FamilyDecoder3 {
+private[codec] trait FamilyDecoder3 {
 
-  implicit def decodeOption[A0](
+  implicit def decodeOption[A](
       implicit
-      A: FamilyDecoder[A0]): FamilyDecoder[Option[A0]] =
-    new FamilyDecoder[Option[A0]] {
-      def apply(map: util.NavigableMap[Array[Byte], Array[Byte]]): Either[Throwable, Option[A0]] =
+      A: FamilyDecoder[A]): FamilyDecoder[Option[A]] =
+    new FamilyDecoder[Option[A]] {
+      def apply(map: NMap[Array[Byte], Array[Byte]]): Either[Throwable, Option[A]] =
         if (map == null || map.isEmpty)
           Right(None)
         else
@@ -148,5 +159,4 @@ trait FamilyDecoder3 {
             case Left(e)  => Left(e)
           }
     }
-
 }

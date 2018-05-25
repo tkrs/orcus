@@ -38,9 +38,16 @@ object result {
   def get[A, M[_]](r: Result, family: Array[Byte], qualifier: Array[Byte])(
       implicit
       A: ValueCodec[A],
-      M: Monad[M]
+      M: MonadError[M, Throwable]
   ): M[Option[A]] =
-    M.map(getValue[M](r, family, qualifier))(_.flatMap(A.decode))
+    M.flatMap(getValue[M](r, family, qualifier)) {
+      case Some(a) =>
+        A.decode(a) match {
+          case Left(e)  => M.raiseError(e)
+          case Right(v) => M.pure(Option(v))
+        }
+      case _ => M.pure(None)
+    }
 
   def getValue[M[_]](r: Result, family: Array[Byte], qualifier: Array[Byte])(
       implicit

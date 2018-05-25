@@ -8,20 +8,13 @@ import org.scalatest.{FunSuite, Matchers}
 class ValueCodecSpec extends FunSuite with Checkers with Matchers {
 
   private def _roundTrip[A: ValueCodec](a: A): Boolean = {
-    val encoded = ValueCodec[A].encode(Option(a))
-    val decoded = ValueCodec[A].decode(encoded)
-    decoded === Option(a)
-  }
-
-  private def roundTripNone[A: ValueCodec]: Boolean = {
-    val a       = Option.empty[A]
     val encoded = ValueCodec[A].encode(a)
-    val decoded = ValueCodec[A].decode(encoded)
-    decoded === Option(a)
+    val decoded = ValueCodec[A].decode(encoded).right.get
+    decoded === a
   }
 
   private def roundTrip[A: ValueCodec: Arbitrary: Shrink] =
-    check(Prop.forAll((a: A) => _roundTrip[A](a)))
+    check(Prop.forAll(_roundTrip[A](_)))
 
   test("ValueCodec[Boolean]")(roundTrip[Boolean])
   test("ValueCodec[Short]")(roundTrip[Short])
@@ -31,22 +24,24 @@ class ValueCodecSpec extends FunSuite with Checkers with Matchers {
   test("ValueCodec[Double]")(roundTrip[Double])
   test("ValueCodec[BigDecimal]")(roundTrip[BigDecimal])
   test("ValueCodec[String]")(roundTrip[String])
-  test("ValueCodec[Option[A]]")(roundTrip[Option[Int]])
+  test("ValueCodec[Option[Int]]")(roundTrip[Option[Int]])
 
-  test("ValueCodec[Boolean]None")(roundTripNone[Boolean])
-  test("ValueCodec[Short]None")(roundTripNone[Short])
-  test("ValueCodec[Int]None")(roundTripNone[Int])
-  test("ValueCodec[Long]None")(roundTripNone[Long])
-  test("ValueCodec[Float]None")(roundTripNone[Float])
-  test("ValueCodec[Double]None")(roundTripNone[Double])
-  test("ValueCodec[BigDecimal]None")(roundTripNone[BigDecimal])
-  test("ValueCodec[String]None")(roundTripNone[String])
-  test("ValueCodec[Option[A]]None")(roundTripNone[Option[Int]])
+  test("ValueCodec[Option[String] should decode empty bytes as empty string") {
+    assert(ValueCodec[Option[String]].decode(Array.emptyByteArray) === Right(Some("")))
+  }
+
+  test("ValueCodec[Option[String] should decode null as None") {
+    assert(ValueCodec[Option[String]].decode(null) === Right(None))
+  }
+
+  test("ValueCodec[Option[A]] should decode null as None") {
+    assert(ValueCodec[Option[Boolean]].decode(null) === Right(None))
+  }
 
   test("imap") {
-    val f        = ValueCodec[Int].imap[String](_.toInt, _.toString)
-    val Some(v0) = f.decode(Bytes.toBytes(10))
-    val v1       = f.encode(Some("10"))
+    val f  = ValueCodec[Int].imap[String](_.toInt, _.toString)
+    val v0 = f.decode(Bytes.toBytes(10)).right.get
+    val v1 = f.encode("10")
     assert(v0 === "10")
     assert(Bytes.toInt(v1) === 10)
   }
