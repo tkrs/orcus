@@ -7,7 +7,6 @@ import org.apache.hadoop.hbase.util.Bytes
 import org.openjdk.jmh.annotations._
 
 import scala.collection.mutable
-import scala.util.control.NonFatal
 
 @State(Scope.Thread)
 @BenchmarkMode(Array(Mode.Throughput))
@@ -16,41 +15,45 @@ import scala.util.control.NonFatal
 @Threads(1)
 @Fork(2)
 @OutputTimeUnit(TimeUnit.MILLISECONDS)
-class DecoderBench extends TestData {
+class DecoderBench {
+  import States._
 
   @Benchmark
-  def decodeToCaseClass: Table[Columns] =
-    Decoder[Table[Columns]].apply(resultForColumns) match {
+  def decodeToCaseClass(data: Data): Table[Columns] =
+    (if (data.size == 10)
+       Decoder[Table[Columns10]].apply(data.genResult)
+     else
+       Decoder[Table[Columns30]].apply(data.genResult)) match {
       case Right(v) => v
       case Left(e)  => throw e
     }
 
   @Benchmark
-  def decodeToMap: Map[String, Columns] =
-    Decoder[Map[String, Columns]].apply(resultForColumns) match {
+  def decodeToCaseClassCachedDecoder(data: Data): Table[Columns] =
+    (if (data.size == 10)
+       data.decode10(data.genResult)
+     else
+       data.decode30(data.genResult)) match {
       case Right(v) => v
       case Left(e)  => throw e
     }
 
   @Benchmark
-  def decodeSelf: Map[String, Columns] =
-    try {
-      val cf = Bytes.toBytes("cf1")
-      val m  = mutable.Map.empty[String, Columns]
-      val r  = resultForColumns
-      val c = Columns(
-        Option(r.getValue(cf, Bytes.toBytes("a"))).map(Bytes.toInt),
-        Option(r.getValue(cf, Bytes.toBytes("b"))).map(Bytes.toFloat),
-        Option(r.getValue(cf, Bytes.toBytes("c"))).map(Bytes.toLong),
-        Option(r.getValue(cf, Bytes.toBytes("d"))).map(Bytes.toDouble),
-        Option(r.getValue(cf, Bytes.toBytes("e"))).map(Bytes.toString),
-        Option(r.getValue(cf, Bytes.toBytes("g"))).map(Bytes.toBoolean),
-        Option(r.getValue(cf, Bytes.toBytes("h"))).map(Bytes.toShort),
-        Option(r.getValue(cf, Bytes.toBytes("i"))).map(Bytes.toBigDecimal(_))
-      )
-      m += "cf1" -> c
-      m.toMap
-    } catch {
-      case NonFatal(e) => throw e
+  def decodeToMap(data: Data): Map[String, Map[String, Int]] =
+    Decoder[Map[String, Map[String, Int]]].apply(data.genResult) match {
+      case Right(v) => v
+      case Left(e)  => throw e
     }
+
+  @Benchmark
+  def decodeSelf(data: Data): Map[String, Columns] = {
+    val cf = Bytes.toBytes("cf1")
+    val m  = mutable.Map.empty[String, Columns]
+    val r  = data.genResult
+    val c =
+      if (data.size == 10) Columns10.fromResult(cf, r)
+      else Columns30.fromResult(cf, r)
+    m += "cf1" -> c
+    m.toMap
+  }
 }
