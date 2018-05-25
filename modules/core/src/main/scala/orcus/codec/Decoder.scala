@@ -121,14 +121,14 @@ trait Decoder1 extends Decoder2 {
       implicit
       K: Witness.Aux[K],
       H: FamilyDecoder[H],
-      T: Lazy[Decoder[T]]): Decoder[FieldType[K, H] :: T] =
+      T: Decoder[T]): Decoder[FieldType[K, H] :: T] =
     new Decoder[FieldType[K, H] :: T] {
       def apply(result: Result): Either[Throwable, FieldType[K, H] :: T] = {
         val k = Bytes.toBytes(K.value.name)
         val h = orcus.result.getFamily[H, Either[Throwable, ?]](result, k)
         h match {
           case Right(v0) =>
-            T.value(result) match {
+            T(result) match {
               case Right(t) => Right(field[K](v0) :: t)
               case Left(e)  => Left(e)
             }

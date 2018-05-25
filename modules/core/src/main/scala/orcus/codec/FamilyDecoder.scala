@@ -104,14 +104,14 @@ trait FamilyDecoder2 extends FamilyDecoder3 {
       implicit
       K: Witness.Aux[K],
       H: ValueCodec[H],
-      T: Lazy[FamilyDecoder[T]]): FamilyDecoder[FieldType[K, H] :: T] =
+      T: FamilyDecoder[T]): FamilyDecoder[FieldType[K, H] :: T] =
     new FamilyDecoder[FieldType[K, H] :: T] {
       def apply(map: util.NavigableMap[Array[Byte], Array[Byte]])
         : Either[Throwable, FieldType[K, H] :: T] = {
         try {
           val h  = Option(map.get(Bytes.toBytes(K.value.name))).orEmpty
           val h0 = field[K](H.decode(h).getOrElse(null.asInstanceOf[H]))
-          T.value(map) match {
+          T(map) match {
             case Right(t) => Right(h0 :: t)
             case Left(e)  => Left(e)
           }
@@ -137,13 +137,13 @@ trait FamilyDecoder3 {
 
   implicit def decodeOption[A0](
       implicit
-      A: Lazy[FamilyDecoder[A0]]): FamilyDecoder[Option[A0]] =
+      A: FamilyDecoder[A0]): FamilyDecoder[Option[A0]] =
     new FamilyDecoder[Option[A0]] {
       def apply(map: util.NavigableMap[Array[Byte], Array[Byte]]): Either[Throwable, Option[A0]] =
         if (map == null || map.isEmpty)
           Right(None)
         else
-          A.value(map) match {
+          A(map) match {
             case Right(v) => Right(Some(v))
             case Left(e)  => Left(e)
           }
