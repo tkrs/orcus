@@ -13,7 +13,11 @@ object PutFamilyEncoder extends PutFamilyEncoder1 {
 
   def apply[A](implicit A: PutFamilyEncoder[A]): PutFamilyEncoder[A] = A
 
-  implicit def mapPutFamilyEncoder[K, V](
+}
+
+private[codec] trait PutFamilyEncoder1 {
+
+  implicit def encodeMap[K, V](
       implicit
       H: ValueCodec[K],
       V: ValueCodec[V]
@@ -21,20 +25,17 @@ object PutFamilyEncoder extends PutFamilyEncoder1 {
     def apply(acc: Put, cf: Array[Byte], a: Map[K, V]): Put = {
       a.foreach {
         case (k, v) =>
-          acc.addColumn(cf, H.encode(Option(k)), V.encode(Option(v)))
+          acc.addColumn(cf, H.encode(k), V.encode(v))
       }
       acc
     }
   }
-}
 
-trait PutFamilyEncoder1 {
-
-  implicit val hnilPutEncoder: PutFamilyEncoder[HNil] = new PutFamilyEncoder[HNil] {
+  implicit val encodeHNil: PutFamilyEncoder[HNil] = new PutFamilyEncoder[HNil] {
     def apply(acc: Put, cf: Array[Byte], a: HNil): Put = acc
   }
 
-  implicit def labelledHConsPutFamilyEncoder[K <: Symbol, H, T <: HList](
+  implicit def encodeLabelledHCons[K <: Symbol, H, T <: HList](
       implicit
       K: Witness.Aux[K],
       H: ValueCodec[H],
@@ -42,12 +43,12 @@ trait PutFamilyEncoder1 {
   ): PutFamilyEncoder[FieldType[K, H] :: T] = new PutFamilyEncoder[FieldType[K, H] :: T] {
     def apply(acc: Put, cf: Array[Byte], a: FieldType[K, H] :: T): Put = a match {
       case h :: t =>
-        val hp = acc.addColumn(cf, Bytes.toBytes(K.value.name), H.encode(Option(h)))
+        val hp = acc.addColumn(cf, Bytes.toBytes(K.value.name), H.encode(h))
         T(hp, cf, t)
     }
   }
 
-  implicit def caseClassPutFamilyEncoder[A, R](
+  implicit def encodeFamilyCaseClass[A, R](
       implicit
       gen: LabelledGeneric.Aux[A, R],
       R: Lazy[PutFamilyEncoder[R]]

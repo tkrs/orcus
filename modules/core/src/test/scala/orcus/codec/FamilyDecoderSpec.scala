@@ -59,41 +59,18 @@ class FamilyDecoderSpec extends FunSuite with Matchers {
     m.put(Bytes.toBytes("a"), null)
     m.put(Bytes.toBytes("b"), Array.emptyByteArray)
     m.put(Bytes.toBytes("c"), Bytes.toBytes("d"))
-    assert(f(m) === Right(Map("a" -> "", "b" -> "", "c" -> "d")))
+    assert(f(m) === Right(Map("b" -> "", "c" -> "d")))
   }
 
   test("It should avoid a null values when its column value is null/empty") {
     val f = FamilyDecoder[Map[String, Boolean]]
-    val m = new ju.TreeMap[Array[Byte], Array[Byte]](Bytes.BYTES_COMPARATOR)
-    m.put(Bytes.toBytes("a"), null)
-    m.put(Bytes.toBytes("b"), Array.emptyByteArray)
-    m.put(Bytes.toBytes("c"), Bytes.toBytes(true))
-    m.put(Bytes.toBytes("d"), Bytes.toBytes(false))
+    val m = new ju.TreeMap[Array[Byte], Array[Byte]](Bytes.BYTES_COMPARATOR) {
+      put(Bytes.toBytes("a"), null)
+      put(Bytes.toBytes("b"), Array.emptyByteArray)
+      put(Bytes.toBytes("c"), Bytes.toBytes(true))
+      put(Bytes.toBytes("d"), Bytes.toBytes(false))
+    }
     assert(f(m) === Right(Map("c" -> true, "d" -> false)))
-  }
-
-  test("It should return map with empty values when column value is empty") {
-    case class All(a: Option[Int] = None,
-                   b: Option[Float] = None,
-                   c: Option[Long] = None,
-                   d: Option[Double] = None,
-                   e: Option[String] = None,
-                   f: Option[Array[Byte]] = None,
-                   g: Option[Boolean] = None,
-                   h: Option[Short] = None,
-                   i: Option[BigDecimal] = None)
-    val f = FamilyDecoder[All]
-    val m = new ju.TreeMap[Array[Byte], Array[Byte]](Bytes.BYTES_COMPARATOR)
-    m.put(Bytes.toBytes("a"), Array.emptyByteArray)
-    m.put(Bytes.toBytes("b"), Array.emptyByteArray)
-    m.put(Bytes.toBytes("c"), Array.emptyByteArray)
-    m.put(Bytes.toBytes("d"), Array.emptyByteArray)
-    m.put(Bytes.toBytes("e"), Array.emptyByteArray)
-    m.put(Bytes.toBytes("f"), Array.emptyByteArray)
-    m.put(Bytes.toBytes("g"), Array.emptyByteArray)
-    m.put(Bytes.toBytes("h"), Array.emptyByteArray)
-    m.put(Bytes.toBytes("i"), Array.emptyByteArray)
-    assert(f(m) === Right(All()))
   }
 
   test("pure") {

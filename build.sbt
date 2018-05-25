@@ -153,7 +153,7 @@ lazy val `cats-effect` = project
   .settings(
     libraryDependencies ++= Seq.concat(
       Seq(
-      Pkg.catsEffect,
+        Pkg.catsEffect,
       ),
       Pkg.forTest,
     ).map(_.withSources),
