@@ -60,8 +60,6 @@ object Decoder extends Decoder1 {
       cbf: CanBuildFrom[Nothing, (String, V), M[String, V]]): Decoder[M[String, V]] =
     new Decoder[M[String, V]] {
 
-      type Out = mutable.Builder[(String, V), M[String, V]]
-
       def apply(result: Result): Either[Throwable, M[String, V]] = {
         val builder = cbf.apply
         val map     = result.getMap
@@ -69,27 +67,25 @@ object Decoder extends Decoder1 {
         else {
           val keys = map.keySet().iterator()
 
-          @tailrec def loop(acc: Either[Throwable, Out]): Either[Throwable, Out] = {
-            if (!keys.hasNext) acc
+          @tailrec def loop(
+              acc: mutable.Builder[(String, V), M[String, V]]): Either[Throwable, M[String, V]] = {
+            if (!keys.hasNext) Right(acc.result())
             else {
               val key = keys.next
               K.decode(key) match {
-                case Left(e) => Left(e)
                 case Right(k) =>
-                  V.apply(result.getFamilyMap(key)) match {
+                  V(result.getFamilyMap(key)) match {
                     case Right(v) =>
-                      loop(Right(builder += k -> v))
+                      loop(builder += k -> v)
                     case Left(e) =>
                       Left(e)
                   }
+                case Left(e) => Left(e)
               }
             }
           }
 
-          loop(Right(builder)) match {
-            case Right(b) => Right(b.result())
-            case Left(e)  => Left(e)
-          }
+          loop(builder)
         }
       }
     }
