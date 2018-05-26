@@ -13,6 +13,10 @@ object PutEncoder extends PutEncoder1 {
 
   def apply[A](implicit A: PutEncoder[A]): PutEncoder[A] = A
 
+}
+
+private[codec] trait PutEncoder1 extends PutEncoder2 {
+
   implicit def encodeMap[K, V](
       implicit
       K: ValueCodec[K],
@@ -28,7 +32,7 @@ object PutEncoder extends PutEncoder1 {
   }
 }
 
-private[codec] trait PutEncoder1 {
+private[codec] trait PutEncoder2 {
 
   implicit val encodeHNil: PutEncoder[HNil] = new PutEncoder[HNil] {
     def apply(acc: Put, a: HNil): Put = acc
