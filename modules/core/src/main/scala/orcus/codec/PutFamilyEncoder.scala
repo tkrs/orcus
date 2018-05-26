@@ -15,7 +15,7 @@ object PutFamilyEncoder extends PutFamilyEncoder1 {
 
 }
 
-private[codec] trait PutFamilyEncoder1 {
+private[codec] trait PutFamilyEncoder1 extends PutFamilyEncoder2 {
 
   implicit def encodeMap[K, V](
       implicit
@@ -30,6 +30,9 @@ private[codec] trait PutFamilyEncoder1 {
       acc
     }
   }
+}
+
+private[codec] trait PutFamilyEncoder2 {
 
   implicit val encodeHNil: PutFamilyEncoder[HNil] = new PutFamilyEncoder[HNil] {
     def apply(acc: Put, cf: Array[Byte], a: HNil): Put = acc

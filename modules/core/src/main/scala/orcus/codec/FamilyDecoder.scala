@@ -62,6 +62,20 @@ object FamilyDecoder extends FamilyDecoder1 {
 
 private[codec] trait FamilyDecoder1 extends FamilyDecoder2 {
 
+  implicit def decodeOption[A](
+      implicit
+      A: FamilyDecoder[A]): FamilyDecoder[Option[A]] =
+    new FamilyDecoder[Option[A]] {
+      def apply(map: NMap[Array[Byte], Array[Byte]]): Either[Throwable, Option[A]] =
+        if (map == null || map.isEmpty)
+          Right(None)
+        else
+          A(map) match {
+            case Right(v) => Right(Some(v))
+            case Left(e)  => Left(e)
+          }
+    }
+
   implicit def decodeMapLike[M[_, _] <: Map[K, V], K, V](
       implicit
       K: ValueCodec[K],
@@ -102,7 +116,7 @@ private[codec] trait FamilyDecoder1 extends FamilyDecoder2 {
     }
 }
 
-private[codec] trait FamilyDecoder2 extends FamilyDecoder3 {
+private[codec] trait FamilyDecoder2 {
 
   implicit val decodeHNil: FamilyDecoder[HNil] = new FamilyDecoder[HNil] {
     def apply(map: NMap[Array[Byte], Array[Byte]]): Either[Throwable, HNil] = Right(HNil)
@@ -117,12 +131,12 @@ private[codec] trait FamilyDecoder2 extends FamilyDecoder3 {
       def apply(map: NMap[Array[Byte], Array[Byte]]): Either[Throwable, FieldType[K, H] :: T] = {
         val k = map.get(Bytes.toBytes(K.value.name))
         H.decode(k) match {
-          case Left(e) => Left(e)
           case Right(h) =>
             T(map) match {
-              case Left(e)  => Left(e)
               case Right(t) => Right(field[K](h) :: t)
+              case Left(e)  => Left(e)
             }
+          case Left(e) => Left(e)
         }
       }
     }
@@ -136,22 +150,5 @@ private[codec] trait FamilyDecoder2 extends FamilyDecoder3 {
           case Right(v) => Right(gen.from(v))
           case Left(e)  => Left(e)
         }
-    }
-}
-
-private[codec] trait FamilyDecoder3 {
-
-  implicit def decodeOption[A](
-      implicit
-      A: FamilyDecoder[A]): FamilyDecoder[Option[A]] =
-    new FamilyDecoder[Option[A]] {
-      def apply(map: NMap[Array[Byte], Array[Byte]]): Either[Throwable, Option[A]] =
-        if (map == null || map.isEmpty)
-          Right(None)
-        else
-          A(map) match {
-            case Right(v) => Right(Some(v))
-            case Left(e)  => Left(e)
-          }
     }
 }

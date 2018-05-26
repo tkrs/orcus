@@ -53,6 +53,21 @@ object Decoder extends Decoder1 {
     def apply(result: Result): Either[Throwable, A] = a
   }
 
+}
+
+private[codec] trait Decoder1 extends Decoder2 {
+
+  implicit def decodeOption[A](implicit A: Decoder[A]): Decoder[Option[A]] =
+    new Decoder[Option[A]] {
+      def apply(result: Result): Either[Throwable, Option[A]] = {
+        if (result.isEmpty) Right(None)
+        else
+          A(result) match {
+            case Right(v) => Right(Some(v))
+            case Left(e)  => Left(e)
+          }
+      }
+    }
   implicit def decodeMapLike[M[_, _] <: Map[String, V], V](
       implicit
       K: ValueCodec[String],
@@ -91,7 +106,7 @@ object Decoder extends Decoder1 {
     }
 }
 
-private[codec] trait Decoder1 extends Decoder2 {
+private[codec] trait Decoder2 {
 
   implicit val decodeHNil: Decoder[HNil] = new Decoder[HNil] {
     def apply(result: Result): Either[Throwable, HNil] = Right(HNil)
@@ -127,20 +142,5 @@ private[codec] trait Decoder1 extends Decoder2 {
           case Right(v) => Right(gen.from(v))
           case Left(e)  => Left(e)
         }
-    }
-}
-
-private[codec] trait Decoder2 {
-
-  implicit def decodeOption[A](implicit A: Decoder[A]): Decoder[Option[A]] =
-    new Decoder[Option[A]] {
-      def apply(result: Result): Either[Throwable, Option[A]] = {
-        if (result.isEmpty) Right(None)
-        else
-          A(result) match {
-            case Right(v) => Right(Some(v))
-            case Left(e)  => Left(e)
-          }
-      }
     }
 }
