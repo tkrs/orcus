@@ -129,11 +129,10 @@ private[codec] trait FamilyDecoder2 {
       T: FamilyDecoder[T]): FamilyDecoder[FieldType[K, H] :: T] =
     new FamilyDecoder[FieldType[K, H] :: T] {
       def apply(map: NMap[Array[Byte], Array[Byte]]): Either[Throwable, FieldType[K, H] :: T] = {
-        val k = map.get(Bytes.toBytes(K.value.name))
-        H.decode(k) match {
-          case Right(h) =>
-            T(map) match {
-              case Right(t) => Right(field[K](h) :: t)
+        T(map) match {
+          case Right(t) =>
+            H.decode(map.get(Bytes.toBytes(K.value.name))) match {
+              case Right(h) => Right(field[K](h) :: t)
               case Left(e)  => Left(e)
             }
           case Left(e) => Left(e)

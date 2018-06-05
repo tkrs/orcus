@@ -44,10 +44,8 @@ private[codec] trait PutFamilyEncoder2 {
       H: ValueCodec[H],
       T: PutFamilyEncoder[T]
   ): PutFamilyEncoder[FieldType[K, H] :: T] = new PutFamilyEncoder[FieldType[K, H] :: T] {
-    def apply(acc: Put, cf: Array[Byte], a: FieldType[K, H] :: T): Put = a match {
-      case h :: t =>
-        val hp = acc.addColumn(cf, Bytes.toBytes(K.value.name), H.encode(h))
-        T(hp, cf, t)
+    def apply(acc: Put, cf: Array[Byte], a: FieldType[K, H] :: T): Put = {
+      T(acc, cf, a.tail).addColumn(cf, Bytes.toBytes(K.value.name), H.encode(a.head))
     }
   }
 

@@ -10,8 +10,8 @@ import scala.collection.mutable
 
 @State(Scope.Thread)
 @BenchmarkMode(Array(Mode.Throughput))
-@Warmup(iterations = 10, time = 1)
-@Measurement(iterations = 10, time = 1)
+@Warmup(iterations = 10, time = 5)
+@Measurement(iterations = 10, time = 10)
 @Threads(1)
 @Fork(2)
 @OutputTimeUnit(TimeUnit.SECONDS)
@@ -20,30 +20,21 @@ class DecoderBench {
 
   @Benchmark
   def decodeToCaseClass(data: Data): Table[Columns] =
-    (if (data.size == 10)
-       Decoder[Table[Columns10]].apply(data.genResult)
-     else
-       Decoder[Table[Columns30]].apply(data.genResult)) match {
-      case Right(v) => v
-      case Left(e)  => throw e
-    }
+    if (data.size == 10)
+      Decoder[Table[Columns10]].apply(data.genResult).right.get
+    else
+      Decoder[Table[Columns30]].apply(data.genResult).right.get
 
   @Benchmark
   def decodeToCaseClassCachedDecoder(data: Data): Table[Columns] =
-    (if (data.size == 10)
-       data.decode10(data.genResult)
-     else
-       data.decode30(data.genResult)) match {
-      case Right(v) => v
-      case Left(e)  => throw e
-    }
+    if (data.size == 10)
+      data.decode10(data.genResult).right.get
+    else
+      data.decode30(data.genResult).right.get
 
   @Benchmark
   def decodeToMap(data: Data): Map[String, Map[String, Int]] =
-    Decoder[Map[String, Map[String, Int]]].apply(data.genResult) match {
-      case Right(v) => v
-      case Left(e)  => throw e
-    }
+    Decoder[Map[String, Map[String, Int]]].apply(data.genResult).right.get
 
   @Benchmark
   def decodeSelf(data: Data): Map[String, Columns] = {
