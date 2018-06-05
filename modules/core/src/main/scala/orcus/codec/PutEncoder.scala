@@ -44,11 +44,8 @@ private[codec] trait PutEncoder2 {
       H: PutFamilyEncoder[H],
       T: PutEncoder[T]
   ): PutEncoder[FieldType[K, H] :: T] = new PutEncoder[FieldType[K, H] :: T] {
-    def apply(acc: Put, a: FieldType[K, H] :: T): Put = a match {
-      case h :: t =>
-        val hp = H(acc, Bytes.toBytes(K.value.name), h)
-        T(hp, t)
-    }
+    def apply(acc: Put, a: FieldType[K, H] :: T): Put =
+      H(T(acc, a.tail), Bytes.toBytes(K.value.name), a.head)
   }
 
   implicit def encodeCaseClass[A, R](implicit

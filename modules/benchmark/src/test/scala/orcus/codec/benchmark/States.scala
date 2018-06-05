@@ -149,6 +149,9 @@ object States {
         .build()
     }
 
+    val tc10 = Table(Columns10())
+    val tc30 = Table(Columns30())
+
     def genResult: Result = Result.create(cells)
 
     lazy val decode10: Decoder[Table[Columns10]] = Decoder[Table[Columns10]]
