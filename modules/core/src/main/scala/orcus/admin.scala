@@ -41,9 +41,7 @@ object admin {
   ): F[Seq[TableDescriptor]] =
     M.map(F(t.listTableDescriptors(includeSysTables)))(_.asScala)
 
-  def listTableDescriptorsByPattern[F[_]](t: AsyncAdmin,
-                                          pattern: Pattern,
-                                          includeSysTables: Boolean = false)(
+  def listTableDescriptorsByPattern[F[_]](t: AsyncAdmin, pattern: Pattern, includeSysTables: Boolean = false)(
       implicit
       M: Apply[F],
       F: CompletableFuture ~> F
@@ -57,10 +55,9 @@ object admin {
   ): F[Seq[TableDescriptor]] =
     M.map(F(t.listTableDescriptorsByNamespace(namespace)))(_.asScala)
 
-  def listTableNames[F[_]](t: AsyncAdmin, includeSysTables: Boolean)(
-      implicit
-      M: Apply[F],
-      F: CompletableFuture ~> F): F[Seq[TableName]] =
+  def listTableNames[F[_]](t: AsyncAdmin, includeSysTables: Boolean)(implicit
+                                                                     M: Apply[F],
+                                                                     F: CompletableFuture ~> F): F[Seq[TableName]] =
     M.map(F(t.listTableNames(includeSysTables)))(_.asScala)
 
   def listTableNamesByPattern[F[_]](t: AsyncAdmin, pattern: Pattern, includeSysTables: Boolean)(
@@ -69,15 +66,13 @@ object admin {
       F: CompletableFuture ~> F): F[Seq[TableName]] =
     M.map(F(t.listTableNames(pattern, includeSysTables)))(_.asScala)
 
-  def getDescriptor[F[_]](t: AsyncAdmin, tableName: TableName)(
-      implicit
-      F: CompletableFuture ~> F): F[TableDescriptor] =
+  def getDescriptor[F[_]](t: AsyncAdmin, tableName: TableName)(implicit
+                                                               F: CompletableFuture ~> F): F[TableDescriptor] =
     F(t.getDescriptor(tableName))
 
-  def createTable[F[_]](t: AsyncAdmin, tableDescriptor: TableDescriptor)(
-      implicit
-      M: Applicative[F],
-      F: CompletableFuture ~> F): F[Unit] =
+  def createTable[F[_]](t: AsyncAdmin, tableDescriptor: TableDescriptor)(implicit
+                                                                         M: Applicative[F],
+                                                                         F: CompletableFuture ~> F): F[Unit] =
     F(t.createTable(tableDescriptor)) *> M.unit
 
   def createTableWithKeyRange[F[_]](t: AsyncAdmin,
@@ -89,18 +84,15 @@ object admin {
                                                      F: CompletableFuture ~> F): F[Unit] =
     F(t.createTable(tableDescriptor, startKey, endKey, numRegions)) *> M.unit
 
-  def createTableWithSplitKeys[F[_]](t: AsyncAdmin,
-                                     tableDescriptor: TableDescriptor,
-                                     splitKeys: Array[Array[Byte]])(
+  def createTableWithSplitKeys[F[_]](t: AsyncAdmin, tableDescriptor: TableDescriptor, splitKeys: Array[Array[Byte]])(
       implicit
       M: Applicative[F],
       F: CompletableFuture ~> F): F[Unit] =
     F(t.createTable(tableDescriptor, splitKeys)) *> M.unit
 
-  def modifyTable[F[_]](t: AsyncAdmin, tableDescriptor: TableDescriptor)(
-      implicit
-      M: Applicative[F],
-      F: CompletableFuture ~> F): F[Unit] =
+  def modifyTable[F[_]](t: AsyncAdmin, tableDescriptor: TableDescriptor)(implicit
+                                                                         M: Applicative[F],
+                                                                         F: CompletableFuture ~> F): F[Unit] =
     F(t.modifyTable(tableDescriptor)) *> M.unit
 
   def deleteTable[F[_]](t: AsyncAdmin, tableName: TableName)(implicit
@@ -124,29 +116,23 @@ object admin {
                                                               F: CompletableFuture ~> F): F[Unit] =
     F(t.disableTable(tableName)) *> M.unit
 
-  def isTableEnabled[F[_]](t: AsyncAdmin, tableName: TableName)(
-      implicit
-      M: Apply[F],
-      F: CompletableFuture ~> F): F[Boolean] =
+  def isTableEnabled[F[_]](t: AsyncAdmin, tableName: TableName)(implicit
+                                                                M: Apply[F],
+                                                                F: CompletableFuture ~> F): F[Boolean] =
     M.map(F(t.isTableEnabled(tableName)))(_.booleanValue)
 
-  def isTableAvailable[F[_]](t: AsyncAdmin, tableName: TableName)(
-      implicit
-      M: Apply[F],
-      F: CompletableFuture ~> F): F[Boolean] =
+  def isTableAvailable[F[_]](t: AsyncAdmin, tableName: TableName)(implicit
+                                                                  M: Apply[F],
+                                                                  F: CompletableFuture ~> F): F[Boolean] =
     M.map(F(t.isTableAvailable(tableName)))(_.booleanValue)
 
-  def isTableAvailableWithSplitKeys[F[_]](t: AsyncAdmin,
-                                          tableName: TableName,
-                                          splitKeys: Array[Array[Byte]])(
+  def isTableAvailableWithSplitKeys[F[_]](t: AsyncAdmin, tableName: TableName, splitKeys: Array[Array[Byte]])(
       implicit
       M: Apply[F],
       F: CompletableFuture ~> F): F[Boolean] =
     M.map(F(t.isTableAvailable(tableName, splitKeys)))(_.booleanValue)
 
-  def addColumnFamily[F[_]](t: AsyncAdmin,
-                            tableName: TableName,
-                            columnFamilyDescriptor: ColumnFamilyDescriptor)(
+  def addColumnFamily[F[_]](t: AsyncAdmin, tableName: TableName, columnFamilyDescriptor: ColumnFamilyDescriptor)(
       implicit
       M: Applicative[F],
       F: CompletableFuture ~> F): F[Unit] =
@@ -158,9 +144,7 @@ object admin {
       F: CompletableFuture ~> F): F[Unit] =
     F(t.deleteColumnFamily(tableName, columnFamily)) *> M.unit
 
-  def modifyColumnFamily[F[_]](t: AsyncAdmin,
-                               tableName: TableName,
-                               columnFamilyDescriptor: ColumnFamilyDescriptor)(
+  def modifyColumnFamily[F[_]](t: AsyncAdmin, tableName: TableName, columnFamilyDescriptor: ColumnFamilyDescriptor)(
       implicit
       M: Applicative[F],
       F: CompletableFuture ~> F): F[Unit] =
@@ -188,22 +172,19 @@ object admin {
       F: CompletableFuture ~> F): F[NamespaceDescriptor] =
     F(t.getNamespaceDescriptor(namespace))
 
-  def listNamespaceDescriptors[F[_]](t: AsyncAdmin)(
-      implicit
-      M: Applicative[F],
-      F: CompletableFuture ~> F): F[Seq[NamespaceDescriptor]] =
+  def listNamespaceDescriptors[F[_]](t: AsyncAdmin)(implicit
+                                                    M: Applicative[F],
+                                                    F: CompletableFuture ~> F): F[Seq[NamespaceDescriptor]] =
     M.map(F(t.listNamespaceDescriptors))(_.asScala)
 
-  def getRegions[F[_]](t: AsyncAdmin, serverName: ServerName)(
-      implicit
-      M: Applicative[F],
-      F: CompletableFuture ~> F): F[Seq[RegionInfo]] =
+  def getRegions[F[_]](t: AsyncAdmin, serverName: ServerName)(implicit
+                                                              M: Applicative[F],
+                                                              F: CompletableFuture ~> F): F[Seq[RegionInfo]] =
     M.map(F(t.getRegions(serverName)))(_.asScala)
 
-  def getRegionsByTableName[F[_]](t: AsyncAdmin, tableName: TableName)(
-      implicit
-      M: Applicative[F],
-      F: CompletableFuture ~> F): F[Seq[RegionInfo]] =
+  def getRegionsByTableName[F[_]](t: AsyncAdmin, tableName: TableName)(implicit
+                                                                       M: Applicative[F],
+                                                                       F: CompletableFuture ~> F): F[Seq[RegionInfo]] =
     M.map(F(t.getRegions(tableName)))(_.asScala)
 
   def flush[F[_]](t: AsyncAdmin, tableName: TableName)(implicit
@@ -211,16 +192,14 @@ object admin {
                                                        F: CompletableFuture ~> F): F[Unit] =
     F(t.flush(tableName)) *> M.unit
 
-  def flushRegion[F[_]](t: AsyncAdmin, regionName: Array[Byte])(
-      implicit
-      M: Applicative[F],
-      F: CompletableFuture ~> F): F[Unit] =
+  def flushRegion[F[_]](t: AsyncAdmin, regionName: Array[Byte])(implicit
+                                                                M: Applicative[F],
+                                                                F: CompletableFuture ~> F): F[Unit] =
     F(t.flushRegion(regionName)) *> M.unit
 
-  def flushRegionServer[F[_]](t: AsyncAdmin, serverName: ServerName)(
-      implicit
-      M: Applicative[F],
-      F: CompletableFuture ~> F): F[Unit] =
+  def flushRegionServer[F[_]](t: AsyncAdmin, serverName: ServerName)(implicit
+                                                                     M: Applicative[F],
+                                                                     F: CompletableFuture ~> F): F[Unit] =
     F(t.flushRegionServer(serverName)) *> M.unit
 
   def compact[F[_]](t: AsyncAdmin, tableName: TableName)(implicit
@@ -248,10 +227,9 @@ object admin {
                                                             F: CompletableFuture ~> F): F[Unit] =
     F(t.compact(tableName, columnName, compactType)) *> M.unit
 
-  def compactRegion[F[_]](t: AsyncAdmin, regionName: Array[Byte])(
-      implicit
-      M: Applicative[F],
-      F: CompletableFuture ~> F): F[Unit] =
+  def compactRegion[F[_]](t: AsyncAdmin, regionName: Array[Byte])(implicit
+                                                                  M: Applicative[F],
+                                                                  F: CompletableFuture ~> F): F[Unit] =
     F(t.compactRegion(regionName)) *> M.unit
 
   def compactFamilyRegion[F[_]](t: AsyncAdmin, regionName: Array[Byte], columnFamily: Array[Byte])(
@@ -260,9 +238,7 @@ object admin {
       F: CompletableFuture ~> F): F[Unit] =
     F(t.compactRegion(regionName, columnFamily)) *> M.unit
 
-  def majorCompact[F[_]](t: AsyncAdmin,
-                         tableName: TableName,
-                         compactType: CompactType = CompactType.NORMAL)(
+  def majorCompact[F[_]](t: AsyncAdmin, tableName: TableName, compactType: CompactType = CompactType.NORMAL)(
       implicit
       M: Applicative[F],
       F: CompletableFuture ~> F): F[Unit] =
@@ -271,36 +247,30 @@ object admin {
   def majorCompactFamily[F[_]](t: AsyncAdmin,
                                tableName: TableName,
                                columnFamily: Array[Byte],
-                               compactType: CompactType = CompactType.NORMAL)(
-      implicit
-      M: Applicative[F],
-      F: CompletableFuture ~> F): F[Unit] =
+                               compactType: CompactType = CompactType.NORMAL)(implicit
+                                                                              M: Applicative[F],
+                                                                              F: CompletableFuture ~> F): F[Unit] =
     F(t.majorCompact(tableName, columnFamily, compactType)) *> M.unit
 
-  def majorCompactRegion[F[_]](t: AsyncAdmin, regionName: Array[Byte])(
-      implicit
-      M: Applicative[F],
-      F: CompletableFuture ~> F): F[Unit] =
+  def majorCompactRegion[F[_]](t: AsyncAdmin, regionName: Array[Byte])(implicit
+                                                                       M: Applicative[F],
+                                                                       F: CompletableFuture ~> F): F[Unit] =
     F(t.majorCompactRegion(regionName)) *> M.unit
 
-  def majorCompactFamilyRegion[F[_]](t: AsyncAdmin,
-                                     regionName: Array[Byte],
-                                     columnFamily: Array[Byte])(
+  def majorCompactFamilyRegion[F[_]](t: AsyncAdmin, regionName: Array[Byte], columnFamily: Array[Byte])(
       implicit
       M: Applicative[F],
       F: CompletableFuture ~> F): F[Unit] =
     F(t.majorCompactRegion(regionName, columnFamily)) *> M.unit
 
-  def compactRegionServer[F[_]](t: AsyncAdmin, serverName: ServerName)(
-      implicit
-      M: Applicative[F],
-      F: CompletableFuture ~> F): F[Unit] =
+  def compactRegionServer[F[_]](t: AsyncAdmin, serverName: ServerName)(implicit
+                                                                       M: Applicative[F],
+                                                                       F: CompletableFuture ~> F): F[Unit] =
     F(t.compactRegionServer(serverName)) *> M.unit
 
-  def majorCompactRegionServer[F[_]](t: AsyncAdmin, serverName: ServerName)(
-      implicit
-      M: Applicative[F],
-      F: CompletableFuture ~> F): F[Unit] =
+  def majorCompactRegionServer[F[_]](t: AsyncAdmin, serverName: ServerName)(implicit
+                                                                            M: Applicative[F],
+                                                                            F: CompletableFuture ~> F): F[Unit] =
     F(t.majorCompactRegionServer(serverName)) *> M.unit
 
 //  def mergeSwitch[F[_]](t: AsyncAdmin, on: Boolean)(implicit

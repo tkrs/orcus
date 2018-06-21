@@ -116,9 +116,7 @@ object table {
               }
             case other =>
               ME.pure(
-                BatchResult.Error(
-                  new Exception(s"Unexpected class returned: ${other.getClass.getSimpleName}"),
-                  a))
+                BatchResult.Error(new Exception(s"Unexpected class returned: ${other.getClass.getSimpleName}"), a))
           }
           ME.recover(f) {
             case t: Throwable =>

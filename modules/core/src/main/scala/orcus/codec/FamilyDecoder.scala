@@ -3,9 +3,7 @@ package orcus.codec
 import java.util.{NavigableMap => NMap}
 
 import cats.Eval
-import org.apache.hadoop.hbase.util.Bytes
-import shapeless.labelled._
-import shapeless._
+import export.imports
 
 import scala.annotation.tailrec
 import scala.collection.generic.CanBuildFrom
@@ -41,9 +39,9 @@ trait FamilyDecoder[A] { self =>
   }
 }
 
-object FamilyDecoder extends FamilyDecoder1 {
+object FamilyDecoder extends LowPriorityFamilyDecoder {
 
-  def apply[A](implicit A: FamilyDecoder[A]): FamilyDecoder[A] = A
+  @inline def apply[A](implicit A: FamilyDecoder[A]): FamilyDecoder[A] = A
 
   def pure[A](a: A): FamilyDecoder[A] = new FamilyDecoder[A] {
     def apply(map: NMap[Array[Byte], Array[Byte]]): Either[Throwable, A] =
@@ -58,9 +56,6 @@ object FamilyDecoder extends FamilyDecoder1 {
   def liftF[A](a: Either[Throwable, A]): FamilyDecoder[A] = new FamilyDecoder[A] {
     def apply(map: NMap[Array[Byte], Array[Byte]]): Either[Throwable, A] = a
   }
-}
-
-private[codec] trait FamilyDecoder1 extends FamilyDecoder2 {
 
   implicit def decodeOption[A](
       implicit
@@ -116,38 +111,5 @@ private[codec] trait FamilyDecoder1 extends FamilyDecoder2 {
     }
 }
 
-private[codec] trait FamilyDecoder2 {
-
-  implicit val decodeHNil: FamilyDecoder[HNil] = new FamilyDecoder[HNil] {
-    def apply(map: NMap[Array[Byte], Array[Byte]]): Either[Throwable, HNil] = Right(HNil)
-  }
-
-  implicit def decodeLabelledHCons[K <: Symbol, H, T <: HList](
-      implicit
-      K: Witness.Aux[K],
-      H: ValueCodec[H],
-      T: FamilyDecoder[T]): FamilyDecoder[FieldType[K, H] :: T] =
-    new FamilyDecoder[FieldType[K, H] :: T] {
-      def apply(map: NMap[Array[Byte], Array[Byte]]): Either[Throwable, FieldType[K, H] :: T] = {
-        T(map) match {
-          case Right(t) =>
-            H.decode(map.get(Bytes.toBytes(K.value.name))) match {
-              case Right(h) => Right(field[K](h) :: t)
-              case Left(e)  => Left(e)
-            }
-          case Left(e) => Left(e)
-        }
-      }
-    }
-
-  implicit def decodeCaseClass[H <: HList, A](implicit
-                                              gen: LabelledGeneric.Aux[A, H],
-                                              A: Lazy[FamilyDecoder[H]]): FamilyDecoder[A] =
-    new FamilyDecoder[A] {
-      def apply(map: NMap[Array[Byte], Array[Byte]]): Either[Throwable, A] =
-        A.value(map) match {
-          case Right(v) => Right(gen.from(v))
-          case Left(e)  => Left(e)
-        }
-    }
-}
+@imports[FamilyDecoder]
+trait LowPriorityFamilyDecoder

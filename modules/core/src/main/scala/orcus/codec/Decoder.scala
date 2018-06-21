@@ -1,17 +1,14 @@
 package orcus.codec
 
 import cats.Eval
-import cats.instances.either._
+import export.imports
 import org.apache.hadoop.hbase.client.Result
-import org.apache.hadoop.hbase.util.Bytes
-import shapeless.labelled._
-import shapeless._
 
 import scala.annotation.tailrec
 import scala.collection.generic.CanBuildFrom
 import scala.collection.mutable
 
-trait Decoder[A] { self =>
+trait Decoder[A] extends Serializable { self =>
 
   def apply(result: Result): Either[Throwable, A]
 
@@ -37,9 +34,9 @@ trait Decoder[A] { self =>
   }
 }
 
-object Decoder extends Decoder1 {
+object Decoder extends LowPriorityDecoder {
 
-  def apply[A](implicit A: Decoder[A]): Decoder[A] = A
+  @inline def apply[A](implicit A: Decoder[A]): Decoder[A] = A
 
   def pure[A](a: A): Decoder[A] = new Decoder[A] {
     def apply(result: Result): Either[Throwable, A] = Right(a)
@@ -53,10 +50,6 @@ object Decoder extends Decoder1 {
     def apply(result: Result): Either[Throwable, A] = a
   }
 
-}
-
-private[codec] trait Decoder1 extends Decoder2 {
-
   implicit def decodeOption[A](implicit A: Decoder[A]): Decoder[Option[A]] =
     new Decoder[Option[A]] {
       def apply(result: Result): Either[Throwable, Option[A]] = {
@@ -68,6 +61,7 @@ private[codec] trait Decoder1 extends Decoder2 {
           }
       }
     }
+
   implicit def decodeMapLike[M[_, _] <: Map[String, V], V](
       implicit
       K: ValueCodec[String],
@@ -82,8 +76,7 @@ private[codec] trait Decoder1 extends Decoder2 {
         else {
           val keys = map.keySet().iterator()
 
-          @tailrec def loop(
-              acc: mutable.Builder[(String, V), M[String, V]]): Either[Throwable, M[String, V]] = {
+          @tailrec def loop(acc: mutable.Builder[(String, V), M[String, V]]): Either[Throwable, M[String, V]] = {
             if (!keys.hasNext) Right(acc.result())
             else {
               val key = keys.next
@@ -106,40 +99,5 @@ private[codec] trait Decoder1 extends Decoder2 {
     }
 }
 
-private[codec] trait Decoder2 {
-
-  implicit val decodeHNil: Decoder[HNil] = new Decoder[HNil] {
-    def apply(result: Result): Either[Throwable, HNil] = Right(HNil)
-  }
-
-  implicit def decodeLabelledHCons[K <: Symbol, H, T <: HList](
-      implicit
-      K: Witness.Aux[K],
-      H: FamilyDecoder[H],
-      T: Decoder[T]): Decoder[FieldType[K, H] :: T] =
-    new Decoder[FieldType[K, H] :: T] {
-      def apply(result: Result): Either[Throwable, FieldType[K, H] :: T] = {
-        T(result) match {
-          case Right(t) =>
-            val k = Bytes.toBytes(K.value.name)
-            orcus.result.getFamily[H, Either[Throwable, ?]](result, k) match {
-              case Right(h) => Right(field[K](h) :: t)
-              case Left(e)  => Left(e)
-            }
-          case Left(e) =>
-            Left(e)
-        }
-      }
-    }
-
-  implicit def decodeCaseClass[H <: HList, A](implicit
-                                              gen: LabelledGeneric.Aux[A, H],
-                                              A: Lazy[Decoder[H]]): Decoder[A] =
-    new Decoder[A] {
-      def apply(result: Result): Either[Throwable, A] =
-        A.value(result) match {
-          case Right(v) => Right(gen.from(v))
-          case Left(e)  => Left(e)
-        }
-    }
-}
+@imports[Decoder]
+trait LowPriorityDecoder

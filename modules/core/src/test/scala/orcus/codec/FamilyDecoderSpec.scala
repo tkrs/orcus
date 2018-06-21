@@ -7,6 +7,7 @@ import org.apache.hadoop.hbase.util.Bytes
 import org.scalatest.{FunSuite, Matchers}
 
 class FamilyDecoderSpec extends FunSuite with Matchers {
+  import generic.derived._
 
   test("flatMap/map should return it mapped value") {
     final case class Foo(a: Int)

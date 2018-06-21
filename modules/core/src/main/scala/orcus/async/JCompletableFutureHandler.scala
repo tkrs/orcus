@@ -7,8 +7,7 @@ import cats.~>
 
 trait JCompletableFutureHandler {
 
-  implicit def handleJavaCompletableFuture[F[_]](
-      implicit F: AsyncHandler[F]): CompletableFuture ~> F = {
+  implicit def handleJavaCompletableFuture[F[_]](implicit F: AsyncHandler[F]): CompletableFuture ~> F = {
 
     def toF[A](cf: CompletableFuture[A]): F[A] =
       F.handle[A](

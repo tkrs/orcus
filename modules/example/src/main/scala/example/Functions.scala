@@ -8,8 +8,7 @@ import cats.{MonadError, ~>}
 import scala.util.control.NonFatal
 
 object Functions {
-  def bracket[R <: Closeable, F[_], A](tr: F[R])(f: R => F[A])(
-      implicit F: MonadError[F, Throwable]): F[A] = {
+  def bracket[R <: Closeable, F[_], A](tr: F[R])(f: R => F[A])(implicit F: MonadError[F, Throwable]): F[A] = {
     F.flatMap(tr) { r =>
       try f(r)
       catch {

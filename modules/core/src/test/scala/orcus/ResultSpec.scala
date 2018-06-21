@@ -15,6 +15,8 @@ import org.mockito.ArgumentMatchers._
 import scala.collection.JavaConverters._
 
 class ResultSpec extends FunSpec with MockitoSugar with Matchers {
+  import codec.generic.derived._
+
   type F[A] = Either[Throwable, A]
 
   describe("getRow") {
@@ -69,8 +71,7 @@ class ResultSpec extends FunSpec with MockitoSugar with Matchers {
   }
 
   describe("getColumnCells") {
-    it(
-      "should take the value from Result.getColumnCells(Array[Byte], Array[Byte]) and convert it to scala's Seq") {
+    it("should take the value from Result.getColumnCells(Array[Byte], Array[Byte]) and convert it to scala's Seq") {
       val m   = mock[Result]
       val cfn = Bytes.toBytes("1")
       val cn  = Bytes.toBytes("2")
@@ -116,8 +117,7 @@ class ResultSpec extends FunSpec with MockitoSugar with Matchers {
   }
 
   describe("get") {
-    it(
-      "should take the value from Result.getValue(Array[Byte], Array[Byte]) and convert it to arbitrary types") {
+    it("should take the value from Result.getValue(Array[Byte], Array[Byte]) and convert it to arbitrary types") {
       val m   = mock[Result]
       val cfn = Bytes.toBytes("1")
       val cn  = Bytes.toBytes("2")

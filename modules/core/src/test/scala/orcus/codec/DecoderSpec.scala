@@ -14,6 +14,7 @@ import org.mockito.Mockito._
 import scala.collection.JavaConverters._
 
 class DecoderSpec extends FunSpec with MockitoSugar {
+  import generic.derived._
 
   describe("flatMap/map") {
     it("should return mapped value") {

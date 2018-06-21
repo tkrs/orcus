@@ -242,8 +242,7 @@ class TableSpec extends FunSpec with MockitoSugar with Matchers {
           BatchResult.VoidMutate,
           BatchResult.Mutate(Some(r3)),
           BatchResult.Mutate(Some(r4)),
-          BatchResult.Error(new Exception("Unexpected class returned: String"),
-                            new HGet(Bytes.toBytes("error")))
+          BatchResult.Error(new Exception("Unexpected class returned: String"), new HGet(Bytes.toBytes("error")))
         )
 
         when(m.batch[Object](a.asJava))

@@ -100,10 +100,15 @@ lazy val core = project
         Pkg.catsCore,
         Pkg.shapeless,
         Pkg.java8Compat,
+        Pkg.exportHook,
+        Pkg.scalaReflect(scalaVersion.value) % "provided",
         Pkg.hbase % "provided"
       ),
       Pkg.forTest,
     ).map(_.withSources),
+  )
+  .settings(
+    addCompilerPlugin(Pkg.macroParadise cross CrossVersion.patch)
   )
 
 lazy val monix = project
@@ -247,10 +252,7 @@ lazy val compilerOptions = Seq(
   "-encoding", "utf-8",
   "-explaintypes",
   "-feature",
-  "-language:existentials",
-  "-language:experimental.macros",
-  "-language:higherKinds",
-  "-language:implicitConversions",
+  "-language:_",
   "-unchecked",
   "-Xcheckinit",
   "-Xfatal-warnings",

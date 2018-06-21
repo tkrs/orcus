@@ -53,17 +53,15 @@ object TableOp {
   final case class Append(a: HAppend)       extends TableOp[HResult]
   final case class Increment(a: HIncrement) extends TableOp[HResult]
   final case class Batch[C[_]](a: Seq[_ <: Row]) extends TableOp[C[BatchResult]] {
-    def run[M[_]](t: AsyncTableT)(
-        implicit
-        ME: MonadError[M, Throwable],
-        cf: CompletableFuture ~> M,
-        cbf: CanBuildFrom[Nothing, BatchResult, C[BatchResult]]): M[C[BatchResult]] =
+    def run[M[_]](t: AsyncTableT)(implicit
+                                  ME: MonadError[M, Throwable],
+                                  cf: CompletableFuture ~> M,
+                                  cbf: CanBuildFrom[Nothing, BatchResult, C[BatchResult]]): M[C[BatchResult]] =
       orcus.table.batch[M, C](t, a)
   }
 }
 
-private[free] abstract class TableOps0[M[_]](implicit inj: InjectK[TableOp, M])
-    extends TableApi[M] {
+private[free] abstract class TableOps0[M[_]](implicit inj: InjectK[TableOp, M]) extends TableApi[M] {
   import TableOp._
 
   override def getName: TableF[TableName] =
