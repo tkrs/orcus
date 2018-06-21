@@ -29,6 +29,7 @@ object CF1 {
   implicit val decodeCF1: orcus.codec.FamilyDecoder[CF1] =
     orcus.codec.generic.derivedFamilyDecoder[CF1]
 }
+
 final case class Hello(cf1: CF1)
 object Hello {
   implicit val encodeHello: orcus.codec.PutEncoder[Hello] =
@@ -57,11 +58,10 @@ trait FreeMain extends App {
     }
 
     def prog =
-      for {
-        _    <- Free.pure(Thread.sleep(10))
-        _put <- Free.pure(mkPut)
-        _    <- ev1.put(_put)
-      } yield (_put.getRow, _put.getTimestamp)
+      Free.pure[F, Put](mkPut) >>= { p =>
+        Thread.sleep(10)
+        ev1.put(p) *> Free.pure((p.getRow, p.getTimestamp))
+      }
 
     Iterator
       .continually(prog)
@@ -80,11 +80,7 @@ trait FreeMain extends App {
         .setRowPrefixFilter(Bytes.toBytes(prefix))
         .setTimeRange(range._1, range._2)
 
-    for {
-      sc <- Free.pure(mkScan)
-      r  <- ev1.getScanner(sc)
-      xs <- ev2.next(r, numRecords)
-    } yield xs
+    ev1.getScanner(mkScan) >>= (sc => ev2.next(sc, numRecords))
   }
 
   def resultProgram[F[a] <: CopK[_, a]](results: Seq[Result])(implicit
