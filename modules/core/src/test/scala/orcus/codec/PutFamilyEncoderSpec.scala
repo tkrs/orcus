@@ -5,6 +5,7 @@ import org.apache.hadoop.hbase.util.Bytes
 import org.scalatest.FunSpec
 
 class PutFamilyEncoderSpec extends FunSpec {
+  import generic.derived._
 
   case class A(a: Int, b: String, c: Double)
 

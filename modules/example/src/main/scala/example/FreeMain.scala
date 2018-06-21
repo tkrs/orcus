@@ -23,7 +23,19 @@ import org.apache.hadoop.hbase.client._
 import org.apache.hadoop.hbase.util.Bytes
 
 final case class CF1(greeting1: Option[String], greeting2: Option[String])
+object CF1 {
+  implicit val encodeCF1: orcus.codec.PutFamilyEncoder[CF1] =
+    orcus.codec.generic.derivedPutFamilyEncoder[CF1]
+  implicit val decodeCF1: orcus.codec.FamilyDecoder[CF1] =
+    orcus.codec.generic.derivedFamilyDecoder[CF1]
+}
 final case class Hello(cf1: CF1)
+object Hello {
+  implicit val encodeHello: orcus.codec.PutEncoder[Hello] =
+    orcus.codec.generic.derivedPutEncoder[Hello]
+  implicit val decodeHello: orcus.codec.Decoder[Hello] =
+    orcus.codec.generic.derivedDecoder[Hello]
+}
 
 trait FreeMain extends App {
   import Setup._
@@ -75,15 +87,11 @@ trait FreeMain extends App {
     } yield xs
   }
 
-  def resultProgram[F[a] <: CopK[_, a]](results: Seq[Result])(
-      implicit
-      ev1: ResultOps[F]): Free[F, Vector[Option[Hello]]] = {
-    for {
-      ys <- results.toVector
-             .map(ev1.to[Option[Hello]])
-             .sequence[Free[F, ?], Option[Hello]]
-    } yield ys
-  }
+  def resultProgram[F[a] <: CopK[_, a]](results: Seq[Result])(implicit
+                                                              ev1: ResultOps[F]): Free[F, Vector[Option[Hello]]] =
+    results.toVector
+      .map(ev1.to[Option[Hello]])
+      .sequence[Free[F, ?], Option[Hello]]
 
   def program[F[a] <: CopK[_, a]](implicit
                                   T: TableOps[F],

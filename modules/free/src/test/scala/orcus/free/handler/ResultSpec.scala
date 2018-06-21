@@ -18,6 +18,7 @@ import org.mockito.ArgumentMatchers._
 import scala.collection.JavaConverters._
 
 class ResultSpec extends FunSpec with MockitoSugar with Matchers {
+  import orcus.codec.generic.derived._
 
   type F[A] = Either[Throwable, A]
 

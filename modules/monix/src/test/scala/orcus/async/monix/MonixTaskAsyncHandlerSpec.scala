@@ -1,12 +1,7 @@
 package orcus.async
 package monix
 
-import java.util.concurrent.{
-  CancellationException,
-  CompletableFuture,
-  CompletionException,
-  Executors
-}
+import java.util.concurrent.{CancellationException, CompletableFuture, CompletionException, Executors}
 import java.util.function.Supplier
 
 import cats.~>
