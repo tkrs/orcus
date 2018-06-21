@@ -13,6 +13,7 @@ import _root_.monix.eval.Task
 import cats.effect.IO
 
 import scala.concurrent.{ExecutionContext, Await => SAwait, Future => SFuture}
+import scala.util.Random
 
 @State(Scope.Benchmark)
 @BenchmarkMode(Array(Mode.Throughput))
@@ -24,6 +25,7 @@ import scala.concurrent.{ExecutionContext, Await => SAwait, Future => SFuture}
 abstract class AsyncHandlerBenchmark {
 
   final val Xs: Vector[Int] = Vector.range(1, 50)
+  final val Rnd: Random     = new Random
 
   @Param(Array("1", "2", "4", "8", "16", "32", "64", "0"))
   var threads: Int = _
@@ -47,12 +49,9 @@ abstract class AsyncHandlerBenchmark {
       backgroundService = Executors.newFixedThreadPool(threads, daemonThreadFactory)
   }
 
-  @inline final def compute: CompletableFuture[Int] =
+  @inline final def compute(i: Int): CompletableFuture[Int] =
     CompletableFuture.supplyAsync(new Supplier[Int] {
-      def get(): Int = {
-        TimeUnit.MILLISECONDS.sleep(10)
-        10
-      }
+      def get(): Int = Rnd.nextInt(i) / i
     }, backgroundService)
 
   @TearDown
@@ -74,7 +73,7 @@ class CatsAsyncHandler extends AsyncHandlerBenchmark {
   @Benchmark
   def bench: Vector[Int] = {
     val nat = implicitly[CompletableFuture ~> IO]
-    val f   = Traverse[Vector].traverse[IO, Int, Int](Xs)(_ => nat.apply(compute))
+    val f   = Traverse[Vector].traverse[IO, Int, Int](Xs)(i => nat(compute(i)))
     SAwait.result(f.unsafeToFuture(), 10.seconds)
   }
 }
@@ -88,7 +87,7 @@ class MonixAsyncHandler extends AsyncHandlerBenchmark {
   @Benchmark
   def bench: Vector[Int] = {
     val nat = implicitly[CompletableFuture ~> Task]
-    val f   = Traverse[Vector].traverse[Task, Int, Int](Xs)(_ => nat.apply(compute))
+    val f   = Traverse[Vector].traverse[Task, Int, Int](Xs)(i => nat(compute(i)))
     SAwait.result(f.runAsync, 10.seconds)
   }
 }
@@ -103,7 +102,7 @@ class ScalaAsyncHandler extends AsyncHandlerBenchmark {
   @Benchmark
   def bench: Vector[Int] = {
     val nat = implicitly[CompletableFuture ~> SFuture]
-    val f   = Traverse[Vector].traverse[SFuture, Int, Int](Xs)(_ => nat.apply(compute))
+    val f   = Traverse[Vector].traverse[SFuture, Int, Int](Xs)(i => nat(compute(i)))
     SAwait.result(f, 10.seconds)
   }
 }
@@ -118,7 +117,7 @@ class ScalaJavaConverter extends AsyncHandlerBenchmark {
 
   @Benchmark
   def bench: Vector[Int] = {
-    val f = Traverse[Vector].traverse[SFuture, Int, Int](Xs)(_ => compute.toScala)
+    val f = Traverse[Vector].traverse[SFuture, Int, Int](Xs)(i => compute(i).toScala)
     SAwait.result(f, 10.seconds)
   }
 }
@@ -131,7 +130,7 @@ class TwitterAsyncHandler extends AsyncHandlerBenchmark {
   @Benchmark
   def bench: Vector[Int] = {
     val nat = implicitly[CompletableFuture ~> TFuture]
-    val f   = Traverse[Vector].traverse[TFuture, Int, Int](Xs)(_ => nat.apply(compute))
+    val f   = Traverse[Vector].traverse[TFuture, Int, Int](Xs)(i => nat(compute(i)))
     TAwait.result(f, 10.seconds)
   }
 }
