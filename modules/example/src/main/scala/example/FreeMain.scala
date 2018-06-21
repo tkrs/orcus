@@ -49,7 +49,7 @@ trait FreeMain extends App {
         _    <- Free.pure(Thread.sleep(10))
         _put <- Free.pure(mkPut)
         _    <- ev1.put(_put)
-      } yield (_put.getRow, _put.getTimeStamp)
+      } yield (_put.getRow, _put.getTimestamp)
 
     Iterator
       .continually(prog)

@@ -15,8 +15,8 @@ object Dependencies {
     val scalatest        = "3.0.5"
     val mockito          = "2.13.0"
     val kindProjector    = "0.9.7"
-    val hbase            = "2.0.0-beta-2"
-    val bigtable         = "1.3.0"
+    val hbase            = "2.0.0"
+    val bigtable         = "1.4.0"
     val logback          = "1.2.3"
     val scalaJava8Compat = "0.8.0"
   }
