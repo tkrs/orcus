@@ -14,7 +14,7 @@ Firstly, this library depends on "provided" HBase client on your project. Thus, 
 ```
 libraryDependencies += Seq(
   "com.github.tkrs" %% "orcus-core" % "x.y.z",
-  "org.apache.hbase" % "hbase-client" % "2.0.0-beta-2"
+  "org.apache.hbase" % "hbase-client" % "2.0.0"
 )
 ```
 
