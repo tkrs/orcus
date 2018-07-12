@@ -45,7 +45,13 @@ lazy val publishSettings = Seq(
   publishMavenStyle := true,
   Test / publishArtifact := false,
   pomIncludeRepository := { _ => false },
-  publishTo := Some(if (isSnapshot.value) Resolver.sonatypeRepo("snapshots") else Resolver.sonatypeRepo("releases")),
+  publishTo := {
+  val nexus = "https://oss.sonatype.org/"
+  if (isSnapshot.value)
+    Some("snapshots" at nexus + "content/repositories/snapshots")
+  else
+    Some("releases" at nexus + "service/local/staging/deploy/maven2")
+  },
   scmInfo := Some(
     ScmInfo(
       url("https://github.com/tkrs/orcus"),
