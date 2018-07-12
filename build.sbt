@@ -32,7 +32,8 @@ ThisBuild / scalacOptions ++= {
 
 Compile / console / scalacOptions ~= (_.filterNot(_.startsWith("-Ywarn-unused")))
 
-lazy val root = (project in file("."))
+lazy val root = project.in(file("."))
+  .settings(noPublishSettings)
   .aggregate(core, monix, `twitter-util`, `cats-effect`, free, iota, example, benchmark)
   .dependsOn(core, monix, `twitter-util`, `cats-effect`, free, iota, example, benchmark)
 
@@ -44,13 +45,7 @@ lazy val publishSettings = Seq(
   publishMavenStyle := true,
   Test / publishArtifact := false,
   pomIncludeRepository := { _ => false },
-  publishTo := {
-    val nexus = "https://oss.sonatype.org/"
-    if (isSnapshot.value)
-      Some("snapshots" at nexus + "content/repositories/snapshots")
-    else
-      Some("releases" at nexus + "service/local/staging/deploy/maven2")
-  },
+  publishTo := Some(if (isSnapshot.value) Resolver.sonatypeRepo("snapshots") else Resolver.sonatypeRepo("releases")),
   scmInfo := Some(
     ScmInfo(
       url("https://github.com/tkrs/orcus"),
@@ -71,6 +66,7 @@ lazy val publishSettings = Seq(
 
 lazy val noPublishSettings = Seq(
   publish := ((): Unit),
+  publishTo := Some(Resolver.mavenLocal),
   publishLocal := ((): Unit),
   publishArtifact := false
 )
