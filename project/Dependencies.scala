@@ -26,10 +26,10 @@ object Dependencies {
   val Pkg = new {
     lazy val catsCore       = "org.typelevel"             %% "cats-core"          % Ver.cats
     lazy val catsFree       = "org.typelevel"             %% "cats-free"          % Ver.cats
+    lazy val catsEffect     = "org.typelevel"             %% "cats-effect"        % Ver.catsEffect
     lazy val monixEval      = "io.monix"                  %% "monix-eval"         % Ver.monix
     lazy val twitterUtil    = "com.twitter"               %% "util-core"          % Ver.twitterUtil
     lazy val catbirdUtil    = "io.catbird"                %% "catbird-util"       % Ver.twitterUtil
-    lazy val catsEffect     = "org.typelevel"             %% "cats-effect"        % Ver.catsEffect
     lazy val iota           = "io.frees"                  %% "iota-core"          % Ver.iota
     lazy val shapeless      = "com.chuusai"               %% "shapeless"          % Ver.shapeless
     lazy val exportHook     = "org.typelevel"             %% "export-hook"        % Ver.exportHook
@@ -43,7 +43,7 @@ object Dependencies {
     lazy val bigtable       = "com.google.cloud.bigtable" % "bigtable-hbase-2.x"  % Ver.bigtable
     lazy val logbackClassic = "ch.qos.logback"            % "logback-classic"     % Ver.logback
 
-    def scalaReflect(v: String) = "org.scala-lang" % "scala-reflect" % v
+    def scalaReflect(v: String) = "org.scala-lang" % "scala-reflect" % v % "provided"
 
     lazy val forTest = Seq(scalatest, scalacheck, mockito).map(_ % "test")
   }
