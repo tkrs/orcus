@@ -15,7 +15,6 @@ ThisBuild / resolvers ++= Seq(
   Resolver.sonatypeRepo("releases"),
   Resolver.sonatypeRepo("snapshots")
 )
-ThisBuild / Test / fork := true
 ThisBuild / scalacOptions ++= {
   CrossVersion.partialVersion(scalaVersion.value) match {
     case Some((2, p)) if p >= 12 =>
@@ -29,8 +28,8 @@ ThisBuild / scalacOptions ++= {
       Nil
   }
 }
-
-Compile / console / scalacOptions ~= (_.filterNot(_.startsWith("-Ywarn-unused")))
+ThisBuild / Compile / console / scalacOptions ~= (_.filterNot(_.startsWith("-Ywarn-unused")))
+ThisBuild / Test / fork := true
 
 lazy val root = project.in(file("."))
   .settings(noPublishSettings)
