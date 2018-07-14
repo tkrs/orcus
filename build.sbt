@@ -1,6 +1,5 @@
 import Dependencies._
 
-ThisBuild / name := "orcus"
 ThisBuild / organization := "com.github.tkrs"
 ThisBuild / scalaVersion := Ver.`scala2.12`
 ThisBuild / crossScalaVersions := Seq(
@@ -15,24 +14,47 @@ ThisBuild / resolvers ++= Seq(
   Resolver.sonatypeRepo("releases"),
   Resolver.sonatypeRepo("snapshots")
 )
-ThisBuild / scalacOptions ++= {
+ThisBuild / scalacOptions ++= compilerOptions ++ {
   CrossVersion.partialVersion(scalaVersion.value) match {
-    case Some((2, p)) if p >= 12 =>
-      compilerOptions ++ Seq(
-        "-Ywarn-extra-implicit",
-        "-Ywarn-unused:_",
-      )
-    case Some((2, p)) if p >= 11 =>
-      compilerOptions
-    case _                       =>
-      Nil
+    case Some((2, p)) if p >= 12 => warnCompilerOptions
+    case _                       => Nil
   }
 }
-ThisBuild / Compile / console / scalacOptions ~= (_.filterNot(_.startsWith("-Ywarn-unused")))
 ThisBuild / Test / fork := true
 
-lazy val root = project.in(file("."))
+lazy val compilerOptions = Seq(
+  "-deprecation",
+  "-encoding", "utf-8",
+  "-explaintypes",
+  "-feature",
+  "-language:_",
+  "-unchecked",
+  "-Xcheckinit",
+  "-Xfuture",
+  "-Ypartial-unification",
+)
+
+lazy val warnCompilerOptions = Seq(
+  "-Xlint",
+  "-Xfatal-warnings",
+  "-Yno-adapted-args",
+  "-Ywarn-unused:_",
+  "-Ywarn-extra-implicit",
+  "-Ywarn-dead-code",
+  "-Ywarn-inaccessible",
+  "-Ywarn-infer-any",
+  "-Ywarn-nullary-override",
+  "-Ywarn-nullary-unit",
+  "-Ywarn-numeric-widen",
+  "-Ywarn-value-discard",
+)
+
+lazy val orcus = project.in(file("."))
   .settings(noPublishSettings)
+  .settings(
+    Compile / console / scalacOptions --= warnCompilerOptions,
+    Compile / console / scalacOptions += "-Yrepl-class-based"
+  )
   .aggregate(core, monix, `twitter-util`, `cats-effect`, free, iota, example, benchmark)
   .dependsOn(core, monix, `twitter-util`, `cats-effect`, free, iota, example, benchmark)
 
@@ -82,7 +104,6 @@ lazy val core = project
   .settings(
     description := "orcus core",
     moduleName := "orcus-core",
-    name := "core",
   )
   .settings(
     libraryDependencies ++= Seq.concat(
@@ -104,7 +125,6 @@ lazy val monix = project
   .settings(
     description := "orcus monix",
     moduleName := "orcus-monix",
-    name := "monix",
   )
   .settings(
     libraryDependencies ++= Seq.concat(
@@ -122,7 +142,6 @@ lazy val `twitter-util` = project
   .settings(
     description := "orcus twitter-util",
     moduleName := "orcus-twitter-util",
-    name := "twitter-util",
   )
   .settings(
     libraryDependencies ++= Seq.concat(
@@ -140,7 +159,6 @@ lazy val `cats-effect` = project
   .settings(
     description := "orcus cats-effect",
     moduleName := "orcus-cats-effect",
-    name := "cats-effect",
   )
   .settings(
     libraryDependencies ++= Seq.concat(
@@ -158,7 +176,6 @@ lazy val free = project
   .settings(
     description := "orcus free",
     moduleName := "orcus-free",
-    name := "free",
   )
   .settings(
     libraryDependencies ++= Seq.concat(
@@ -177,7 +194,6 @@ lazy val iota = project
   .settings(
     description := "orcus iota",
     moduleName := "orcus-iota",
-    name := "iota",
   )
   .settings(
     libraryDependencies ++= Seq.concat(
@@ -196,7 +212,6 @@ lazy val example = project
   .settings(
     description := "orcus example",
     moduleName := "orcus-example",
-    name := "example",
   )
   .settings(
     libraryDependencies ++= Seq(
@@ -215,7 +230,6 @@ lazy val benchmark = (project in file("modules/benchmark"))
   .settings(
     description := "orcus benchmark",
     moduleName := "orcus-benchmark",
-    name := "benchmark"
   )
   .settings(
     libraryDependencies ++= Seq(
@@ -231,25 +245,3 @@ lazy val benchmark = (project in file("modules/benchmark"))
     `cats-effect`,
     monix,
   ).map(_ % "test->test"): _*)
-
-lazy val compilerOptions = Seq(
-  "-deprecation",
-  "-encoding", "utf-8",
-  "-explaintypes",
-  "-feature",
-  "-language:_",
-  "-unchecked",
-  "-Xcheckinit",
-  "-Xfatal-warnings",
-  "-Xfuture",
-  "-Xlint",
-  "-Yno-adapted-args",
-  "-Ypartial-unification",
-  "-Ywarn-dead-code",
-  "-Ywarn-inaccessible",
-  "-Ywarn-infer-any",
-  "-Ywarn-nullary-override",
-  "-Ywarn-nullary-unit",
-  "-Ywarn-numeric-widen",
-  "-Ywarn-value-discard"
-)
