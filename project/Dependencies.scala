@@ -14,7 +14,7 @@ object Dependencies {
     val exportHook       = "1.2.0"
     val scalacheck       = "1.14.0"
     val scalatest        = "3.0.5"
-    val mockito          = "2.13.0"
+    val mockito          = "2.19.1"
     val kindProjector    = "0.9.7"
     val hbase            = "2.0.0"
     val bigtable         = "1.4.0"
