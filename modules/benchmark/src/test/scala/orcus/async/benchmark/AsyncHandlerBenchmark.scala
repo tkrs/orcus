@@ -4,7 +4,7 @@ package benchmark
 import java.util.concurrent._
 import java.util.function.Supplier
 
-import cats.{Traverse, ~>}
+import cats.{Applicative, Traverse, ~>}
 import cats.instances.vector._
 import org.openjdk.jmh.annotations._
 import com.twitter.util.{Await => TAwait, Future => TFuture}
@@ -17,11 +17,25 @@ import scala.util.Random
 
 @State(Scope.Benchmark)
 @BenchmarkMode(Array(Mode.Throughput))
-@Warmup(iterations = 10, time = 5)
-@Measurement(iterations = 10, time = 10)
-@Threads(1)
-@Fork(2)
+@Warmup(iterations = 10, time = 1)
+@Measurement(iterations = 10, time = 5)
 @OutputTimeUnit(TimeUnit.SECONDS)
+@Threads(1)
+@Fork(
+  value = 2,
+  jvmArgs = Array(
+    "-server",
+    "-Xms2g",
+    "-Xmx2g",
+    "-XX:NewSize=1g",
+    "-XX:MaxNewSize=1g",
+    "-XX:InitialCodeCacheSize=512m",
+    "-XX:ReservedCodeCacheSize=512m",
+    "-XX:+UseParallelGC",
+    "-XX:-UseBiasedLocking",
+    "-XX:+AlwaysPreTouch"
+  )
+)
 abstract class AsyncHandlerBenchmark {
 
   final val Xs: Vector[Int] = Vector.range(1, 50)
@@ -131,6 +145,25 @@ class TwitterAsyncHandler extends AsyncHandlerBenchmark {
   def bench: Vector[Int] = {
     val nat = implicitly[CompletableFuture ~> TFuture]
     val f   = Traverse[Vector].traverse[TFuture, Int, Int](Xs)(i => nat(compute(i)))
+    TAwait.result(f, 10.seconds)
+  }
+}
+
+class ArrowsTwitterAsyncHandler extends AsyncHandlerBenchmark {
+  import arrows.twitter.Task
+  import com.twitter.conversions.time._
+  import orcus.async.arrowstwitter._
+
+  implicit val applicativeTask: Applicative[Task] = new Applicative[Task] {
+    def pure[A](x: A): Task[A] = Task.value(x)
+
+    def ap[A, B](ff: Task[A => B])(fa: Task[A]): Task[B] = ff.flatMap(fa.map)
+  }
+
+  @Benchmark
+  def bench: Vector[Int] = {
+    val nat = implicitly[CompletableFuture ~> Task]
+    val f   = Traverse[Vector].traverse[Task, Int, Int](Xs)(i => nat(compute(i))).run
     TAwait.result(f, 10.seconds)
   }
 }
