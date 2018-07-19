@@ -6,7 +6,7 @@ ThisBuild / crossScalaVersions := Seq(
   Ver.`scala2.11`,
   Ver.`scala2.12`
 )
-ThisBuild / libraryDependencies ++= Seq(
+ThisBuild / libraryDependencies ++= Pkg.forTest ++ Seq(
   compilerPlugin(Pkg.kindProjector),
   compilerPlugin(Pkg.macroParadise cross CrossVersion.patch)
 )
@@ -55,8 +55,8 @@ lazy val orcus = project.in(file("."))
     Compile / console / scalacOptions --= warnCompilerOptions,
     Compile / console / scalacOptions += "-Yrepl-class-based"
   )
-  .aggregate(core, monix, `twitter-util`, `cats-effect`, free, iota, example, benchmark)
-  .dependsOn(core, monix, `twitter-util`, `cats-effect`, free, iota, example, benchmark)
+  .aggregate(core, `arrows-twitter`, `twitter-util`, monix, `cats-effect`, free, iota, example, benchmark)
+  .dependsOn(core, `arrows-twitter`, `twitter-util`, monix, `cats-effect`, free, iota, example, benchmark)
 
 lazy val publishSettings = Seq(
   releaseCrossBuild := true,
@@ -112,7 +112,6 @@ lazy val core = project
         Pkg.scalaReflect(scalaVersion.value),
         Pkg.hbase % "provided"
       ),
-      Pkg.forTest,
     ).map(_.withSources),
   )
 
@@ -124,11 +123,8 @@ lazy val monix = project
     moduleName := "orcus-monix",
   )
   .settings(
-    libraryDependencies ++= Seq.concat(
-      Seq(
-        Pkg.monixEval,
-      ),
-      Pkg.forTest,
+    libraryDependencies ++= Seq(
+      Pkg.monixEval,
     ).map(_.withSources),
   )
   .dependsOn(core)
@@ -141,11 +137,22 @@ lazy val `twitter-util` = project
     moduleName := "orcus-twitter-util",
   )
   .settings(
-    libraryDependencies ++= Seq.concat(
-      Seq(
-        Pkg.twitterUtil,
-      ),
-      Pkg.forTest,
+    libraryDependencies ++= Seq(
+      Pkg.twitterUtil,
+    ).map(_.withSources),
+  )
+  .dependsOn(core)
+
+lazy val `arrows-twitter` = project
+  .in(file("modules/arrows-twitter"))
+  .settings(publishSettings)
+  .settings(
+    description := "orcus arrows-twitter",
+    moduleName := "orcus-arrows-twitter",
+  )
+  .settings(
+    libraryDependencies ++= Seq(
+      Pkg.twitterArrows,
     ).map(_.withSources),
   )
   .dependsOn(core)
@@ -158,11 +165,8 @@ lazy val `cats-effect` = project
     moduleName := "orcus-cats-effect",
   )
   .settings(
-    libraryDependencies ++= Seq.concat(
-      Seq(
-        Pkg.catsEffect,
-      ),
-      Pkg.forTest,
+    libraryDependencies ++= Seq(
+      Pkg.catsEffect,
     ).map(_.withSources),
   )
   .dependsOn(core)
@@ -175,12 +179,9 @@ lazy val free = project
     moduleName := "orcus-free",
   )
   .settings(
-    libraryDependencies ++= Seq.concat(
-      Seq(
+    libraryDependencies ++= Seq(
         Pkg.catsFree,
         Pkg.hbase % "provided"
-      ),
-      Pkg.forTest,
     ).map(_.withSources),
   )
   .dependsOn(core)
@@ -193,12 +194,9 @@ lazy val iota = project
     moduleName := "orcus-iota",
   )
   .settings(
-    libraryDependencies ++= Seq.concat(
-      Seq(
-        Pkg.iota,
-        Pkg.hbase % "provided",
-      ),
-      Pkg.forTest,
+    libraryDependencies ++= Seq(
+      Pkg.iota,
+      Pkg.hbase % "provided",
     ).map(_.withSources),
   )
   .dependsOn(free)
@@ -239,6 +237,7 @@ lazy val benchmark = (project in file("modules/benchmark"))
   .dependsOn(Seq(
     iota,
     `twitter-util`,
+    `arrows-twitter`,
     `cats-effect`,
     monix,
   ).map(_ % "test->test"): _*)

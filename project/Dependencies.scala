@@ -7,6 +7,7 @@ object Dependencies {
     val scalafmt         = "1.3.0"
     val cats             = "1.1.0"
     val monix            = "3.0.0-RC1"
+    val twitterArrows    = "0.1.21"
     val twitterUtil      = "18.7.0"
     val catsEffect       = "1.0.0-RC2"
     val iota             = "0.3.8"
@@ -28,6 +29,7 @@ object Dependencies {
     lazy val catsFree       = "org.typelevel"             %% "cats-free"          % Ver.cats
     lazy val catsEffect     = "org.typelevel"             %% "cats-effect"        % Ver.catsEffect
     lazy val monixEval      = "io.monix"                  %% "monix-eval"         % Ver.monix
+    lazy val twitterArrows  = "io.trane"                  %% "arrows-twitter"     % Ver.twitterArrows
     lazy val twitterUtil    = "com.twitter"               %% "util-core"          % Ver.twitterUtil
     lazy val catbirdUtil    = "io.catbird"                %% "catbird-util"       % Ver.twitterUtil
     lazy val iota           = "io.frees"                  %% "iota-core"          % Ver.iota
