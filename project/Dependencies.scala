@@ -5,7 +5,7 @@ object Dependencies {
     val `scala2.12`      = "2.12.6"
     val `scala2.11`      = "2.11.12"
     val scalafmt         = "1.3.0"
-    val cats             = "1.1.0"
+    val cats             = "1.2.0"
     val monix            = "3.0.0-RC1"
     val twitterArrows    = "0.1.21"
     val twitterUtil      = "18.7.0"
