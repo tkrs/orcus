@@ -20,7 +20,7 @@ trait ArrowsTwitterAsyncHandlerInstances {
       }
     }
 
-  def arrowsTwitterForkedTaskAsyncHandler(implicit fp: FuturePool): AsyncHandler[Task] =
+  def forkedTaskAsyncHandler(implicit fp: FuturePool): AsyncHandler[Task] =
     new AsyncHandler[Task] {
       def handle[A](callback: Callback[A], cancel: => Unit): Task[A] = {
         Task.fork(fp)(Task.async {
