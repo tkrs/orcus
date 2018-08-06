@@ -50,6 +50,7 @@ lazy val warnCompilerOptions = Seq(
 )
 
 lazy val orcus = project.in(file("."))
+  .settings(publishSettings)
   .settings(noPublishSettings)
   .settings(
     Compile / console / scalacOptions --= warnCompilerOptions,
@@ -203,6 +204,7 @@ lazy val iota = project
 
 lazy val example = project
   .in(file("modules/example"))
+  .settings(publishSettings)
   .settings(noPublishSettings)
   .settings(
     description := "orcus example",
@@ -221,6 +223,7 @@ lazy val example = project
   .dependsOn(iota, `cats-effect`)
 
 lazy val benchmark = (project in file("modules/benchmark"))
+  .settings(publishSettings)
   .settings(noPublishSettings)
   .settings(
     description := "orcus benchmark",
