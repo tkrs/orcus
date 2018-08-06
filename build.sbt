@@ -56,8 +56,8 @@ lazy val orcus = project.in(file("."))
     Compile / console / scalacOptions --= warnCompilerOptions,
     Compile / console / scalacOptions += "-Yrepl-class-based"
   )
-  .aggregate(core, `arrows-twitter`, `twitter-util`, monix, `cats-effect`, free, iota, example, benchmark)
-  .dependsOn(core, `arrows-twitter`, `twitter-util`, monix, `cats-effect`, free, iota, example, benchmark)
+  .aggregate(core, `arrows-twitter`, `twitter-util`, monix, `cats-effect`, `cats-free`, iota, example, benchmark)
+  .dependsOn(core, `arrows-twitter`, `twitter-util`, monix, `cats-effect`, `cats-free`, iota, example, benchmark)
 
 lazy val publishSettings = Seq(
   releaseCrossBuild := true,
@@ -172,12 +172,12 @@ lazy val `cats-effect` = project
   )
   .dependsOn(core)
 
-lazy val free = project
-  .in(file("modules/free"))
+lazy val `cats-free` = project
+  .in(file("modules/cats-free"))
   .settings(publishSettings)
   .settings(
-    description := "orcus free",
-    moduleName := "orcus-free",
+    description := "orcus cats-free",
+    moduleName := "orcus-cats-free",
   )
   .settings(
     libraryDependencies ++= Seq(
@@ -200,7 +200,7 @@ lazy val iota = project
       Pkg.hbase % "provided",
     ).map(_.withSources),
   )
-  .dependsOn(free)
+  .dependsOn(`cats-free`)
 
 lazy val example = project
   .in(file("modules/example"))
