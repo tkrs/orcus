@@ -1,6 +1,6 @@
 package orcus.free.handler
 
-import cats.{MonadError, ~>}
+import cats.{ApplicativeError, ~>}
 import cats.data.Kleisli
 import orcus.async._
 import orcus.free.TableOp
@@ -15,7 +15,7 @@ object table {
     import TableOp._
 
     implicit def tableOpHandler[M[_]](implicit
-                                      ME: MonadError[M, Throwable],
+                                      ME: ApplicativeError[M, Throwable],
                                       AC: AsyncHandler[M]): Handler[M] =
       new Handler[M] {
         override def apply[A](fa: TableOp[A]): Kleisli[M, AsyncTableT, A] = fa match {

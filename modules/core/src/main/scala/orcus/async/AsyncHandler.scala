@@ -6,5 +6,5 @@ trait AsyncHandler[F[_]] {
 
 object AsyncHandler extends ScalaFutureAsyncHandlerInstances {
 
-  def apply[F[_]](implicit F: AsyncHandler[F]): AsyncHandler[F] = F
+  @inline def apply[F[_]](implicit F: AsyncHandler[F]): AsyncHandler[F] = F
 }
