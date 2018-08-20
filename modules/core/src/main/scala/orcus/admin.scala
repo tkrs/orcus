@@ -4,7 +4,7 @@ package orcus
 import java.util.concurrent.CompletableFuture
 import java.util.regex.Pattern
 
-import cats.{Applicative, Apply, ~>}
+import cats.{Applicative, Functor, ~>}
 import cats.syntax.apply._
 //import com.google.protobuf.RpcChannel
 import org.apache.hadoop.hbase.{
@@ -29,40 +29,40 @@ object admin {
 
   def tableExists[F[_]](t: AsyncAdmin, tableName: TableName)(
       implicit
-      M: Apply[F],
+      M: Functor[F],
       F: CompletableFuture ~> F
   ): F[Boolean] =
     M.map(F(t.tableExists(tableName)))(_.booleanValue)
 
   def listTableDescriptors[F[_]](t: AsyncAdmin, includeSysTables: Boolean = false)(
       implicit
-      M: Apply[F],
+      M: Functor[F],
       F: CompletableFuture ~> F
   ): F[Seq[TableDescriptor]] =
     M.map(F(t.listTableDescriptors(includeSysTables)))(_.asScala)
 
   def listTableDescriptorsByPattern[F[_]](t: AsyncAdmin, pattern: Pattern, includeSysTables: Boolean = false)(
       implicit
-      M: Apply[F],
+      M: Functor[F],
       F: CompletableFuture ~> F
   ): F[Seq[TableDescriptor]] =
     M.map(F(t.listTableDescriptors(pattern, includeSysTables)))(_.asScala)
 
   def listTableDescriptorsByNamespace[F[_]](t: AsyncAdmin, namespace: String)(
       implicit
-      M: Apply[F],
+      M: Functor[F],
       F: CompletableFuture ~> F
   ): F[Seq[TableDescriptor]] =
     M.map(F(t.listTableDescriptorsByNamespace(namespace)))(_.asScala)
 
   def listTableNames[F[_]](t: AsyncAdmin, includeSysTables: Boolean)(implicit
-                                                                     M: Apply[F],
+                                                                     M: Functor[F],
                                                                      F: CompletableFuture ~> F): F[Seq[TableName]] =
     M.map(F(t.listTableNames(includeSysTables)))(_.asScala)
 
   def listTableNamesByPattern[F[_]](t: AsyncAdmin, pattern: Pattern, includeSysTables: Boolean)(
       implicit
-      M: Apply[F],
+      M: Functor[F],
       F: CompletableFuture ~> F): F[Seq[TableName]] =
     M.map(F(t.listTableNames(pattern, includeSysTables)))(_.asScala)
 
@@ -117,18 +117,18 @@ object admin {
     F(t.disableTable(tableName)) *> M.unit
 
   def isTableEnabled[F[_]](t: AsyncAdmin, tableName: TableName)(implicit
-                                                                M: Apply[F],
+                                                                M: Functor[F],
                                                                 F: CompletableFuture ~> F): F[Boolean] =
     M.map(F(t.isTableEnabled(tableName)))(_.booleanValue)
 
   def isTableAvailable[F[_]](t: AsyncAdmin, tableName: TableName)(implicit
-                                                                  M: Apply[F],
+                                                                  M: Functor[F],
                                                                   F: CompletableFuture ~> F): F[Boolean] =
     M.map(F(t.isTableAvailable(tableName)))(_.booleanValue)
 
   def isTableAvailableWithSplitKeys[F[_]](t: AsyncAdmin, tableName: TableName, splitKeys: Array[Array[Byte]])(
       implicit
-      M: Apply[F],
+      M: Functor[F],
       F: CompletableFuture ~> F): F[Boolean] =
     M.map(F(t.isTableAvailable(tableName, splitKeys)))(_.booleanValue)
 

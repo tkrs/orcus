@@ -2,7 +2,7 @@ package orcus.free
 
 import java.util.concurrent.CompletableFuture
 
-import cats.{InjectK, MonadError, ~>}
+import cats.{InjectK, ApplicativeError, ~>}
 import cats.free.Free
 import orcus.BatchResult
 import orcus.table.AsyncTableT
@@ -54,7 +54,7 @@ object TableOp {
   final case class Increment(a: HIncrement) extends TableOp[HResult]
   final case class Batch[C[_]](a: Seq[_ <: Row]) extends TableOp[C[BatchResult]] {
     def run[M[_]](t: AsyncTableT)(implicit
-                                  ME: MonadError[M, Throwable],
+                                  ME: ApplicativeError[M, Throwable],
                                   cf: CompletableFuture ~> M,
                                   cbf: CanBuildFrom[Nothing, BatchResult, C[BatchResult]]): M[C[BatchResult]] =
       orcus.table.batch[M, C](t, a)

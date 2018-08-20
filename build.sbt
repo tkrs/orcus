@@ -7,6 +7,7 @@ ThisBuild / crossScalaVersions := Seq(
   Ver.`scala2.12`
 )
 ThisBuild / libraryDependencies ++= Pkg.forTest ++ Seq(
+  Pkg.hbase % "provided",
   compilerPlugin(Pkg.kindProjector),
   compilerPlugin(Pkg.macroParadise cross CrossVersion.patch)
 )
@@ -111,7 +112,6 @@ lazy val core = project
         Pkg.java8Compat,
         Pkg.exportHook,
         Pkg.scalaReflect(scalaVersion.value),
-        Pkg.hbase % "provided"
       ),
     ).map(_.withSources),
   )
@@ -124,9 +124,7 @@ lazy val monix = project
     moduleName := "orcus-monix",
   )
   .settings(
-    libraryDependencies ++= Seq(
-      Pkg.monixEval,
-    ).map(_.withSources),
+    libraryDependencies += Pkg.monixEval.withSources,
   )
   .dependsOn(core)
 
@@ -138,9 +136,7 @@ lazy val `twitter-util` = project
     moduleName := "orcus-twitter-util",
   )
   .settings(
-    libraryDependencies ++= Seq(
-      Pkg.twitterUtil,
-    ).map(_.withSources),
+    libraryDependencies += Pkg.twitterUtil.withSources,
   )
   .dependsOn(core)
 
@@ -152,9 +148,7 @@ lazy val `arrows-twitter` = project
     moduleName := "orcus-arrows-twitter",
   )
   .settings(
-    libraryDependencies ++= Seq(
-      Pkg.twitterArrows,
-    ).map(_.withSources),
+    libraryDependencies += Pkg.twitterArrows.withSources,
   )
   .dependsOn(core)
 
@@ -166,9 +160,7 @@ lazy val `cats-effect` = project
     moduleName := "orcus-cats-effect",
   )
   .settings(
-    libraryDependencies ++= Seq(
-      Pkg.catsEffect,
-    ).map(_.withSources),
+    libraryDependencies += Pkg.catsEffect.withSources,
   )
   .dependsOn(core)
 
@@ -180,10 +172,7 @@ lazy val `cats-free` = project
     moduleName := "orcus-cats-free",
   )
   .settings(
-    libraryDependencies ++= Seq(
-        Pkg.catsFree,
-        Pkg.hbase % "provided"
-    ).map(_.withSources),
+    libraryDependencies += Pkg.catsFree.withSources,
   )
   .dependsOn(core)
 
@@ -195,10 +184,7 @@ lazy val iota = project
     moduleName := "orcus-iota",
   )
   .settings(
-    libraryDependencies ++= Seq(
-      Pkg.iota,
-      Pkg.hbase % "provided",
-    ).map(_.withSources),
+    libraryDependencies += Pkg.iota.withSources,
   )
   .dependsOn(`cats-free`)
 
