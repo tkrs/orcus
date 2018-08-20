@@ -1,10 +1,9 @@
 package orcus.free
 
-import java.util.concurrent.CompletableFuture
-
-import cats.{InjectK, ApplicativeError, ~>}
+import cats.{ApplicativeError, InjectK}
 import cats.free.Free
 import orcus.BatchResult
+import orcus.async.Par
 import orcus.table.AsyncTableT
 import org.apache.hadoop.conf.{Configuration => HConfig}
 import org.apache.hadoop.hbase.TableName
@@ -55,7 +54,7 @@ object TableOp {
   final case class Batch[C[_]](a: Seq[_ <: Row]) extends TableOp[C[BatchResult]] {
     def run[M[_]](t: AsyncTableT)(implicit
                                   ME: ApplicativeError[M, Throwable],
-                                  cf: CompletableFuture ~> M,
+                                  cf: Par[M],
                                   cbf: CanBuildFrom[Nothing, BatchResult, C[BatchResult]]): M[C[BatchResult]] =
       orcus.table.batch[M, C](t, a)
   }

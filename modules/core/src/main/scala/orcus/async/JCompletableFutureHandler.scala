@@ -7,9 +7,11 @@ import cats.~>
 
 trait JCompletableFutureHandler {
 
-  implicit def handleJavaCompletableFuture[F[_]](implicit F: AsyncHandler[F]): CompletableFuture ~> F = {
+  implicit def handleJavaCompletableFuture[F[_]](implicit F: AsyncHandler[F]): Par[F] = new Par[F] {
 
-    def toF[A](cf: CompletableFuture[A]): F[A] =
+    def parallel: CompletableFuture ~> F = λ[CompletableFuture ~> F](toF(_))
+
+    private def toF[A](cf: CompletableFuture[A]): F[A] =
       F.handle[A](
         { cb =>
           val f = new BiConsumer[A, Throwable] {
@@ -21,7 +23,5 @@ trait JCompletableFutureHandler {
           val _ = cf.cancel(true)
         }
       )
-
-    λ[CompletableFuture ~> F](toF(_))
   }
 }

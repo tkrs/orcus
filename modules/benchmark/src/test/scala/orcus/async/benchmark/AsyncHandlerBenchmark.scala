@@ -4,7 +4,7 @@ package benchmark
 import java.util.concurrent._
 import java.util.function.Supplier
 
-import cats.{Applicative, Traverse, ~>}
+import cats.{Applicative, Traverse}
 import cats.instances.vector._
 import org.openjdk.jmh.annotations._
 import com.twitter.util.{Await => TAwait, Future => TFuture}
@@ -86,8 +86,8 @@ class CatsAsyncHandler extends AsyncHandlerBenchmark {
 
   @Benchmark
   def bench: Vector[Int] = {
-    val nat = implicitly[CompletableFuture ~> IO]
-    val f   = Traverse[Vector].traverse[IO, Int, Int](Xs)(i => nat(compute(i)))
+    val p = implicitly[Par[IO]]
+    val f = Traverse[Vector].traverse[IO, Int, Int](Xs)(i => p.parallel(compute(i)))
     SAwait.result(f.unsafeToFuture(), 10.seconds)
   }
 }
@@ -100,8 +100,8 @@ class MonixAsyncHandler extends AsyncHandlerBenchmark {
 
   @Benchmark
   def bench: Vector[Int] = {
-    val nat = implicitly[CompletableFuture ~> Task]
-    val f   = Traverse[Vector].traverse[Task, Int, Int](Xs)(i => nat(compute(i)))
+    val p = implicitly[Par[Task]]
+    val f = Traverse[Vector].traverse[Task, Int, Int](Xs)(i => p.parallel(compute(i)))
     SAwait.result(f.runAsync, 10.seconds)
   }
 }
@@ -115,8 +115,8 @@ class ScalaAsyncHandler extends AsyncHandlerBenchmark {
 
   @Benchmark
   def bench: Vector[Int] = {
-    val nat = implicitly[CompletableFuture ~> SFuture]
-    val f   = Traverse[Vector].traverse[SFuture, Int, Int](Xs)(i => nat(compute(i)))
+    val p = implicitly[Par[SFuture]]
+    val f = Traverse[Vector].traverse[SFuture, Int, Int](Xs)(i => p.parallel(compute(i)))
     SAwait.result(f, 10.seconds)
   }
 }
@@ -143,8 +143,8 @@ class TwitterAsyncHandler extends AsyncHandlerBenchmark {
 
   @Benchmark
   def bench: Vector[Int] = {
-    val nat = implicitly[CompletableFuture ~> TFuture]
-    val f   = Traverse[Vector].traverse[TFuture, Int, Int](Xs)(i => nat(compute(i)))
+    val p = implicitly[Par[TFuture]]
+    val f = Traverse[Vector].traverse[TFuture, Int, Int](Xs)(i => p.parallel(compute(i)))
     TAwait.result(f, 10.seconds)
   }
 }
@@ -162,8 +162,8 @@ class ArrowsTwitterAsyncHandler extends AsyncHandlerBenchmark {
 
   @Benchmark
   def bench: Vector[Int] = {
-    val nat = implicitly[CompletableFuture ~> Task]
-    val f   = Traverse[Vector].traverse[Task, Int, Int](Xs)(i => nat(compute(i))).run
+    val p = implicitly[Par[Task]]
+    val f = Traverse[Vector].traverse[Task, Int, Int](Xs)(i => p.parallel(compute(i))).run
     TAwait.result(f, 10.seconds)
   }
 }

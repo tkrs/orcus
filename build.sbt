@@ -126,7 +126,7 @@ lazy val monix = project
   .settings(
     libraryDependencies += Pkg.monixEval.withSources,
   )
-  .dependsOn(core)
+  .dependsOn(core % "compile->compile;test->test")
 
 lazy val `twitter-util` = project
   .in(file("modules/twitter-util"))
@@ -138,7 +138,7 @@ lazy val `twitter-util` = project
   .settings(
     libraryDependencies += Pkg.twitterUtil.withSources,
   )
-  .dependsOn(core)
+  .dependsOn(core % "compile->compile;test->test")
 
 lazy val `arrows-twitter` = project
   .in(file("modules/arrows-twitter"))
@@ -150,7 +150,7 @@ lazy val `arrows-twitter` = project
   .settings(
     libraryDependencies += Pkg.twitterArrows.withSources,
   )
-  .dependsOn(core)
+  .dependsOn(core % "compile->compile;test->test")
 
 lazy val `cats-effect` = project
   .in(file("modules/cats-effect"))
@@ -162,7 +162,7 @@ lazy val `cats-effect` = project
   .settings(
     libraryDependencies += Pkg.catsEffect.withSources,
   )
-  .dependsOn(core)
+  .dependsOn(core % "compile->compile;test->test")
 
 lazy val `cats-free` = project
   .in(file("modules/cats-free"))
