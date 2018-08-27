@@ -9,7 +9,7 @@ object Dependencies {
     val monix            = "3.0.0-RC1"
     val twitterArrows    = "0.1.21"
     val twitterUtil      = "18.7.0"
-    val catsEffect       = "1.0.0-RC2"
+    val catsEffect       = "1.0.0-RC3"
     val iota             = "0.3.8"
     val shapeless        = "2.3.3"
     val exportHook       = "1.2.0"
