@@ -32,7 +32,7 @@ class DecoderSpec extends FunSpec with MockitoSugar {
       when(m.getFamilyMap(Bytes.toBytes("b"))).thenReturn(t)
 
       val f = for {
-        x <- Decoder[Foo]
+        _ <- Decoder[Foo]
         y <- Decoder[Bar]
       } yield y
 
@@ -69,7 +69,7 @@ class DecoderSpec extends FunSpec with MockitoSugar {
 
         when(m.getFamilyMap(Bytes.toBytes("b"))).thenReturn(t)
 
-        val f = Decoder[Foo].map(a => fail())
+        val f = Decoder[Foo].map(_ => fail())
 
         val b = f(m)
         assert(b.isLeft)
@@ -109,7 +109,7 @@ class DecoderSpec extends FunSpec with MockitoSugar {
       when(m.getFamilyMap(Bytes.toBytes("b"))).thenReturn(t)
 
       val ex = new Exception(";)")
-      val f  = Decoder[Foo].mapF(x => Left(ex))
+      val f  = Decoder[Foo].mapF(_ => Left(ex))
       val l  = f(m)
       assert(l.isLeft)
     }
@@ -125,7 +125,7 @@ class DecoderSpec extends FunSpec with MockitoSugar {
 
       when(m.getFamilyMap(Bytes.toBytes("b"))).thenReturn(t)
 
-      val f = Decoder[Foo].mapF(x => fail())
+      val f = Decoder[Foo].mapF(_ => fail())
       val l = f(m)
       assert(l.isLeft)
     }

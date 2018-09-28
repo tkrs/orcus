@@ -40,7 +40,7 @@ class FamilyDecoderSpec extends FunSuite with Matchers {
   test("mapF should return left when mapF create the Left") {
     final case class Foo(a: Int)
     val e = new Exception(":)")
-    val f = FamilyDecoder[Foo].mapF[String](x => Left(e))
+    val f = FamilyDecoder[Foo].mapF[String](_ => Left(e))
 
     val t = new ju.TreeMap[Array[Byte], Array[Byte]](Bytes.BYTES_COMPARATOR)
     t.put(Bytes.toBytes("a"), Bytes.toBytes(10))

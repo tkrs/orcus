@@ -4,18 +4,18 @@ sudo: false
 
 scala:
   - 2.11.12
-  - 2.12.6
+  - 2.12.7
 
 jdk:
   - openjdk8
 
 matrix:
   include:
-    - scala: 2.12.6
+    - scala: 2.12.7
       jdk: openjdk9
-    - scala: 2.12.6
+    - scala: 2.12.7
       jdk: openjdk10
-    - scala: 2.12.6
+    - scala: 2.12.7
       jdk: openjdk11
 
 cache:
