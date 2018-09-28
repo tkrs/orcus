@@ -5,6 +5,7 @@ sudo: false
 scala:
   - 2.11.12
   - 2.12.7
+  - 2.13.0-M4
 
 jdk:
   - openjdk8
@@ -13,6 +14,8 @@ jdk:
 
 matrix:
   allow_failures:
+    - jdk: openjdk11
+      scala: 2.13.0-M4
     - jdk: openjdk-ea
 
 cache:
@@ -29,6 +32,10 @@ script:
   - |
     if [[ "$TRAVIS_JDK_VERSION" = "openjdk8" && "$TRAVIS_SCALA_VERSION" = 2.12.* ]]; then
       sbt ++$TRAVIS_SCALA_VERSION clean coverage compile test:compile test coverageReport coverageOff && codecov
+    elif [[ "$TRAVIS_SCALA_VERSION" = 2.13.* ]]; then
+      sbt ++$TRAVIS_SCALA_VERSION clean \
+        core/compile core/test:compile core/test \
+        cats-effect/compile cats-effect/test:compile cats-effect/test
     else
       sbt ++$TRAVIS_SCALA_VERSION clean compile test:compile test
     fi
@@ -38,7 +45,11 @@ script:
       mkdir -p $gpg_key_path
       echo $GPG_KEY | base64 --decode > $gpg_key_path/secring.gpg
       export PGP_SECRET_RING=$gpg_key_path/secring.gpg
-      sbt ++$TRAVIS_SCALA_VERSION publishSigned
+      if [[ "$TRAVIS_SCALA_VERSION" != 2.13.* ]]; then
+        sbt ++$TRAVIS_SCALA_VERSION publishSigned
+      else
+        sbt ++$TRAVIS_SCALA_VERSION core/publishSigned cats-effect/publishSigned
+      fi
     fi
 
 after_script:

@@ -2,6 +2,7 @@ import sbt._
 
 object Dependencies {
   val Ver = new {
+    val `scala2.13`      = "2.13.0-M4"
     val `scala2.12`      = "2.12.7"
     val `scala2.11`      = "2.11.12"
     val scalafmt         = "1.5.1"
@@ -15,6 +16,7 @@ object Dependencies {
     val exportHook       = "1.2.0"
     val scalacheck       = "1.14.0"
     val scalatest        = "3.0.5"
+    val scalatestSnap    = "3.0.6-SNAP2"
     val mockito          = "2.19.1"
     val kindProjector    = "0.9.7"
     val hbase            = "2.1.0"
@@ -36,7 +38,6 @@ object Dependencies {
     lazy val shapeless      = "com.chuusai"               %% "shapeless"          % Ver.shapeless
     lazy val exportHook     = "org.typelevel"             %% "export-hook"        % Ver.exportHook
     lazy val java8Compat    = "org.scala-lang.modules"    %% "scala-java8-compat" % Ver.scalaJava8Compat
-    lazy val scalatest      = "org.scalatest"             %% "scalatest"          % Ver.scalatest
     lazy val scalacheck     = "org.scalacheck"            %% "scalacheck"         % Ver.scalacheck
     lazy val mockito        = "org.mockito"               % "mockito-core"        % Ver.mockito
     lazy val kindProjector  = "org.spire-math"            %% "kind-projector"     % Ver.kindProjector
@@ -45,8 +46,8 @@ object Dependencies {
     lazy val bigtable       = "com.google.cloud.bigtable" % "bigtable-hbase-2.x"  % Ver.bigtable
     lazy val logbackClassic = "ch.qos.logback"            % "logback-classic"     % Ver.logback
 
+    def scalatest(v: String) = "org.scalatest" %% "scalatest" % (if (v == Ver.`scala2.13`) Ver.scalatestSnap else Ver.scalatest)
     def scalaReflect(v: String) = "org.scala-lang" % "scala-reflect" % v % "provided"
-
-    lazy val forTest = Seq(scalatest, scalacheck, mockito).map(_ % "test")
+    def forTest(v: String) = Seq(scalatest(v), scalacheck, mockito).map(_ % "test")
   }
 }

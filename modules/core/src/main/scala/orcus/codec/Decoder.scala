@@ -2,10 +2,10 @@ package orcus.codec
 
 import cats.Eval
 import export.imports
+import orcus.internal.ScalaVersionSpecifics._
 import org.apache.hadoop.hbase.client.Result
 
 import scala.annotation.tailrec
-import scala.collection.generic.CanBuildFrom
 import scala.collection.mutable
 
 trait Decoder[A] extends Serializable { self =>
@@ -66,11 +66,11 @@ object Decoder extends LowPriorityDecoder {
       implicit
       K: ValueCodec[String],
       V: FamilyDecoder[V],
-      cbf: CanBuildFrom[Nothing, (String, V), M[String, V]]): Decoder[M[String, V]] =
+      factory: Factory[(String, V), M[String, V]]): Decoder[M[String, V]] =
     new Decoder[M[String, V]] {
 
       def apply(result: Result): Either[Throwable, M[String, V]] = {
-        val builder = cbf.apply
+        val builder = factory.newBuilder
         val map     = result.getMap
         if (map == null) Right(builder.result())
         else {

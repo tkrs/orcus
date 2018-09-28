@@ -4,21 +4,24 @@ ThisBuild / organization := "com.github.tkrs"
 ThisBuild / scalaVersion := Ver.`scala2.12`
 ThisBuild / crossScalaVersions := Seq(
   Ver.`scala2.11`,
-  Ver.`scala2.12`
+  Ver.`scala2.12`,
+  Ver.`scala2.13`,
 )
 ThisBuild / resolvers ++= Seq(
   Resolver.sonatypeRepo("releases"),
   Resolver.sonatypeRepo("snapshots")
 )
-ThisBuild / libraryDependencies ++= Pkg.forTest ++ Seq(
-  Pkg.hbase % "provided",
-  compilerPlugin(Pkg.kindProjector),
-  compilerPlugin(Pkg.macroParadise)
-)
+ThisBuild / libraryDependencies ++= Pkg.forTest(scalaVersion.value) ++ {
+  CrossVersion.partialVersion(scalaVersion.value) match {
+    case Some((2, 13)) => Seq(Pkg.hbase % "provided", compilerPlugin(Pkg.kindProjector))
+    case _ => Seq(Pkg.hbase % "provided", compilerPlugin(Pkg.kindProjector), compilerPlugin(Pkg.macroParadise))
+  }
+}
 ThisBuild / scalacOptions ++= compilerOptions ++ {
   CrossVersion.partialVersion(scalaVersion.value) match {
-    case Some((2, p)) if p >= 12 => warnCompilerOptions
-    case _                       => Nil
+    case Some((2, 13)) => warnCompilerOptions ++ Seq("-Ymacro-annotations")
+    case Some((2, 12)) => warnCompilerOptions ++ Seq("-Ypartial-unification", "-Yno-adapted-args")
+    case _             => Seq("-Ypartial-unification")
   }
 }
 ThisBuild / Test / fork := true
@@ -32,13 +35,11 @@ lazy val compilerOptions = Seq(
   "-unchecked",
   "-Xcheckinit",
   "-Xfuture",
-  "-Ypartial-unification",
 )
 
 lazy val warnCompilerOptions = Seq(
   "-Xlint",
   "-Xfatal-warnings",
-  "-Yno-adapted-args",
   "-Ywarn-unused:_",
   "-Ywarn-extra-implicit",
   "-Ywarn-dead-code",
@@ -90,16 +91,38 @@ lazy val publishSettings = Seq(
       </developer>
     </developers>,
   pgpPassphrase := sys.env.get("PGP_PASSPHRASE").map(_.toCharArray),
-  pgpSecretRing := sys.env.get("PGP_SECRET_RING").fold(pgpSecretRing.value)(file)
+  pgpSecretRing := sys.env.get("PGP_SECRET_RING").fold(pgpSecretRing.value)(file),
+  Compile / doc / sources := {
+    CrossVersion.partialVersion(scalaVersion.value) match {
+      case Some((2, 13)) => Nil
+      case _ => (Compile / doc / sources).value
+    }
+  }
 )
 
 lazy val noPublishSettings = Seq(
   publish / skip := true
 )
 
+lazy val crossVersionSharedSources: Seq[Setting[_]] =
+  Seq(Compile, Test).map { sc =>
+    (sc / unmanagedSourceDirectories) ++= {
+      (sc / unmanagedSourceDirectories).value.flatMap { dir =>
+        if(dir.getName != "scala") Seq(dir)
+        else
+          CrossVersion.partialVersion(scalaVersion.value) match {
+            case Some((2, 13)) => Seq(file(dir.getPath + "_2.13"))
+            case Some((2, 12)) => Seq(file(dir.getPath + "_2.12"))
+            case _ => Seq(file(dir.getPath + "_2.11"))
+          }
+      }
+    }
+  }
+
 lazy val core = project
   .in(file("modules/core"))
   .settings(publishSettings)
+  .settings(crossVersionSharedSources)
   .settings(
     description := "orcus core",
     moduleName := "orcus-core",
@@ -119,6 +142,7 @@ lazy val core = project
 lazy val monix = project
   .in(file("modules/monix"))
   .settings(publishSettings)
+  .settings(crossVersionSharedSources)
   .settings(
     description := "orcus monix",
     moduleName := "orcus-monix",
@@ -131,6 +155,7 @@ lazy val monix = project
 lazy val `twitter-util` = project
   .in(file("modules/twitter-util"))
   .settings(publishSettings)
+  .settings(crossVersionSharedSources)
   .settings(
     description := "orcus twitter-util",
     moduleName := "orcus-twitter-util",
@@ -143,6 +168,7 @@ lazy val `twitter-util` = project
 lazy val `arrows-twitter` = project
   .in(file("modules/arrows-twitter"))
   .settings(publishSettings)
+  .settings(crossVersionSharedSources)
   .settings(
     description := "orcus arrows-twitter",
     moduleName := "orcus-arrows-twitter",
@@ -167,6 +193,7 @@ lazy val `cats-effect` = project
 lazy val `cats-free` = project
   .in(file("modules/cats-free"))
   .settings(publishSettings)
+  .settings(crossVersionSharedSources)
   .settings(
     description := "orcus cats-free",
     moduleName := "orcus-cats-free",
@@ -179,6 +206,7 @@ lazy val `cats-free` = project
 lazy val iota = project
   .in(file("modules/iota"))
   .settings(publishSettings)
+  .settings(crossVersionSharedSources)
   .settings(
     description := "orcus iota",
     moduleName := "orcus-iota",
@@ -192,6 +220,7 @@ lazy val example = project
   .in(file("modules/example"))
   .settings(publishSettings)
   .settings(noPublishSettings)
+  .settings(crossVersionSharedSources)
   .settings(
     description := "orcus example",
     moduleName := "orcus-example",
@@ -206,11 +235,12 @@ lazy val example = project
     fork := true,
     coverageEnabled := false
   )
-  .dependsOn(iota, `cats-effect`)
+  .dependsOn(`cats-effect`, `cats-free`, iota)
 
 lazy val benchmark = (project in file("modules/benchmark"))
   .settings(publishSettings)
   .settings(noPublishSettings)
+  .settings(crossVersionSharedSources)
   .settings(
     description := "orcus benchmark",
     moduleName := "orcus-benchmark",

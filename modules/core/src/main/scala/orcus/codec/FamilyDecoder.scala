@@ -4,9 +4,9 @@ import java.util.{NavigableMap => NMap}
 
 import cats.Eval
 import export.imports
+import orcus.internal.ScalaVersionSpecifics._
 
 import scala.annotation.tailrec
-import scala.collection.generic.CanBuildFrom
 import scala.collection.mutable
 
 trait FamilyDecoder[A] { self =>
@@ -71,15 +71,14 @@ object FamilyDecoder extends LowPriorityFamilyDecoder {
           }
     }
 
-  implicit def decodeMapLike[M[_, _] <: Map[K, V], K, V](
-      implicit
-      K: ValueCodec[K],
-      V: ValueCodec[V],
-      cbf: CanBuildFrom[Nothing, (K, V), M[K, V]]): FamilyDecoder[M[K, V]] =
+  implicit def decodeMapLike[M[_, _] <: Map[K, V], K, V](implicit
+                                                         K: ValueCodec[K],
+                                                         V: ValueCodec[V],
+                                                         factory: Factory[(K, V), M[K, V]]): FamilyDecoder[M[K, V]] =
     new FamilyDecoder[M[K, V]] {
 
       def apply(map: NMap[Array[Byte], Array[Byte]]): Either[Throwable, M[K, V]] = {
-        val builder = cbf()
+        val builder = factory.newBuilder
         if (map == null)
           Right(builder.result())
         else {

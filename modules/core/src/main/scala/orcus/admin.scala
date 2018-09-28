@@ -39,32 +39,32 @@ object admin {
       M: Functor[F],
       F: Par[F]
   ): F[Seq[TableDescriptor]] =
-    M.map(F.parallel(t.listTableDescriptors(includeSysTables)))(_.asScala)
+    M.map(F.parallel(t.listTableDescriptors(includeSysTables)))(_.asScala.toSeq)
 
   def listTableDescriptorsByPattern[F[_]](t: AsyncAdmin, pattern: Pattern, includeSysTables: Boolean = false)(
       implicit
       M: Functor[F],
       F: Par[F]
   ): F[Seq[TableDescriptor]] =
-    M.map(F.parallel(t.listTableDescriptors(pattern, includeSysTables)))(_.asScala)
+    M.map(F.parallel(t.listTableDescriptors(pattern, includeSysTables)))(_.asScala.toSeq)
 
   def listTableDescriptorsByNamespace[F[_]](t: AsyncAdmin, namespace: String)(
       implicit
       M: Functor[F],
       F: Par[F]
   ): F[Seq[TableDescriptor]] =
-    M.map(F.parallel(t.listTableDescriptorsByNamespace(namespace)))(_.asScala)
+    M.map(F.parallel(t.listTableDescriptorsByNamespace(namespace)))(_.asScala.toSeq)
 
   def listTableNames[F[_]](t: AsyncAdmin, includeSysTables: Boolean)(implicit
                                                                      M: Functor[F],
                                                                      F: Par[F]): F[Seq[TableName]] =
-    M.map(F.parallel(t.listTableNames(includeSysTables)))(_.asScala)
+    M.map(F.parallel(t.listTableNames(includeSysTables)))(_.asScala.toSeq)
 
   def listTableNamesByPattern[F[_]](t: AsyncAdmin, pattern: Pattern, includeSysTables: Boolean)(
       implicit
       M: Functor[F],
       F: Par[F]): F[Seq[TableName]] =
-    M.map(F.parallel(t.listTableNames(pattern, includeSysTables)))(_.asScala)
+    M.map(F.parallel(t.listTableNames(pattern, includeSysTables)))(_.asScala.toSeq)
 
   def getDescriptor[F[_]](t: AsyncAdmin, tableName: TableName)(implicit
                                                                F: Par[F]): F[TableDescriptor] =
@@ -170,17 +170,17 @@ object admin {
   def listNamespaceDescriptors[F[_]](t: AsyncAdmin)(implicit
                                                     M: Applicative[F],
                                                     F: Par[F]): F[Seq[NamespaceDescriptor]] =
-    M.map(F.parallel(t.listNamespaceDescriptors))(_.asScala)
+    M.map(F.parallel(t.listNamespaceDescriptors))(_.asScala.toSeq)
 
   def getRegions[F[_]](t: AsyncAdmin, serverName: ServerName)(implicit
                                                               M: Applicative[F],
                                                               F: Par[F]): F[Seq[RegionInfo]] =
-    M.map(F.parallel(t.getRegions(serverName)))(_.asScala)
+    M.map(F.parallel(t.getRegions(serverName)))(_.asScala.toSeq)
 
   def getRegionsByTableName[F[_]](t: AsyncAdmin, tableName: TableName)(implicit
                                                                        M: Applicative[F],
                                                                        F: Par[F]): F[Seq[RegionInfo]] =
-    M.map(F.parallel(t.getRegions(tableName)))(_.asScala)
+    M.map(F.parallel(t.getRegions(tableName)))(_.asScala.toSeq)
 
   def flush[F[_]](t: AsyncAdmin, tableName: TableName)(implicit
                                                        M: Applicative[F],
@@ -352,7 +352,7 @@ object admin {
 //      implicit
 //      M: Apply[F],
 //      F: Par[F]): F[Seq[QuotaSettings]] =
-//    M.map(F.parallel(t.getQuota(filter)))(_.asScala)
+//    M.map(F.parallel(t.getQuota(filter)))(_.asScala.toSeq)
 //
 //  def addReplicationPeer[F[_]](t: AsyncAdmin,
 //                               peerId: String,
@@ -411,18 +411,18 @@ object admin {
 //      implicit
 //      M: Apply[F],
 //      F: CompletableFuture ~> F): F[Seq[ReplicationPeerDescription]] =
-//    M.map(F.parallel(t.listReplicationPeers))(_.asScala)
+//    M.map(F.parallel(t.listReplicationPeers))(_.asScala.toSeq)
 //
 //  def listReplicationPeersByPattern[F[_]](t: AsyncAdmin, pattern: Pattern)(
 //      implicit
 //      M: Apply[F],
 //      F: Par[F]): F[Seq[ReplicationPeerDescription]] =
-//    M.map(F.parallel(t.listReplicationPeers(pattern)))(_.asScala)
+//    M.map(F.parallel(t.listReplicationPeers(pattern)))(_.asScala.toSeq)
 //
 //  def listReplicatedTableCFs[F[_]](t: AsyncAdmin)(implicit
 //                                                  M: Apply[F],
 //                                                  F: Par[F]): F[Seq[TableCFs]] =
-//    M.map(F.parallel(t.listReplicatedTableCFs))(_.asScala)
+//    M.map(F.parallel(t.listReplicatedTableCFs))(_.asScala.toSeq)
 //
 //  def enableTableReplication[F[_]](t: AsyncAdmin, tableName: TableName)(
 //      implicit
@@ -480,25 +480,25 @@ object admin {
 //  def listSnapshots[F[_]](t: AsyncAdmin)(implicit
 //                                         M: Apply[F],
 //                                         F: Par[F]): F[Seq[SnapshotDescription]] =
-//    M.map(F.parallel(t.listSnapshots))(_.asScala)
+//    M.map(F.parallel(t.listSnapshots))(_.asScala.toSeq)
 //
 //  def listSnapshotsByPattern[F[_]](t: AsyncAdmin, pattern: Pattern)(
 //      implicit
 //      M: Apply[F],
 //      F: CompletableFuture ~> F): F[Seq[SnapshotDescription]] =
-//    M.map(F.parallel(t.listSnapshots(pattern)))(_.asScala)
+//    M.map(F.parallel(t.listSnapshots(pattern)))(_.asScala.toSeq)
 //
 //  def listTableSnapshots[F[_]](t: AsyncAdmin, pattern: Pattern)(
 //      implicit
 //      M: Apply[F],
 //      F: Par[F]): F[Seq[SnapshotDescription]] =
-//    M.map(F.parallel(t.listTableSnapshots(pattern)))(_.asScala)
+//    M.map(F.parallel(t.listTableSnapshots(pattern)))(_.asScala.toSeq)
 //
 //  def listTableSnapshotsByPattern[F[_]](t: AsyncAdmin, pattern: Pattern, snapshotPattern: Pattern)(
 //      implicit
 //      M: Apply[F],
 //      F: Par[F]): F[Seq[SnapshotDescription]] =
-//    M.map(F.parallel(t.listTableSnapshots(pattern, snapshotPattern)))(_.asScala)
+//    M.map(F.parallel(t.listTableSnapshots(pattern, snapshotPattern)))(_.asScala.toSeq)
 //
 //  def deleteSnapshots[F[_]](t: AsyncAdmin)(implicit
 //                                           M: Applicative[F],
@@ -579,7 +579,7 @@ object admin {
 //      implicit
 //      M: Apply[F],
 //      F: CompletableFuture ~> F): F[Seq[ServerName]] =
-//    M.map(F.parallel(t.listDecommissionedRegionServers))(_.asScala)
+//    M.map(F.parallel(t.listDecommissionedRegionServers))(_.asScala.toSeq)
 //
 //  def recommissionRegionServer[F[_]](t: AsyncAdmin,
 //                                     server: ServerName,
@@ -605,17 +605,17 @@ object admin {
 //  def getBackupMasters[F[_]](t: AsyncAdmin)(implicit
 //                                            M: Apply[F],
 //                                            F: Par[FPar[F]ame]] =
-//    M.map(F.parallel(t.getBackupMasters))(_.asScala)
+//    M.map(F.parallel(t.getBackupMasters))(_.asScala.toSeq)
 //
 //  def getRegionServers[F[_]](t: AsyncAdmin)(implicit
 //                                            M: Apply[F],
 //                                            F: Par[F]): F[Iterable[ServerName]] =
-//    M.map(F.parallel(t.getRegionServers))(_.asScala)
+//    M.map(F.parallel(t.getRegionServers))(_.asScala.toSeq)
 //
 //  def getMasterCoprocessorNames[F[_]](t: AsyncAdmin)(implicit
 //                                                     M: Apply[F],
 //                                                     F: Par[F]): F[Seq[String]] =
-//    M.map(F.parallel(t.getMasterCoprocessorNames))(_.asScala)
+//    M.map(F.parallel(t.getMasterCoprocessorNames))(_.asScala.toSeq)
 //
 //  def shutdown[F[_]](t: AsyncAdmin)(implicit
 //                                    M: Applicative[F],
@@ -654,13 +654,13 @@ object admin {
 //      implicit
 //      M: Apply[F],
 //      F: CompletableFuture ~> F): F[Seq[RegionMetrics]] =
-//    M.map(F.parallel(t.getRegionMetrics(serverName)))(_.asScala)
+//    M.map(F.parallel(t.getRegionMetrics(serverName)))(_.asScala.toSeq)
 //
 //  def getRegionMetricsWithTable[F[_]](t: AsyncAdmin, serverName: ServerName, tableName: TableName)(
 //      implicit
 //      M: Apply[F],
 //      F: Par[F]): F[Seq[RegionMetrics]] =
-//    M.map(F.parallel(t.getRegionMetrics(serverName, tableName)))(_.asScala)
+//    M.map(F.parallel(t.getRegionMetrics(serverName, tableName)))(_.asScala.toSeq)
 //
 //  def isMasterInMaintenanceMode[F[_]](t: AsyncAdmin)(implicit
 //                                                     M: Apply[F],
@@ -702,7 +702,7 @@ object admin {
 //      implicit
 //      M: Apply[F],
 //      F: Par[F]): F[Seq[SecurityCapability]] =
-//    M.map(F.parallel(t.getSecurityCapabilities))(_.asScala)
+//    M.map(F.parallel(t.getSecurityCapabilities))(_.asScala.toSeq)
 //
 //  def balancerSwitch[F[_]](t: AsyncAdmin, on: Boolean)(implicit
 //                                                       M: Apply[F],
@@ -785,14 +785,14 @@ object admin {
 //      M: Apply[F],
 //      F: Par[F]
 //  ): F[Seq[ServerName]] =
-//    M.map(F.parallel(t.listDeadServers))(_.asScala)
+//    M.map(F.parallel(t.listDeadServers))(_.asScala.toSeq)
 //
 //  def clearDeadServers[F[_]](t: AsyncAdmin, servers: Seq[ServerName])(
 //      implicit
 //      M: Apply[F],
 //      F: Par[F]
 //  ): F[Seq[ServerName]] =
-//    M.map(F.parallel(t.clearDeadServers(servers.asJava)))(_.asScala)
+//    M.map(F.parallel(t.clearDeadServers(servers.asJava)))(_.asScala.toSeq)
 //
 //  def clearBlockCache[F[_]](t: AsyncAdmin, tableName: TableName)(
 //      implicit
