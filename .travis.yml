@@ -8,11 +8,7 @@ scala:
 
 jdk:
   - openjdk8
-
-matrix:
-  include:
-    - scala: 2.12.7
-      jdk: openjdk11
+  - openjdk11
 
 cache:
   directories:
