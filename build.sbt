@@ -6,14 +6,14 @@ ThisBuild / crossScalaVersions := Seq(
   Ver.`scala2.11`,
   Ver.`scala2.12`
 )
+ThisBuild / resolvers ++= Seq(
+  Resolver.sonatypeRepo("releases"),
+  Resolver.sonatypeRepo("snapshots")
+)
 ThisBuild / libraryDependencies ++= Pkg.forTest ++ Seq(
   Pkg.hbase % "provided",
   compilerPlugin(Pkg.kindProjector),
   compilerPlugin(Pkg.macroParadise)
-)
-ThisBuild / resolvers ++= Seq(
-  Resolver.sonatypeRepo("releases"),
-  Resolver.sonatypeRepo("snapshots")
 )
 ThisBuild / scalacOptions ++= compilerOptions ++ {
   CrossVersion.partialVersion(scalaVersion.value) match {
