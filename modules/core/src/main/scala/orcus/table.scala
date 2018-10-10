@@ -3,6 +3,7 @@ package orcus
 import cats.{Applicative, ApplicativeError}
 import cats.data.Kleisli
 import orcus.async.Par
+import orcus.internal.ScalaVersionSpecifics._
 import org.apache.hadoop.conf.{Configuration => HConfig}
 import org.apache.hadoop.hbase.client.{
   AsyncTable,
@@ -21,7 +22,6 @@ import org.apache.hadoop.hbase.client.{
 import org.apache.hadoop.hbase.{TableName => HTableName}
 
 import scala.collection.JavaConverters._
-import scala.collection.generic.CanBuildFrom
 
 object table {
 
@@ -64,7 +64,7 @@ object table {
       FE: ApplicativeError[F, Throwable],
       F: Par[F]
   ): F[Seq[HResult]] =
-    FE.map(F.parallel(t.scanAll(a)))(_.asScala)
+    FE.map(F.parallel(t.scanAll(a)))(_.asScala.toSeq)
 
   def getScanner[F[_]](t: AsyncTableT, a: HScan)(
       implicit
@@ -95,7 +95,7 @@ object table {
       implicit
       FE: ApplicativeError[F, Throwable],
       F: Par[F],
-      cbf: CanBuildFrom[Nothing, BatchResult, C[BatchResult]]
+      factory: Factory[BatchResult, C[BatchResult]]
   ): F[C[BatchResult]] = {
     val itr   = as.iterator
     val itcfo = t.batch[Object](as.asJava).iterator.asScala
@@ -120,7 +120,7 @@ object table {
               FE.pure(BatchResult.Error(t, a))
           }
       }
-    val fbb = itfb.foldLeft(FE.pure(cbf.apply)) {
+    val fbb = itfb.foldLeft(FE.pure(factory.newBuilder)) {
       case (acc, fb) => FE.map2(fb, acc)((a, b) => b += a)
     }
     FE.map(fbb)(_.result)
@@ -130,11 +130,11 @@ object table {
       implicit
       FE: ApplicativeError[F, Throwable],
       F: Par[F],
-      C: CanBuildFrom[Nothing, Option[HResult], C[Option[HResult]]]
+      factory: Factory[Option[HResult], C[Option[HResult]]]
   ): F[C[Option[HResult]]] = {
     FE.map(F.parallel(t.batchAll[Object](as.asJava))) { xs =>
       val it = xs.iterator
-      val c  = C.apply
+      val c  = factory.newBuilder
       while (it.hasNext) c += (it.next match { case r: HResult => Option(r); case null => None })
       c.result
     }

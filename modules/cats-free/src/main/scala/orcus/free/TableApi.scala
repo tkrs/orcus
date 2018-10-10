@@ -4,6 +4,7 @@ import cats.{ApplicativeError, InjectK}
 import cats.free.Free
 import orcus.BatchResult
 import orcus.async.Par
+import orcus.internal.ScalaVersionSpecifics._
 import orcus.table.AsyncTableT
 import org.apache.hadoop.conf.{Configuration => HConfig}
 import org.apache.hadoop.hbase.TableName
@@ -18,8 +19,6 @@ import org.apache.hadoop.hbase.client.{
   ResultScanner => HResultScanner,
   Scan => HScan
 }
-
-import scala.collection.generic.CanBuildFrom
 
 trait TableApi[F[_]] {
   type TableF[A] = Free[F, A]
@@ -55,7 +54,7 @@ object TableOp {
     def run[M[_]](t: AsyncTableT)(implicit
                                   ME: ApplicativeError[M, Throwable],
                                   cf: Par[M],
-                                  cbf: CanBuildFrom[Nothing, BatchResult, C[BatchResult]]): M[C[BatchResult]] =
+                                  factory: Factory[BatchResult, C[BatchResult]]): M[C[BatchResult]] =
       orcus.table.batch[M, C](t, a)
   }
 }

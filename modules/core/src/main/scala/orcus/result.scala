@@ -27,7 +27,7 @@ object result {
       implicit
       M: Applicative[M]
   ): M[Seq[Cell]] =
-    M.pure(r.getColumnCells(family, qualifier).asScala)
+    M.pure(r.getColumnCells(family, qualifier).asScala.toSeq)
 
   def getColumnLatestCell[M[_]](r: Result, family: Array[Byte], qualifier: Array[Byte])(
       implicit
