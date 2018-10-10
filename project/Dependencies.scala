@@ -40,7 +40,7 @@ object Dependencies {
     lazy val scalacheck     = "org.scalacheck"            %% "scalacheck"         % Ver.scalacheck
     lazy val mockito        = "org.mockito"               % "mockito-core"        % Ver.mockito
     lazy val kindProjector  = "org.spire-math"            %% "kind-projector"     % Ver.kindProjector
-    lazy val macroParadise  = "org.scalamacros"           % "paradise"            % Ver.macroParadise
+    lazy val macroParadise  = "org.scalamacros"           % "paradise"            % Ver.macroParadise cross CrossVersion.patch
     lazy val hbase          = "org.apache.hbase"          % "hbase-client"        % Ver.hbase
     lazy val bigtable       = "com.google.cloud.bigtable" % "bigtable-hbase-2.x"  % Ver.bigtable
     lazy val logbackClassic = "ch.qos.logback"            % "logback-classic"     % Ver.logback

@@ -9,7 +9,7 @@ ThisBuild / crossScalaVersions := Seq(
 ThisBuild / libraryDependencies ++= Pkg.forTest ++ Seq(
   Pkg.hbase % "provided",
   compilerPlugin(Pkg.kindProjector),
-  compilerPlugin(Pkg.macroParadise cross CrossVersion.patch)
+  compilerPlugin(Pkg.macroParadise)
 )
 ThisBuild / resolvers ++= Seq(
   Resolver.sonatypeRepo("releases"),
