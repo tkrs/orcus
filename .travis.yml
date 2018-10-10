@@ -33,7 +33,7 @@ script:
     if [[ "$TRAVIS_JDK_VERSION" = "openjdk8" && "$TRAVIS_SCALA_VERSION" = 2.12.* ]]; then
       sbt ++$TRAVIS_SCALA_VERSION clean coverage compile test:compile test coverageReport coverageOff && codecov
     elif [[ "$TRAVIS_SCALA_VERSION" = 2.13.* ]]; then
-      sbt ++$TRAVIS_SCALA_VERSION clean \
+      sbt ++$TRAVIS_SCALA_VERSION! clean \
         core/compile core/test:compile core/test \
         cats-effect/compile cats-effect/test:compile cats-effect/test
     else
@@ -48,7 +48,7 @@ script:
       if [[ "$TRAVIS_SCALA_VERSION" != 2.13.* ]]; then
         sbt ++$TRAVIS_SCALA_VERSION publishSigned
       else
-        sbt ++$TRAVIS_SCALA_VERSION core/publishSigned cats-effect/publishSigned
+        sbt ++$TRAVIS_SCALA_VERSION! core/publishSigned cats-effect/publishSigned
       fi
     fi
 
