@@ -4,7 +4,7 @@ sudo: false
 
 scala:
   - 2.11.12
-  - 2.12.7
+  - 2.12.8
   - 2.13.0-M4
 
 jdk:
@@ -40,17 +40,23 @@ script:
       sbt ++$TRAVIS_SCALA_VERSION clean compile test:compile test
     fi
   - |
-    if [[ "$TRAVIS_JDK_VERSION" = "openjdk8" && "$TRAVIS_BRANCH" = "master" && $(cat version.sbt) =~ "-SNAPSHOT" ]]; then
-      gpg_key_path=$HOME/.gnupg
-      mkdir -p $gpg_key_path
-      echo $GPG_KEY | base64 --decode > $gpg_key_path/secring.gpg
-      export PGP_SECRET_RING=$gpg_key_path/secring.gpg
-      if [[ "$TRAVIS_SCALA_VERSION" != 2.13.* ]]; then
-        sbt ++$TRAVIS_SCALA_VERSION publishSigned
-      else
-        sbt ++$TRAVIS_SCALA_VERSION! core/publishSigned cats-effect/publishSigned
+    if [[ "$TRAVIS_JDK_VERSION" = "openjdk8" && $(cat version.sbt) =~ "-SNAPSHOT" ]]; then
+      export PGP_SECRET_RING="${HOME}/.gnupg/secring.gpg"
+      mkdir -p $(dirname "${PGP_SECRET_RING}")
+      echo $GPG_KEY | base64 --decode > "${PGP_SECRET_RING}"
+      if [ "$TRAVIS_BRANCH" = "master" ]; then
+        if [ "$TRAVIS_PULL_REQUEST" = "false" ]; then
+          sbt ++$TRAVIS_SCALA_VERSION publishSigned
+        else
+          if [ "$TRAVIS_SECURE_ENV_VARS" = "true" ]; then
+            sbt ++$TRAVIS_SCALA_VERSION publishLocalSigned
+          else
+            sbt ++$TRAVIS_SCALA_VERSION publishLocal
+          fi
+        fi
       fi
     fi
+
 
 after_script:
   # See http://www.scala-sbt.org/1.x/docs/Travis-CI-with-sbt.html
