@@ -137,7 +137,7 @@ class ScalaJavaConverter extends AsyncHandlerBenchmark {
 }
 
 class TwitterAsyncHandler extends AsyncHandlerBenchmark {
-  import com.twitter.conversions.time._
+  import com.twitter.conversions.DurationOps._
   import io.catbird.util._
   import orcus.async.twitterutil._
 
@@ -151,7 +151,7 @@ class TwitterAsyncHandler extends AsyncHandlerBenchmark {
 
 class ArrowsTwitterAsyncHandler extends AsyncHandlerBenchmark {
   import arrows.twitter.Task
-  import com.twitter.conversions.time._
+  import com.twitter.conversions.DurationOps._
   import orcus.async.arrowstwitter._
 
   implicit val applicativeTask: Applicative[Task] = new Applicative[Task] {
