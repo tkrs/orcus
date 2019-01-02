@@ -131,14 +131,13 @@ object table {
       FE: ApplicativeError[F, Throwable],
       F: Par[F],
       factory: Factory[Option[HResult], C[Option[HResult]]]
-  ): F[C[Option[HResult]]] = {
+  ): F[C[Option[HResult]]] =
     FE.map(F.parallel(t.batchAll[Object](as.asJava))) { xs =>
       val it = xs.iterator
       val c  = factory.newBuilder
       while (it.hasNext) c += (it.next match { case r: HResult => Option(r); case null => None })
       c.result
     }
-  }
 
   def kleisli[F[_], A](f: AsyncTableT => F[A]): Kleisli[F, AsyncTableT, A] =
     Kleisli[F, AsyncTableT, A](f)

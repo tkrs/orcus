@@ -25,9 +25,8 @@ private[codec] trait DerivedPutFamilyEncoder1 {
       T: DerivedPutFamilyEncoder[T]
   ): DerivedPutFamilyEncoder[FieldType[K, H] :: T] =
     new DerivedPutFamilyEncoder[FieldType[K, H] :: T] {
-      def apply(acc: Put, cf: Array[Byte], a: FieldType[K, H] :: T): Put = {
+      def apply(acc: Put, cf: Array[Byte], a: FieldType[K, H] :: T): Put =
         T(acc, cf, a.tail).addColumn(cf, Bytes.toBytes(K.value.name), H.encode(a.head))
-      }
     }
 
   implicit def encodePutFamlyGen[A, R](

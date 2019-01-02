@@ -52,14 +52,13 @@ object Decoder extends LowPriorityDecoder {
 
   implicit def decodeOption[A](implicit A: Decoder[A]): Decoder[Option[A]] =
     new Decoder[Option[A]] {
-      def apply(result: Result): Either[Throwable, Option[A]] = {
+      def apply(result: Result): Either[Throwable, Option[A]] =
         if (result.isEmpty) Right(None)
         else
           A(result) match {
             case Right(v) => Right(Some(v))
             case Left(e)  => Left(e)
           }
-      }
     }
 
   implicit def decodeMapLike[M[_, _] <: Map[String, V], V](
@@ -76,7 +75,7 @@ object Decoder extends LowPriorityDecoder {
         else {
           val keys = map.keySet().iterator()
 
-          @tailrec def loop(acc: mutable.Builder[(String, V), M[String, V]]): Either[Throwable, M[String, V]] = {
+          @tailrec def loop(acc: mutable.Builder[(String, V), M[String, V]]): Either[Throwable, M[String, V]] =
             if (!keys.hasNext) Right(acc.result())
             else {
               val key = keys.next
@@ -91,7 +90,6 @@ object Decoder extends LowPriorityDecoder {
                 case Left(e) => Left(e)
               }
             }
-          }
 
           loop(builder)
         }

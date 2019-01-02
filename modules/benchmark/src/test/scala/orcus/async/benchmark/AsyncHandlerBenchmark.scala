@@ -56,12 +56,11 @@ abstract class AsyncHandlerBenchmark {
   }
 
   @Setup
-  def setup(): Unit = {
+  def setup(): Unit =
     if (threads <= 0)
       backgroundService = Executors.newCachedThreadPool(daemonThreadFactory)
     else
       backgroundService = Executors.newFixedThreadPool(threads, daemonThreadFactory)
-  }
 
   @inline final def compute(i: Int): CompletableFuture[Int] =
     CompletableFuture.supplyAsync(new Supplier[Int] {

@@ -25,7 +25,7 @@ private[codec] trait DerivedDecoder1 {
       H: FamilyDecoder[H],
       T: DerivedDecoder[T]): DerivedDecoder[FieldType[K, H] :: T] =
     new DerivedDecoder[FieldType[K, H] :: T] {
-      def apply(result: Result): Either[Throwable, FieldType[K, H] :: T] = {
+      def apply(result: Result): Either[Throwable, FieldType[K, H] :: T] =
         T(result) match {
           case Right(t) =>
             val k = Bytes.toBytes(K.value.name)
@@ -36,7 +36,6 @@ private[codec] trait DerivedDecoder1 {
           case Left(e) =>
             Left(e)
         }
-      }
     }
 
   implicit def decodeLabelledGen[H <: HList, A](implicit

@@ -98,10 +98,10 @@ trait FreeMain extends App {
 
     for {
       xs <- putProgram[F](rowKey, numRecords)
-      h = xs.head._2
-      _ = println(h)
-      t = xs.last._2
-      _ = println(t)
+      h  = xs.head._2
+      _  = println(h)
+      t  = xs.last._2
+      _  = println(t)
       xs <- scanProgram[F](rowKey, numRecords, (h, t))
       ys <- resultProgram(xs)
     } yield ys
@@ -124,7 +124,7 @@ trait FreeMain extends App {
 
   def getConnection: IO[AsyncConnection]
 
-  val f = bracket(getConnection) { conn =>
+  val f = getConnection.bracket(conn => IO(conn.close())) { conn =>
     val i: Algebra ~> TableK[IO, ?]          = interpreter[IO]
     val k: TableK[IO, Vector[Option[Hello]]] = program[Algebra].foldMap(i)
     val t: AsyncTableT                       = conn.getTableBuilder(tableName).build()

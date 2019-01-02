@@ -18,20 +18,18 @@ class PutEncoderBench {
   import States._
 
   @Benchmark
-  def encodeFromCaseClass(data: Data): Put = {
+  def encodeFromCaseClass(data: Data): Put =
     if (data.size == 10)
       PutEncoder[Table[Columns10]].apply(data.newPut, data.tc10)
     else
       PutEncoder[Table[Columns30]].apply(data.newPut, data.tc30)
-  }
 
   @Benchmark
-  def encodeFromCaseClassCachedEncoder(data: Data): Put = {
+  def encodeFromCaseClassCachedEncoder(data: Data): Put =
     if (data.size == 10)
       data.encode10(data.newPut, data.tc10)
     else
       data.encode30(data.newPut, data.tc30)
-  }
 
   @Benchmark
   def encodeFromMap(data: Data): Put =

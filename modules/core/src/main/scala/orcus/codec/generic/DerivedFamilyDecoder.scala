@@ -25,7 +25,7 @@ private[codec] trait DerivedFamilyDecoder1 {
       H: ValueCodec[H],
       T: DerivedFamilyDecoder[T]): DerivedFamilyDecoder[FieldType[K, H] :: T] =
     new DerivedFamilyDecoder[FieldType[K, H] :: T] {
-      def apply(map: NMap[Array[Byte], Array[Byte]]): Either[Throwable, FieldType[K, H] :: T] = {
+      def apply(map: NMap[Array[Byte], Array[Byte]]): Either[Throwable, FieldType[K, H] :: T] =
         T(map) match {
           case Right(t) =>
             H.decode(map.get(Bytes.toBytes(K.value.name))) match {
@@ -34,7 +34,6 @@ private[codec] trait DerivedFamilyDecoder1 {
             }
           case Left(e) => Left(e)
         }
-      }
     }
 
   implicit def familyDecodeLabelledGen[H <: HList, A](implicit
