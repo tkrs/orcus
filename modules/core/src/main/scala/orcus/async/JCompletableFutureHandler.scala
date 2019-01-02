@@ -20,7 +20,7 @@ trait JCompletableFutureHandler {
           }
           val _ = cf.whenComplete(f)
         }, {
-          val _ = cf.cancel(true)
+          val _ = cf.cancel(false)
         }
       )
   }
