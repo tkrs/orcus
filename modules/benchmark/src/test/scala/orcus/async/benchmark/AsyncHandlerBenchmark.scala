@@ -102,7 +102,7 @@ class MonixAsyncHandler extends AsyncHandlerBenchmark {
   def bench: Vector[Int] = {
     val p = implicitly[Par[Task]]
     val f = Traverse[Vector].traverse[Task, Int, Int](Xs)(i => p.parallel(compute(i)))
-    SAwait.result(f.runAsync, 10.seconds)
+    SAwait.result(f.runToFuture, 10.seconds)
   }
 }
 
