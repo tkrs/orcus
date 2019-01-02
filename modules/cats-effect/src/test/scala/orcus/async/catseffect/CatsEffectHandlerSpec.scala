@@ -6,18 +6,16 @@ import java.util.concurrent.{CompletableFuture, CompletionException}
 import cats.effect.IO
 import org.scalatest.FunSpec
 
-import scala.concurrent.duration._
+class CatsEffectHandlerSpec extends FunSpec with AsyncSpec {
 
-class CatsEffectIOAsyncHandlerSpec extends FunSpec with AsyncSpec {
-
-  describe("AsyncHandler[Task]") {
+  describe("AsyncHandler[Effect[F]") {
     it("should get a value as-is when its CompletableFuture is succeed") {
       def run = Par[IO].parallel(CompletableFuture.completedFuture(10))
-      assert(10 === run.unsafeRunTimed(3.seconds).get)
+      assert(10 === run.unsafeRunSync())
     }
     it("should throw CompletionException as-is when its CompletableFuture is fail") {
       def run = Par[IO].parallel(failedFuture[Int])
-      assertThrows[CompletionException](run.unsafeRunTimed(3.seconds))
+      assertThrows[CompletionException](run.unsafeRunSync())
     }
   }
 }
