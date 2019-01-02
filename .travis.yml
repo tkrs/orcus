@@ -37,7 +37,7 @@ script:
         core/compile core/test:compile core/test \
         cats-effect/compile cats-effect/test:compile cats-effect/test
     else
-      sbt ++$TRAVIS_SCALA_VERSION clean compile test:compile test
+        sbt ++$TRAVIS_SCALA_VERSION clean scalafmt::test test:scalafmt::test compile test:compile test
     fi
   - |
     if [[ "$TRAVIS_JDK_VERSION" = "openjdk8" && $(cat version.sbt) =~ "-SNAPSHOT" ]]; then

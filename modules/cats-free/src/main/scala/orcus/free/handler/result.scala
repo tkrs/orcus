@@ -1,6 +1,6 @@
 package orcus.free.handler
 
-import cats.{MonadError, ~>}
+import cats.{~>, MonadError}
 import orcus.free.ResultOp
 
 object result {

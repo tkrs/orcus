@@ -8,7 +8,7 @@ trait ArrowsTwitterAsyncHandlerInstances {
 
   implicit val arrowsTwitterTaskAsyncHandler: AsyncHandler[Task] =
     new AsyncHandler[Task] {
-      def handle[A](callback: Callback[A], cancel: => Unit): Task[A] = {
+      def handle[A](callback: Callback[A], cancel: => Unit): Task[A] =
         Task.async {
           val p = Promise[A]
           callback {
@@ -17,12 +17,11 @@ trait ArrowsTwitterAsyncHandlerInstances {
           }
           p
         }
-      }
     }
 
   def forkedTaskAsyncHandler(implicit fp: FuturePool): AsyncHandler[Task] =
     new AsyncHandler[Task] {
-      def handle[A](callback: Callback[A], cancel: => Unit): Task[A] = {
+      def handle[A](callback: Callback[A], cancel: => Unit): Task[A] =
         Task.fork(fp)(Task.async {
           val p = Promise[A]
           callback {
@@ -31,6 +30,5 @@ trait ArrowsTwitterAsyncHandlerInstances {
           }
           p
         })
-      }
     }
 }

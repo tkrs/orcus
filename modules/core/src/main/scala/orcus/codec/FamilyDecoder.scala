@@ -14,12 +14,11 @@ trait FamilyDecoder[A] { self =>
   def apply(map: NMap[Array[Byte], Array[Byte]]): Either[Throwable, A]
 
   def flatMap[B](f: A => FamilyDecoder[B]): FamilyDecoder[B] = new FamilyDecoder[B] {
-    def apply(map: NMap[Array[Byte], Array[Byte]]): Either[Throwable, B] = {
+    def apply(map: NMap[Array[Byte], Array[Byte]]): Either[Throwable, B] =
       self(map) match {
         case Right(a)    => f(a)(map)
         case l @ Left(_) => l.asInstanceOf[Either[Throwable, B]]
       }
-    }
   }
 
   def map[B](f: A => B): FamilyDecoder[B] = new FamilyDecoder[B] {
@@ -84,7 +83,7 @@ object FamilyDecoder extends LowPriorityFamilyDecoder {
         else {
           val entries = map.entrySet().iterator()
 
-          @tailrec def loop(acc: mutable.Builder[(K, V), M[K, V]]): Either[Throwable, M[K, V]] = {
+          @tailrec def loop(acc: mutable.Builder[(K, V), M[K, V]]): Either[Throwable, M[K, V]] =
             if (!entries.hasNext) Right(acc.result())
             else {
               val entry = entries.next()
@@ -102,7 +101,6 @@ object FamilyDecoder extends LowPriorityFamilyDecoder {
                 case Left(e) => Left(e)
               }
             }
-          }
 
           loop(builder)
         }

@@ -32,7 +32,7 @@ object States {
       extends Columns
 
   object Columns10 {
-    def fromResult(cf: Array[Byte], r: Result): Columns10 = {
+    def fromResult(cf: Array[Byte], r: Result): Columns10 =
       Columns10(
         Bytes.toInt(r.getValue(cf, Bytes.toBytes("a01"))),
         Bytes.toInt(r.getValue(cf, Bytes.toBytes("a02"))),
@@ -45,7 +45,6 @@ object States {
         Bytes.toInt(r.getValue(cf, Bytes.toBytes("a09"))),
         Bytes.toInt(r.getValue(cf, Bytes.toBytes("a10")))
       )
-    }
   }
 
   final case class Columns30(a01: Int = 1,
@@ -81,7 +80,7 @@ object States {
       extends Columns
 
   object Columns30 {
-    def fromResult(cf: Array[Byte], r: Result): Columns30 = {
+    def fromResult(cf: Array[Byte], r: Result): Columns30 =
       Columns30(
         Bytes.toInt(r.getValue(cf, Bytes.toBytes("a01"))),
         Bytes.toInt(r.getValue(cf, Bytes.toBytes("a02"))),
@@ -114,7 +113,6 @@ object States {
         Bytes.toInt(r.getValue(cf, Bytes.toBytes("a29"))),
         Bytes.toInt(r.getValue(cf, Bytes.toBytes("a30")))
       )
-    }
   }
 
   @State(Scope.Thread)
@@ -138,7 +136,7 @@ object States {
     def cf1: Array[Byte] = Bytes.toBytes("cf1")
     def newPut: Put      = new Put(row)
 
-    def cell(q: String, v: Array[Byte]): Cell = {
+    def cell(q: String, v: Array[Byte]): Cell =
       ExtendedCellBuilderFactory
         .create(CellBuilderType.DEEP_COPY)
         .setRow(row)
@@ -148,7 +146,6 @@ object States {
         .setType(Cell.Type.Put)
         .setValue(v)
         .build()
-    }
 
     val tc10 = Table(Columns10())
     val tc30 = Table(Columns30())
