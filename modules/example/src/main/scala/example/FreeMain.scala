@@ -1,7 +1,6 @@
 package example
 
 import java.time.Instant
-import java.util.function.BiConsumer
 
 import cats.data.Kleisli
 import cats.effect.IO
@@ -11,6 +10,7 @@ import cats.~>
 import com.google.cloud.bigtable.hbase.BigtableConfiguration
 import iota.{CopK, TNilK}
 import iota.TListK.:::
+import orcus.async.Par
 import orcus.async.catseffect._
 import orcus.codec.PutEncoder
 import orcus.free.{ResultOp, ResultScannerOp, TableOp}
@@ -135,15 +135,8 @@ trait FreeMain extends App {
 }
 
 object HBaseMain extends FreeMain {
-  def getConnection: IO[AsyncConnection] = IO.async[AsyncConnection] { cb =>
-    val _ = ConnectionFactory
-      .createAsyncConnection()
-      .whenComplete(new BiConsumer[AsyncConnection, Throwable] {
-        def accept(t: AsyncConnection, u: Throwable): Unit = {
-          val _ = if (u != null) cb(u.asLeft) else cb(t.asRight)
-        }
-      })
-  }
+  def getConnection: IO[AsyncConnection] =
+    Par[IO].parallel(ConnectionFactory.createAsyncConnection())
 }
 
 object BigtableMain extends FreeMain {
