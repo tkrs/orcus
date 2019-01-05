@@ -6,6 +6,7 @@ import java.util.concurrent.CompletableFuture
 import cats.~>
 import cats.data.Kleisli
 import cats.instances.future._
+import orcus.async.future._
 import orcus.{BatchResult, table => ot}
 import orcus.free.{TableOp, TableOps}
 import orcus.free.handler.table.Handler
