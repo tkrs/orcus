@@ -9,13 +9,24 @@ private[futurePool] trait AsyncHandlerInstances {
   implicit def handleArrowsTwitterFuturePoolTask(implicit fp: FuturePool): AsyncHandler[Task] =
     new AsyncHandler[Task] {
       def handle[A](callback: Callback[A], cancel: => Unit): Task[A] =
-        Task.fork(fp)(Task.async {
-          val p = Promise[A]
-          callback {
-            case Left(e)  => p.setException(e)
-            case Right(v) => p.setValue(v)
-          }
-          p
-        })
+        Task
+          .fork(fp)(Task.async {
+            val p = Promise[A]
+
+            p.setInterruptHandler {
+              case e: Throwable =>
+                if (!p.isDefined) {
+                  p.setException(e)
+                  cancel
+                }
+            }
+
+            callback {
+              case Left(e)  => p.setException(e)
+              case Right(v) => p.setValue(v)
+            }
+
+            p
+          })
     }
 }

@@ -9,10 +9,24 @@ private[future] trait AsyncHandlerInstances {
     new AsyncHandler[Future] {
       def handle[A](callback: Callback[A], cancel: => Unit): Future[A] = {
         val p = Promise[A]
+
+        p.setInterruptHandler {
+          case e: Throwable =>
+            if (!p.isDefined) {
+              p.setException(e)
+              cancel
+            }
+        }
+
+        p.onFailure {
+          case e => println(e)
+        }
+
         callback {
           case Left(e)  => p.setException(e)
           case Right(v) => p.setValue(v)
         }
+
         p
       }
     }
