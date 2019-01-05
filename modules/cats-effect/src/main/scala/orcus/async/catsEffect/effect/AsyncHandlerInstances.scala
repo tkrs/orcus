@@ -1,9 +1,9 @@
-package orcus.async.catsEffect
+package orcus.async.catsEffect.effect
 
 import cats.effect.Effect
 import orcus.async.{AsyncHandler, Callback}
 
-private[catsEffect] trait AsyncHandlerInstances {
+private[effect] trait AsyncHandlerInstances {
 
   implicit def handleEffect[F[_]](implicit F: Effect[F]): AsyncHandler[F] =
     new AsyncHandler[F] {

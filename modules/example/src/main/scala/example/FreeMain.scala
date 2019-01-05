@@ -3,7 +3,7 @@ package example
 import java.time.Instant
 
 import cats.data.Kleisli
-import cats.effect.IO
+import cats.effect.{ContextShift, IO}
 import cats.free.Free
 import cats.implicits._
 import cats.~>
@@ -11,7 +11,7 @@ import com.google.cloud.bigtable.hbase.BigtableConfiguration
 import iota.{CopK, TNilK}
 import iota.TListK.:::
 import orcus.async.Par
-import orcus.async.catsEffect._
+import orcus.async.catsEffect.concurrent._
 import orcus.codec.PutEncoder
 import orcus.free.{ResultOp, ResultScannerOp, TableOp}
 import orcus.free.iota._
@@ -21,6 +21,15 @@ import orcus.free.handler.table.{Handler => TableHandler}
 import orcus.table.AsyncTableT
 import org.apache.hadoop.hbase.client._
 import org.apache.hadoop.hbase.util.Bytes
+
+import scala.concurrent.ExecutionContext
+
+object IOContextShift {
+  implicit val global: ContextShift[IO] = IO.contextShift(ExecutionContext.global)
+}
+
+import ExecutionContext.Implicits.global
+import IOContextShift.{global => globalCtx}
 
 final case class CF1(greeting1: Option[String], greeting2: Option[String])
 object CF1 {

@@ -10,7 +10,7 @@ import org.openjdk.jmh.annotations._
 import com.twitter.util.{Await => TAwait, Future => TFuture}
 import _root_.monix.execution.Scheduler
 import _root_.monix.eval.Task
-import cats.effect.IO
+import cats.effect.{ContextShift, IO}
 
 import scala.concurrent.{ExecutionContext, Await => SAwait, Future => SFuture}
 import scala.util.Random
@@ -77,11 +77,13 @@ abstract class AsyncHandlerBenchmark {
 }
 
 class CatsAsyncHandler extends AsyncHandlerBenchmark {
-  import orcus.async.catsEffect._
+  import orcus.async.catsEffect.concurrent._
   import scala.concurrent.duration._
 
   implicit val ec: ExecutionContext =
     ExecutionContext.fromExecutorService(Executors.newWorkStealingPool())
+
+  implicit val ctxShift: ContextShift[IO] = IO.contextShift(ec)
 
   @Benchmark
   def bench: Vector[Int] = {
