@@ -1,12 +1,12 @@
-package orcus.async.arrowstwitter.pooling
+package orcus.async.arrowsTwitter.future.pooling
 
 import arrows.twitter.Task
 import com.twitter.util.{FuturePool, Promise}
 import orcus.async.{AsyncHandler, Callback}
 
-trait ArrowsTwitterPooledAsyncHandlerInstances {
+private[pooling] trait AsyncHandlerInstances {
 
-  implicit def forkedTaskAsyncHandler(implicit fp: FuturePool): AsyncHandler[Task] =
+  implicit def handleArrowsTwitterFuturePoolTask(implicit fp: FuturePool): AsyncHandler[Task] =
     new AsyncHandler[Task] {
       def handle[A](callback: Callback[A], cancel: => Unit): Task[A] =
         Task.fork(fp)(Task.async {

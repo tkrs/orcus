@@ -11,7 +11,7 @@ import com.google.cloud.bigtable.hbase.BigtableConfiguration
 import iota.{CopK, TNilK}
 import iota.TListK.:::
 import orcus.async.Par
-import orcus.async.catseffect._
+import orcus.async.catsEffect._
 import orcus.codec.PutEncoder
 import orcus.free.{ResultOp, ResultScannerOp, TableOp}
 import orcus.free.iota._

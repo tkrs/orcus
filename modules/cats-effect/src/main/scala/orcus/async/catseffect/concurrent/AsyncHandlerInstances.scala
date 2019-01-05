@@ -1,11 +1,11 @@
-package orcus.async.catseffect.concurrent
+package orcus.async.catsEffect.concurrent
 
 import cats.effect.ConcurrentEffect
 import orcus.async.{AsyncHandler, Callback}
 
 import scala.concurrent.ExecutionContext
 
-trait CatsEffectConcurrentHandlerInstances {
+private[concurrent] trait AsyncHandlerInstances {
 
   implicit def handleConcurrentEffect[F[_]](implicit F: ConcurrentEffect[F], ec: ExecutionContext): AsyncHandler[F] =
     new AsyncHandler[F] {

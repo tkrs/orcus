@@ -77,7 +77,7 @@ abstract class AsyncHandlerBenchmark {
 }
 
 class CatsAsyncHandler extends AsyncHandlerBenchmark {
-  import orcus.async.catseffect._
+  import orcus.async.catsEffect._
   import scala.concurrent.duration._
 
   implicit val ec: ExecutionContext =
@@ -138,7 +138,7 @@ class ScalaJavaConverter extends AsyncHandlerBenchmark {
 class TwitterAsyncHandler extends AsyncHandlerBenchmark {
   import com.twitter.conversions.DurationOps._
   import io.catbird.util._
-  import orcus.async.twitterutil._
+  import orcus.async.twitterUtil.future._
 
   @Benchmark
   def bench: Vector[Int] = {
@@ -151,7 +151,7 @@ class TwitterAsyncHandler extends AsyncHandlerBenchmark {
 class ArrowsTwitterAsyncHandler extends AsyncHandlerBenchmark {
   import arrows.twitter.Task
   import com.twitter.conversions.DurationOps._
-  import orcus.async.arrowstwitter._
+  import orcus.async.arrowsTwitter.future._
 
   implicit val applicativeTask: Applicative[Task] = new Applicative[Task] {
     def pure[A](x: A): Task[A] = Task.value(x)

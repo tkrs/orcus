@@ -1,12 +1,12 @@
-package orcus.async.arrowstwitter
+package orcus.async.arrowsTwitter.future
 
 import arrows.twitter.Task
 import com.twitter.util.Promise
 import orcus.async.{AsyncHandler, Callback}
 
-trait ArrowsTwitterAsyncHandlerInstances {
+private[future] trait AsyncHandlerInstances {
 
-  implicit val arrowsTwitterTaskAsyncHandler: AsyncHandler[Task] =
+  implicit val handleArrowsTwitterFutureTask: AsyncHandler[Task] =
     new AsyncHandler[Task] {
       def handle[A](callback: Callback[A], cancel: => Unit): Task[A] =
         Task.async {
