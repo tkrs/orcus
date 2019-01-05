@@ -109,6 +109,7 @@ class MonixAsyncHandler extends AsyncHandlerBenchmark {
 
 class ScalaAsyncHandler extends AsyncHandlerBenchmark {
   import cats.instances.future._
+  import orcus.async.future._
   import scala.concurrent.duration._
 
   implicit val ec: ExecutionContext =

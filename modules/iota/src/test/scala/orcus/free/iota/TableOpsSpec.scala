@@ -7,6 +7,7 @@ import cats.data.Kleisli
 import cats.instances.future._
 import cats.~>
 import orcus.{table => ot}
+import orcus.async.future._
 import orcus.free.handler.table
 import org.scalatest.FunSuite
 

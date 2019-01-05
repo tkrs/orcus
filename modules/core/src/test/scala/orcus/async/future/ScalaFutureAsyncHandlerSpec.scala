@@ -1,11 +1,12 @@
-package orcus.async
+package orcus.async.future
 
 import java.util.concurrent.{CompletableFuture, CompletionException}
 
+import orcus.async.{AsyncSpec, Par}
 import org.scalatest.FunSpec
 
-import scala.concurrent.{Await, Future}
 import scala.concurrent.duration._
+import scala.concurrent.{Await, Future}
 
 class ScalaFutureAsyncHandlerSpec extends FunSpec with AsyncSpec {
 

@@ -1,8 +1,10 @@
-package orcus.async
+package orcus.async.future
+
+import orcus.async.{AsyncHandler, Callback}
 
 import scala.concurrent.{Future, Promise}
 
-trait ScalaFutureAsyncHandlerInstances {
+private[future] trait AsyncHandlerInstances {
 
   implicit lazy val handleScalaFuture: AsyncHandler[Future] =
     new AsyncHandler[Future] {
