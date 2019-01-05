@@ -1,4 +1,4 @@
-package orcus.async.catseffect.concurrent
+package orcus.async.catsEffect.concurrent
 
 import java.util.concurrent.{CompletableFuture, CompletionException}
 

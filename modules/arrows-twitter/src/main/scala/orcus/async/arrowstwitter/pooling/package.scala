@@ -1,3 +1,0 @@
-package orcus.async.arrowstwitter
-
-package object pooling extends ArrowsTwitterPooledAsyncHandlerInstances
