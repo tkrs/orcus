@@ -1,10 +1,10 @@
-package orcus.async.arrowsTwitter.future.pooling
+package orcus.async.arrowsTwitter.futurePool
 
 import arrows.twitter.Task
 import com.twitter.util.{FuturePool, Promise}
 import orcus.async.{AsyncHandler, Callback}
 
-private[pooling] trait AsyncHandlerInstances {
+private[futurePool] trait AsyncHandlerInstances {
 
   implicit def handleArrowsTwitterFuturePoolTask(implicit fp: FuturePool): AsyncHandler[Task] =
     new AsyncHandler[Task] {

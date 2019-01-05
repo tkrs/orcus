@@ -1,4 +1,4 @@
-package orcus.async.arrowsTwitter.future.pooling
+package orcus.async.arrowsTwitter.futurePool
 
 import java.util.concurrent.{CompletableFuture, CompletionException}
 
