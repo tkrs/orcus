@@ -18,10 +18,6 @@ private[future] trait AsyncHandlerInstances {
             }
         }
 
-        p.onFailure {
-          case e => println(e)
-        }
-
         callback {
           case Left(e)  => p.setException(e)
           case Right(v) => p.setValue(v)
