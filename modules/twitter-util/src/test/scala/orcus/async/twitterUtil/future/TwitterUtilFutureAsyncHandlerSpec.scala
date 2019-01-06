@@ -6,6 +6,8 @@ import com.twitter.util.{Await, Future}
 import orcus.async.{AsyncSpec, Par}
 import org.scalatest.FunSpec
 
+import scala.concurrent.CancellationException
+
 class TwitterUtilFutureAsyncHandlerSpec extends FunSpec with AsyncSpec {
 
   describe("AsyncHandler[Future]") {
@@ -16,6 +18,15 @@ class TwitterUtilFutureAsyncHandlerSpec extends FunSpec with AsyncSpec {
     it("should throw CompletionException as-is when its CompletableFuture is fail") {
       def run = Par[Future].parallel(failedFuture[Int])
       assertThrows[CompletionException](Await.result(run))
+    }
+    describe("Canceling") {
+      it("should be canceled") {
+        val source = blockedFuture[Int]
+        val future = Par[Future].parallel(source)
+        future.raise(new CancellationException)
+        assertThrows[CancellationException](Await.result(future))
+        assert(source.isCancelled)
+      }
     }
   }
 }
