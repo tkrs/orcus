@@ -10,7 +10,7 @@ object Dependencies {
     val monix            = "3.0.0-RC2"
     val twitterArrows    = "0.1.23"
     val twitterUtil      = "18.12.0"
-    val catsEffect       = "1.1.0"
+    val catsEffect       = "1.3.0"
     val iota             = "0.3.10"
     val shapeless        = "2.3.3"
     val exportHook       = "1.2.0"
@@ -50,7 +50,7 @@ object Dependencies {
 
     def scalatest(v: String) =
       "org.scalatest" %% "scalatest" % (if (v == Ver.`scala2.13`) Ver.scalatestSnap else Ver.scalatest)
-    def scalaReflect(v: String) = "org.scala-lang" % "scala-reflect" % v % "provided"
-    def forTest(v: String)      = Seq(scalatest(v), scalacheck, mockito).map(_ % "test")
+    def scalaReflect(v: String) = "org.scala-lang" % "scala-reflect" % v % Provided
+    def forTest(v: String)      = Seq(scalatest(v), scalacheck, mockito).map(_ % Test)
   }
 }
