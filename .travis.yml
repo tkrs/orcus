@@ -4,6 +4,7 @@ sudo: false
 scala:
 - 2.11.12
 - 2.12.8
+- 2.13.0-RC1
 jdk:
 - openjdk8
 - openjdk11
@@ -27,7 +28,8 @@ script:
   elif [[ "$TRAVIS_SCALA_VERSION" = 2.13.* ]]; then
     sbt ++$TRAVIS_SCALA_VERSION! clean \
       core/compile core/test:compile core/test \
-      cats-effect/compile cats-effect/test:compile cats-effect/test
+      cats-effect/compile cats-effect/test:compile cats-effect/test \
+      cats-free/compile cats-free/test:compile cats-free/test
   else
       sbt ++$TRAVIS_SCALA_VERSION clean scalafmt::test test:scalafmt::test compile test:compile test
   fi
@@ -38,10 +40,18 @@ script:
     echo $GPG_KEY | base64 --decode > "${PGP_SECRET_RING}"
     if [ "$TRAVIS_BRANCH" = "master" ]; then
       if [ "$TRAVIS_PULL_REQUEST" = "false" ]; then
-        sbt ++$TRAVIS_SCALA_VERSION publishSigned
+        if [[ "$TRAVIS_SCALA_VERSION" = 2.13.* ]]; then
+          sbt ++$TRAVIS_SCALA_VERSION! core/publishSigned cats-effect/publishSigned cats-free/publishSigned
+        else
+          sbt ++$TRAVIS_SCALA_VERSION publishSigned
+        fi
       else
         if [ "$TRAVIS_SECURE_ENV_VARS" = "true" ]; then
-          sbt ++$TRAVIS_SCALA_VERSION publishLocalSigned
+          if [[ "$TRAVIS_SCALA_VERSION" = 2.13.* ]]; then
+            sbt ++$TRAVIS_SCALA_VERSION! core/publishLocalSigned cats-effect/publishLocalSigned cats-free/publishLocalSigned
+          else
+            sbt ++$TRAVIS_SCALA_VERSION publishLocalSigned
+          fi
         else
           sbt ++$TRAVIS_SCALA_VERSION publishLocal
         fi

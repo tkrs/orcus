@@ -15,10 +15,10 @@ object table {
     import TableOp._
 
     implicit def tableOpHandler[M[_]](implicit
-                                      ME: ApplicativeError[M, Throwable],
-                                      AC: AsyncHandler[M]): Handler[M] =
+                                      apErrorM: ApplicativeError[M, Throwable],
+                                      asyncHandlerM: AsyncHandler[M]): Handler[M] =
       new Handler[M] {
-        override def apply[A](fa: TableOp[A]): Kleisli[M, AsyncTableT, A] = fa match {
+        def apply[A](fa: TableOp[A]): Kleisli[M, AsyncTableT, A] = fa match {
           case GetName          => kleisli(getName[M])
           case GetConfiguration => kleisli(getConfiguration[M])
           case Exists(a)        => kleisli(exists[M](_, a))

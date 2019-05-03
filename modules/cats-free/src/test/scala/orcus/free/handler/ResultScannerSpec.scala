@@ -2,14 +2,14 @@ package orcus.free.handler
 
 import java.nio.ByteBuffer
 
-import cats.~>
 import cats.instances.either._
+import cats.~>
 import orcus.free.handler.resultScanner.Handler
 import orcus.free.{ResultScannerOp, ResultScannerOps}
 import org.apache.hadoop.hbase.client.{Result, ResultScanner}
 import org.mockito.Mockito._
-import org.scalatest.mockito.MockitoSugar
 import org.scalatest.{FunSpec, Matchers}
+import org.scalatestplus.mockito.MockitoSugar
 
 class ResultScannerSpec extends FunSpec with MockitoSugar with Matchers {
 

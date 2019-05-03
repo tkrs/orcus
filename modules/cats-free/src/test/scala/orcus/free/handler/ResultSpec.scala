@@ -3,17 +3,17 @@ package orcus.free.handler
 import java.nio.ByteBuffer
 import java.util
 
-import cats.~>
 import cats.instances.either._
-import orcus.free.{ResultOp, ResultOps}
+import cats.~>
 import orcus.free.handler.result.Handler
+import orcus.free.{ResultOp, ResultOps}
 import org.apache.hadoop.hbase.Cell
 import org.apache.hadoop.hbase.client.Result
 import org.apache.hadoop.hbase.util.Bytes
-import org.scalatest.{FunSpec, Matchers}
-import org.scalatest.mockito.MockitoSugar
-import org.mockito.Mockito._
 import org.mockito.ArgumentMatchers._
+import org.mockito.Mockito._
+import org.scalatest.{FunSpec, Matchers}
+import org.scalatestplus.mockito.MockitoSugar
 
 import scala.collection.JavaConverters._
 

@@ -3,7 +3,7 @@ package orcus
 import cats.instances.either._
 import org.apache.hadoop.hbase.client.{Result, ResultScanner}
 import org.scalatest.{FunSpec, Matchers}
-import org.scalatest.mockito.MockitoSugar
+import org.scalatestplus.mockito.MockitoSugar
 import org.mockito.Mockito._
 
 class ResultScannerSpec extends FunSpec with MockitoSugar with Matchers {

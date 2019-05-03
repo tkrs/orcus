@@ -2,25 +2,25 @@ import sbt._
 
 object Dependencies {
   val Ver = new {
-    val `scala2.13`      = "2.13.0-M4"
+    val `scala2.13`      = "2.13.0-RC1"
     val `scala2.12`      = "2.12.8"
     val `scala2.11`      = "2.11.12"
     val scalafmt         = "1.5.1"
-    val cats             = "1.6.0"
+    val cats             = "2.0.0-M1"
     val monix            = "3.0.0-RC2"
     val twitterArrows    = "0.1.23"
     val twitterUtil      = "18.12.0"
-    val catsEffect       = "1.3.0"
+    val catsEffect       = "2.0.0-M1"
     val iota             = "0.3.10"
     val shapeless        = "2.3.3"
     val exportHook       = "1.2.0"
     val scalacheck       = "1.14.0"
-    val scalatest        = "3.0.5"
-    val scalatestSnap    = "3.0.6-SNAP2"
+    val scalatest        = "3.0.7"
+    val scalatestSnap    = "3.0.8-RC2"
     val mockito          = "2.23.0"
-    val kindProjector    = "0.9.9"
+    val kindProjector    = "0.10.0"
     val hbase            = "2.1.3"
-    val bigtable         = "1.10.0"
+    val bigtable         = "1.11.0"
     val logback          = "1.2.3"
     val scalaLogging     = "3.9.0"
     val scalaJava8Compat = "0.9.0"
@@ -41,7 +41,7 @@ object Dependencies {
     lazy val java8Compat    = "org.scala-lang.modules" %% "scala-java8-compat" % Ver.scalaJava8Compat
     lazy val scalacheck     = "org.scalacheck" %% "scalacheck" % Ver.scalacheck
     lazy val mockito        = "org.mockito" % "mockito-core" % Ver.mockito
-    lazy val kindProjector  = "org.spire-math" %% "kind-projector" % Ver.kindProjector
+    lazy val kindProjector  = "org.typelevel" %% "kind-projector" % Ver.kindProjector
     lazy val macroParadise  = ("org.scalamacros" % "paradise" % Ver.macroParadise).cross(CrossVersion.patch)
     lazy val hbase          = "org.apache.hbase" % "hbase-client" % Ver.hbase
     lazy val bigtable       = "com.google.cloud.bigtable" % "bigtable-hbase-2.x" % Ver.bigtable

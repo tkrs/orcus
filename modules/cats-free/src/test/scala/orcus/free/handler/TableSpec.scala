@@ -1,15 +1,13 @@
 package orcus.free.handler
 
-import java.{lang => jl}
 import java.util.concurrent.CompletableFuture
+import java.{lang => jl}
 
-import cats.~>
-import cats.data.Kleisli
 import cats.instances.future._
+import orcus.BatchResult
 import orcus.async.future._
-import orcus.{BatchResult, table => ot}
-import orcus.free.{TableOp, TableOps}
 import orcus.free.handler.table.Handler
+import orcus.free.{TableOp, TableOps}
 import org.apache.hadoop.conf.Configuration
 import org.apache.hadoop.hbase.TableName
 import org.apache.hadoop.hbase.client.{
@@ -26,20 +24,20 @@ import org.apache.hadoop.hbase.client.{
   Scan => HScan
 }
 import org.apache.hadoop.hbase.util.Bytes
-import org.scalatest.{FunSpec, Matchers}
-import org.scalatest.mockito.MockitoSugar
 import org.mockito.Mockito._
+import org.scalatest.{FunSpec, Matchers}
+import org.scalatestplus.mockito.MockitoSugar
 
 import scala.collection.JavaConverters._
-import scala.concurrent.{Await, Future}
 import scala.concurrent.ExecutionContext.Implicits.global
 import scala.concurrent.duration._
+import scala.concurrent.{Await, Future}
 
 class TableSpec extends FunSpec with MockitoSugar with Matchers {
 
   type F[A] = Future[A]
 
-  def interpreter[M[_], A](implicit H: Handler[M]): TableOp ~> Kleisli[M, ot.AsyncTableT, ?] = H
+  def interpreter[M[_]](implicit H: Handler[M]): Handler[M] = H
 
   def ops[M[_]](implicit T: TableOps[M]): TableOps[M] = T
 
@@ -52,7 +50,7 @@ class TableSpec extends FunSpec with MockitoSugar with Matchers {
 
         when(m.getName).thenReturn(tn)
 
-        val f = ops[TableOp].getName.foldMap(interpreter[F, TableName]).run(m)
+        val f = ops[TableOp].getName.foldMap(interpreter[F]).run(m)
         val v = Await.result(f, 3.seconds)
 
         assert(tn === v)
@@ -67,7 +65,7 @@ class TableSpec extends FunSpec with MockitoSugar with Matchers {
 
         when(m.getConfiguration).thenReturn(c)
 
-        val f = ops[TableOp].getConfiguration.foldMap(interpreter[F, Configuration]).run(m)
+        val f = ops[TableOp].getConfiguration.foldMap(interpreter[F]).run(m)
         val v = Await.result(f, 3.seconds)
 
         assert(c === v)
@@ -82,7 +80,7 @@ class TableSpec extends FunSpec with MockitoSugar with Matchers {
 
         when(m.exists(g)).thenReturn(CompletableFuture.completedFuture(jl.Boolean.TRUE))
 
-        val f = ops[TableOp].exists(g).foldMap(interpreter[F, Boolean]).run(m)
+        val f = ops[TableOp].exists(g).foldMap(interpreter[F]).run(m)
         val v = Await.result(f, 3.seconds)
 
         assert(v)
@@ -98,7 +96,7 @@ class TableSpec extends FunSpec with MockitoSugar with Matchers {
 
         when(m.get(g)).thenReturn(CompletableFuture.completedFuture(r))
 
-        val f = ops[TableOp].get(g).foldMap(interpreter[F, Result]).run(m)
+        val f = ops[TableOp].get(g).foldMap(interpreter[F]).run(m)
         val v = Await.result(f, 3.seconds)
 
         assert(r === v)
@@ -113,7 +111,7 @@ class TableSpec extends FunSpec with MockitoSugar with Matchers {
 
         when(m.put(g)).thenReturn(CompletableFuture.completedFuture(null.asInstanceOf[Void]))
 
-        val f = ops[TableOp].put(g).foldMap(interpreter[F, Unit]).run(m)
+        val f = ops[TableOp].put(g).foldMap(interpreter[F]).run(m)
         val v = Await.result(f, 3.seconds)
 
         assert(v.isInstanceOf[Unit])
@@ -132,7 +130,7 @@ class TableSpec extends FunSpec with MockitoSugar with Matchers {
 
         when(m.scanAll(scan)).thenReturn(CompletableFuture.completedFuture(expected.asJava))
 
-        val f = ops[TableOp].scanAll(scan).foldMap(interpreter[F, Unit]).run(m)
+        val f = ops[TableOp].scanAll(scan).foldMap(interpreter[F]).run(m)
         val v = Await.result(f, 3.seconds)
 
         assert(v === expected)
@@ -149,7 +147,7 @@ class TableSpec extends FunSpec with MockitoSugar with Matchers {
 
         when(m.getScanner(s)).thenReturn(r)
 
-        val f = ops[TableOp].getScanner(s).foldMap(interpreter[F, ResultScanner]).run(m)
+        val f = ops[TableOp].getScanner(s).foldMap(interpreter[F]).run(m)
         val v = Await.result(f, 3.seconds)
 
         assert(r === v)
@@ -164,7 +162,7 @@ class TableSpec extends FunSpec with MockitoSugar with Matchers {
 
         when(m.delete(d)).thenReturn(CompletableFuture.completedFuture(null.asInstanceOf[Void]))
 
-        val f = ops[TableOp].delete(d).foldMap(interpreter[F, Unit]).run(m)
+        val f = ops[TableOp].delete(d).foldMap(interpreter[F]).run(m)
         val v = Await.result(f, 3.seconds)
 
         assert(v.isInstanceOf[Unit])
@@ -180,7 +178,7 @@ class TableSpec extends FunSpec with MockitoSugar with Matchers {
 
         when(m.append(a)).thenReturn(CompletableFuture.completedFuture(r))
 
-        val f = ops[TableOp].append(a).foldMap(interpreter[F, Result]).run(m)
+        val f = ops[TableOp].append(a).foldMap(interpreter[F]).run(m)
         val v = Await.result(f, 3.seconds)
 
         assert(r === v)
@@ -196,7 +194,7 @@ class TableSpec extends FunSpec with MockitoSugar with Matchers {
 
         when(m.increment(a)).thenReturn(CompletableFuture.completedFuture(r))
 
-        val f = ops[TableOp].increment(a).foldMap(interpreter[F, Result]).run(m)
+        val f = ops[TableOp].increment(a).foldMap(interpreter[F]).run(m)
         val v = Await.result(f, 3.seconds)
 
         assert(r === v)
@@ -234,7 +232,7 @@ class TableSpec extends FunSpec with MockitoSugar with Matchers {
           r4,
           ""
         )
-        val expected = Vector(
+        val expected = Seq(
           BatchResult.Mutate(Some(r1)),
           BatchResult.VoidMutate,
           BatchResult.Mutate(None),
@@ -243,7 +241,7 @@ class TableSpec extends FunSpec with MockitoSugar with Matchers {
           BatchResult.VoidMutate,
           BatchResult.Mutate(Some(r3)),
           BatchResult.Mutate(Some(r4)),
-          BatchResult.Error(new Exception("Unexpected class returned: String"), new HGet(Bytes.toBytes("error")))
+          BatchResult.Error(new Exception("Unexpected class is returned: String"), new HGet(Bytes.toBytes("error")))
         )
 
         when(m.batch[Object](a.asJava))
@@ -256,8 +254,10 @@ class TableSpec extends FunSpec with MockitoSugar with Matchers {
               CompletableFuture.completedFuture(r)
           }.asJava)
 
-        val f =
-          ops[TableOp].batch[Vector](a).foldMap(interpreter[F, Vector[Option[HIncrement]]]).run(m)
+        val f = ops[TableOp]
+          .batch(a)
+          .foldMap(interpreter[F])
+          .run(m)
         val v = Await.result(f, 3.seconds)
 
         assert(v === expected)
