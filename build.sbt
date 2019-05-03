@@ -228,12 +228,16 @@ lazy val example = project
   .settings(
     libraryDependencies ++= Seq(
       Pkg.bigtable,
+      Pkg.logging,
       Pkg.logbackClassic
     ).map(_.withSources)
   )
   .settings(
     fork := true,
     coverageEnabled := false
+  )
+  .settings(
+    scalacOptions -= "-Xfatal-warnings",
   )
   .dependsOn(`cats-effect`, `cats-free`, iota)
 

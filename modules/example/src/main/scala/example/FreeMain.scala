@@ -1,146 +1,149 @@
 package example
 
-import java.time.Instant
+import java.time.LocalDate
 
 import cats.data.Kleisli
-import cats.effect.{ContextShift, IO}
+import cats.effect.{ExitCode, IO, IOApp}
 import cats.free.Free
 import cats.implicits._
 import cats.~>
 import com.google.cloud.bigtable.hbase.BigtableConfiguration
-import iota.{CopK, TNilK}
+import com.typesafe.scalalogging.LazyLogging
 import iota.TListK.:::
+import iota.{CopK, TNilK}
+import orcus.admin
 import orcus.async.Par
 import orcus.async.catsEffect.concurrent._
-import orcus.codec.PutEncoder
-import orcus.free.{ResultOp, ResultScannerOp, TableOp}
-import orcus.free.iota._
+import orcus.codec.{PutEncoder, ValueCodec}
 import orcus.free.handler.result.{Handler => ResultHandler}
 import orcus.free.handler.resultScanner.{Handler => ResultScannerHandler}
 import orcus.free.handler.table.{Handler => TableHandler}
+import orcus.free.iota._
+import orcus.free.{ResultOp, ResultScannerOp, TableOp}
 import orcus.table.AsyncTableT
+import org.apache.hadoop.hbase.TableName
 import org.apache.hadoop.hbase.client._
 import org.apache.hadoop.hbase.util.Bytes
 
-import scala.concurrent.ExecutionContext
+import scala.concurrent.ExecutionContext.Implicits.global
+import scala.concurrent.duration._
 
-object IOContextShift {
-  implicit val global: ContextShift[IO] = IO.contextShift(ExecutionContext.global)
-}
+trait FreeMain extends IOApp with LazyLogging {
+  import Syntax._
 
-import ExecutionContext.Implicits.global
-import IOContextShift.{global => globalCtx}
+  final val tableName: TableName = TableName.valueOf("novelist")
+  final val keyPrefix: String    = "novel"
+  final val novels = Map(
+    "Ryunosuke Akutagawa" -> List(
+      Novel(Work("Rashomon", LocalDate.of(1915, 11, 1))),
+      Novel(Work("Hana", LocalDate.of(1916, 1, 1))),
+      Novel(Work("In a Grove", LocalDate.of(1922, 1, 1)))
+    ),
+    "Soseki Natsume" -> List(
+      Novel(Work("Kokoro", LocalDate.of(1914, 4, 20))),
+      Novel(Work("I Am a Cat", LocalDate.of(1905, 1, 1))),
+      Novel(Work("Botchan", LocalDate.of(1906, 1, 1)))
+    )
+  )
 
-final case class CF1(greeting1: Option[String], greeting2: Option[String])
-object CF1 {
-  implicit val encodeCF1: orcus.codec.PutFamilyEncoder[CF1] =
-    orcus.codec.generic.derivedPutFamilyEncoder[CF1]
-  implicit val decodeCF1: orcus.codec.FamilyDecoder[CF1] =
-    orcus.codec.generic.derivedFamilyDecoder[CF1]
-}
+  final def createTable(conn: AsyncAdmin): IO[Unit] = {
+    val tableDescripter = TableDescriptorBuilder
+      .newBuilder(tableName)
+      .setColumnFamily(ColumnFamilyDescriptorBuilder.newBuilder(Bytes.toBytes("work")).build())
+      .build()
 
-final case class Hello(cf1: CF1)
-object Hello {
-  implicit val encodeHello: orcus.codec.PutEncoder[Hello] =
-    orcus.codec.generic.derivedPutEncoder[Hello]
-  implicit val decodeHello: orcus.codec.Decoder[Hello] =
-    orcus.codec.generic.derivedDecoder[Hello]
-}
+    admin.tableExists[IO](conn, tableName).ifM(IO.unit, admin.createTable[IO](conn, tableDescripter))
+  }
 
-trait FreeMain extends App {
-  import Setup._
-  import Functions._
+  final def deleteTable(conn: AsyncAdmin): IO[Unit] =
+    admin.deleteTable[IO](conn, tableName)
 
-  def putProgram[F[a] <: CopK[_, a]](prefix: String, numRecords: Int)(
+  final def putProgram[F[a] <: CopK[_, a]](
       implicit
-      ev1: TableOps[F]): Free[F, Vector[(Array[Byte], Long)]] = {
+      tableOps: TableOps[F]): Free[F, Unit] = {
 
-    def mkPut = {
+    def mkPut(author: String, novel: Novel) = {
       val ts     = System.currentTimeMillis()
-      val rowKey = Bytes.toBytes(s"$prefix#${Long.MaxValue - ts}")
-      val hello  = Hello(CF1(Some(s"$greeting at ${Instant.ofEpochMilli(ts)}"), None))
+      val rowKey = novel.work.key(keyPrefix, author)
 
-      PutEncoder[Hello]
-        .apply(new Put(rowKey, ts), hello)
+      PutEncoder[Novel]
+        .apply(new Put(rowKey, ts), novel)
         .setTTL(1800)
         .setDurability(Durability.ASYNC_WAL)
     }
 
-    def prog =
-      Free.pure[F, Put](mkPut) >>= { p =>
-        Thread.sleep(10)
-        ev1.put(p) *> Free.pure((p.getRow, p.getTimestamp))
-      }
+    def prog(author: String, novels: List[Novel]): Free[F, Unit] =
+      novels
+        .traverse(n => Free.pure[F, Put](mkPut(author, n)) >>= (p => tableOps.put(p))) *> Free.pure(())
 
-    Iterator
-      .continually(prog)
-      .take(numRecords)
-      .toVector
-      .sequence[Free[F, ?], (Array[Byte], Long)]
+    novels.toList
+      .map((prog _).tupled)
+      .sequence[Free[F, ?], Unit] *> Free.pure(())
   }
 
-  def scanProgram[F[a] <: CopK[_, a]](prefix: String, numRecords: Int, range: (Long, Long))(
+  final def scanProgram[F[a] <: CopK[_, a]](numRecords: Int)(
       implicit
-      ev1: TableOps[F],
-      ev2: ResultScannerOps[F]): Free[F, Seq[Result]] = {
+      tableOps: TableOps[F],
+      resultScannerOps: ResultScannerOps[F]): Free[F, Seq[Result]] = {
 
     def mkScan =
       new Scan()
-        .setRowPrefixFilter(Bytes.toBytes(prefix))
-        .setTimeRange(range._1, range._2)
+        .setRowPrefixFilter(Bytes.toBytes(keyPrefix))
 
-    ev1.getScanner(mkScan) >>= (sc => ev2.next(sc, numRecords))
+    tableOps.getScanner(mkScan) >>= (sc => resultScannerOps.next(sc, numRecords))
   }
 
-  def resultProgram[F[a] <: CopK[_, a]](results: Seq[Result])(implicit
-                                                              ev1: ResultOps[F]): Free[F, Vector[Option[Hello]]] =
+  final def resultProgram[F[a] <: CopK[_, a]](results: Seq[Result])(
+      implicit
+      resultOps: ResultOps[F]): Free[F, Vector[Option[Novel]]] =
     results.toVector
-      .map(ev1.to[Option[Hello]])
-      .sequence[Free[F, ?], Option[Hello]]
+      .map(resultOps.to[Option[Novel]])
+      .sequence[Free[F, ?], Option[Novel]]
 
-  def program[F[a] <: CopK[_, a]](implicit
-                                  T: TableOps[F],
-                                  R: ResultOps[F],
-                                  RS: ResultScannerOps[F]): Free[F, Vector[Option[Hello]]] = {
-    val rowKey     = "greeting"
+  final def program[F[a] <: CopK[_, a]](implicit
+                                        T: TableOps[F],
+                                        R: ResultOps[F],
+                                        RS: ResultScannerOps[F]): Free[F, Vector[Option[Novel]]] = {
     val numRecords = 100
 
     for {
-      xs <- putProgram[F](rowKey, numRecords)
-      h  = xs.head._2
-      _  = println(h)
-      t  = xs.last._2
-      _  = println(t)
-      xs <- scanProgram[F](rowKey, numRecords, (h, t))
+      _  <- putProgram[F]
+      xs <- scanProgram[F](numRecords)
       ys <- resultProgram(xs)
     } yield ys
   }
 
-  type Algebra[A]      = CopK[TableOp ::: ResultOp ::: ResultScannerOp ::: TNilK, A]
-  type TableK[F[_], A] = Kleisli[F, AsyncTableT, A]
+  final type Algebra[A]      = CopK[TableOp ::: ResultOp ::: ResultScannerOp ::: TNilK, A]
+  final type TableK[F[_], A] = Kleisli[F, AsyncTableT, A]
 
-  def interpreter[M[_]](
-      implicit
-      T: TableHandler[M],
-      R: ResultHandler[M],
-      RS: ResultScannerHandler[M]
-  ): Algebra ~> TableK[M, ?] = {
-    val t: TableOp ~> TableK[M, ?]          = T
-    val r: ResultOp ~> TableK[M, ?]         = R.liftF
-    val rs: ResultScannerOp ~> TableK[M, ?] = RS.liftF
+  final def interpreter[M[_]](implicit
+                              tableHandlerM: TableHandler[M],
+                              resultHandlerM: ResultHandler[M],
+                              resultScannerHandlerM: ResultScannerHandler[M]): Algebra ~> TableK[M, ?] = {
+    val t: TableOp ~> TableK[M, ?]          = tableHandlerM
+    val r: ResultOp ~> TableK[M, ?]         = resultHandlerM.liftF
+    val rs: ResultScannerOp ~> TableK[M, ?] = resultScannerHandlerM.liftF
     CopK.FunctionK.of[Algebra, TableK[M, ?]](t, r, rs)
   }
 
-  def getConnection: IO[AsyncConnection]
-
-  val f = getConnection.bracket(conn => IO(conn.close())) { conn =>
+  final def runExample(conn: AsyncConnection): IO[ExitCode] = {
     val i: Algebra ~> TableK[IO, ?]          = interpreter[IO]
-    val k: TableK[IO, Vector[Option[Hello]]] = program[Algebra].foldMap(i)
-    val t: AsyncTableT                       = conn.getTableBuilder(tableName).build()
-    k.run(t).map(_.foreach(println))
+    val k: TableK[IO, Vector[Option[Novel]]] = program[Algebra].foldMap(i)
+
+    for {
+      a <- IO(conn.getAdmin)
+      _ <- createTable(a)
+      _ <- IO.sleep(3.seconds)
+      t <- IO(conn.getTableBuilder(tableName).build())
+      _ <- k.run(t).map(_.foreach(a => logger.info(a.toString)))
+      _ <- deleteTable(a)
+    } yield ExitCode.Success
   }
 
-  f.unsafeRunSync()
+  final def run(args: List[String]): IO[ExitCode] =
+    getConnection.bracket(runExample)(conn => IO(conn.close()))
+
+  def getConnection: IO[AsyncConnection]
 }
 
 object HBaseMain extends FreeMain {
@@ -152,7 +155,39 @@ object BigtableMain extends FreeMain {
   def getConnection: IO[AsyncConnection] = {
     val projectId  = sys.props.getOrElse("bigtable.project-id", "fake")
     val instanceId = sys.props.getOrElse("bigtable.instance-id", "fake")
-    val c          = BigtableConfiguration.configure(projectId, instanceId)
-    IO(new BigtableAsyncConnection(c))
+    IO(new BigtableAsyncConnection(BigtableConfiguration.configure(projectId, instanceId)))
+  }
+}
+
+final case class Work(name: String, releaseDate: LocalDate)
+object Work {
+  implicit val releaseDateCodec: orcus.codec.ValueCodec[LocalDate] =
+    ValueCodec[Long].imap(_.toEpochDay, LocalDate.ofEpochDay)
+  implicit val encodeWork: orcus.codec.PutFamilyEncoder[Work] =
+    orcus.codec.generic.derivedPutFamilyEncoder[Work]
+  implicit val decodeWork: orcus.codec.FamilyDecoder[Work] =
+    orcus.codec.generic.derivedFamilyDecoder[Work]
+
+  implicit class WorkOps(val a: Work) extends AnyVal {
+    def key(prefix: String, author: String): Array[Byte] = {
+      val b = StringBuilder.newBuilder
+      val v = b.append(prefix).append(Long.MaxValue - a.releaseDate.toEpochDay).append(author).append(a.name)
+      Bytes.toBytes(v.toString())
+    }
+  }
+}
+
+final case class Novel(work: Work)
+object Novel {
+  implicit val encodeNovel: orcus.codec.PutEncoder[Novel] =
+    orcus.codec.generic.derivedPutEncoder[Novel]
+  implicit val decodeNovel: orcus.codec.Decoder[Novel] =
+    orcus.codec.generic.derivedDecoder[Novel]
+}
+
+object Syntax {
+
+  implicit final class Nat[F[_], G[_]](val nat: F ~> G) extends AnyVal {
+    def liftF[E]: F ~> Kleisli[G, E, ?] = λ[F ~> Kleisli[G, E, ?]](fa => Kleisli(_ => nat(fa)))
   }
 }
