@@ -11,7 +11,7 @@ import org.apache.hadoop.hbase.util.Bytes
 import org.apache.hadoop.hbase.{NamespaceDescriptor, ServerName, TableName}
 import org.mockito.Mockito._
 import org.scalatest.FlatSpec
-import org.scalatest.mockito.MockitoSugar
+import org.scalatestplus.mockito.MockitoSugar
 
 import scala.collection.JavaConverters._
 import scala.concurrent.ExecutionContext.Implicits.global

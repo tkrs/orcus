@@ -93,17 +93,17 @@ object table {
 
   def batch[F[_], C[_]](t: AsyncTableT, as: Seq[_ <: HRow])(
       implicit
-      FE: ApplicativeError[F, Throwable],
-      F: Par[F],
-      factory: Factory[BatchResult, C[BatchResult]]
+      apErrorF: ApplicativeError[F, Throwable],
+      parF: Par[F],
+      factoryC: Factory[BatchResult, C[BatchResult]]
   ): F[C[BatchResult]] = {
     val itr   = as.iterator
     val itcfo = t.batch[Object](as.asJava).iterator.asScala
     val itfb = itr
-      .zip(itcfo.map(F.parallel.apply))
+      .zip(itcfo.map(parF.parallel.apply))
       .map {
         case (a, fo) =>
-          FE.recoverWith(FE.map[Object, BatchResult](fo) {
+          apErrorF.recoverWith(apErrorF.map[Object, BatchResult](fo) {
             case r: HResult =>
               BatchResult.Mutate(Some(r))
             case null =>
@@ -114,16 +114,16 @@ object table {
                   BatchResult.VoidMutate
               }
             case other =>
-              BatchResult.Error(new Exception(s"Unexpected class returned: ${other.getClass.getSimpleName}"), a)
+              BatchResult.Error(new Exception(s"Unexpected class is returned: ${other.getClass.getSimpleName}"), a)
           }) {
             case t: Throwable =>
-              FE.pure(BatchResult.Error(t, a))
+              apErrorF.pure(BatchResult.Error(t, a))
           }
       }
-    val fbb = itfb.foldLeft(FE.pure(factory.newBuilder)) {
-      case (acc, fb) => FE.map2(fb, acc)((a, b) => b += a)
+    val fbb = itfb.foldLeft(apErrorF.pure(factoryC.newBuilder)) {
+      case (acc, fb) => apErrorF.map2(fb, acc)((a, b) => b += a)
     }
-    FE.map(fbb)(_.result)
+    apErrorF.map(fbb)(_.result)
   }
 
   def batchAll[F[_], C[_]](t: AsyncTableT, as: Seq[_ <: HRow])(

@@ -19,8 +19,19 @@ ThisBuild / libraryDependencies ++= Pkg.forTest(scalaVersion.value) ++ {
 }
 ThisBuild / scalacOptions ++= compilerOptions ++ {
   CrossVersion.partialVersion(scalaVersion.value) match {
-    case Some((2, 13)) => warnCompilerOptions ++ Seq("-Ymacro-annotations")
-    case Some((2, 12)) => warnCompilerOptions ++ Seq("-Ypartial-unification", "-Yno-adapted-args")
+    case Some((2, 13)) => Seq("-Ymacro-annotations")
+    case Some((2, 12)) => warnCompilerOptions ++ Seq(
+            "-Ypartial-unification",
+            "-Yno-adapted-args",
+            "-Xfuture",
+            "-Ywarn-inaccessible",
+            "-Ywarn-extra-implicit",
+            "-Ywarn-dead-code",
+            "-Ywarn-nullary-override",
+            "-Ywarn-nullary-unit",
+            "-Ywarn-numeric-widen",
+        )
+
     case _             => Seq("-Ypartial-unification")
   }
 }
@@ -34,20 +45,12 @@ lazy val compilerOptions = Seq(
   "-language:_",
   "-unchecked",
   "-Xcheckinit",
-  "-Xfuture",
 )
 
 lazy val warnCompilerOptions = Seq(
   "-Xlint",
   "-Xfatal-warnings",
   "-Ywarn-unused:_",
-  "-Ywarn-extra-implicit",
-  "-Ywarn-dead-code",
-  "-Ywarn-inaccessible",
-  "-Ywarn-infer-any",
-  "-Ywarn-nullary-override",
-  "-Ywarn-nullary-unit",
-  "-Ywarn-numeric-widen",
   "-Ywarn-value-discard",
 )
 

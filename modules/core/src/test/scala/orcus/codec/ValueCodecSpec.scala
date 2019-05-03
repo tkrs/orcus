@@ -2,8 +2,8 @@ package orcus.codec
 
 import org.apache.hadoop.hbase.util.Bytes
 import org.scalacheck.{Arbitrary, Prop, Shrink}
-import org.scalatest.prop.Checkers
 import org.scalatest.{FunSuite, Matchers}
+import org.scalatestplus.scalacheck.Checkers
 
 class ValueCodecSpec extends FunSuite with Checkers with Matchers {
 
