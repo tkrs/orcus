@@ -18,7 +18,7 @@ object ResultScannerOp {
   final case class Next(resultScanner: ResultScanner, i: Int) extends ResultScannerOp[Seq[Result]]
 }
 
-private[free] abstract class ResultScannerOps0[M[_]](implicit inj: InjectK[ResultScannerOp, M])
+abstract private[free] class ResultScannerOps0[M[_]](implicit inj: InjectK[ResultScannerOp, M])
     extends ResultScannerApi[M] {
   import ResultScannerOp._
 
