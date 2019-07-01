@@ -59,7 +59,7 @@ object TableOp {
   }
 }
 
-private[free] abstract class TableOps0[M[_]](implicit inj: InjectK[TableOp, M]) extends TableApi[M] {
+abstract private[free] class TableOps0[M[_]](implicit inj: InjectK[TableOp, M]) extends TableApi[M] {
   import TableOp._
 
   override def getName: TableF[TableName] =
