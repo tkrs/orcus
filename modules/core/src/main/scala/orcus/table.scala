@@ -28,74 +28,74 @@ object table {
   type AsyncTableT = AsyncTable[T] forSome { type T <: ScanResultConsumerBase }
 
   def getName[F[_]](t: AsyncTableT)(
-      implicit
-      F: Applicative[F]
+    implicit
+    F: Applicative[F]
   ): F[HTableName] =
     F.pure(t.getName)
 
   def getConfiguration[F[_]](t: AsyncTableT)(
-      implicit
-      F: Applicative[F]
+    implicit
+    F: Applicative[F]
   ): F[HConfig] =
     F.pure(t.getConfiguration)
 
   def exists[F[_]](t: AsyncTableT, get: HGet)(
-      implicit
-      FE: ApplicativeError[F, Throwable],
-      F: Par[F]
+    implicit
+    FE: ApplicativeError[F, Throwable],
+    F: Par[F]
   ): F[Boolean] =
     FE.map(F.parallel(t.exists(get)))(_.booleanValue())
 
   def get[F[_]](t: AsyncTableT, a: HGet)(
-      implicit
-      F: Par[F]
+    implicit
+    F: Par[F]
   ): F[HResult] =
     F.parallel(t.get(a))
 
   def put[F[_]](t: AsyncTableT, a: HPut)(
-      implicit
-      FE: ApplicativeError[F, Throwable],
-      F: Par[F]
+    implicit
+    FE: ApplicativeError[F, Throwable],
+    F: Par[F]
   ): F[Unit] =
     FE.map(F.parallel(t.put(a)))(_ => ())
 
   def scanAll[F[_]](t: AsyncTableT, a: HScan)(
-      implicit
-      FE: ApplicativeError[F, Throwable],
-      F: Par[F]
+    implicit
+    FE: ApplicativeError[F, Throwable],
+    F: Par[F]
   ): F[Seq[HResult]] =
     FE.map(F.parallel(t.scanAll(a)))(_.asScala.toSeq)
 
   def getScanner[F[_]](t: AsyncTableT, a: HScan)(
-      implicit
-      FE: ApplicativeError[F, Throwable]
+    implicit
+    FE: ApplicativeError[F, Throwable]
   ): F[HResultScanner] =
     FE.catchNonFatal(t.getScanner(a))
 
   def delete[F[_]](t: AsyncTableT, a: HDelete)(
-      implicit
-      FE: ApplicativeError[F, Throwable],
-      F: Par[F]
+    implicit
+    FE: ApplicativeError[F, Throwable],
+    F: Par[F]
   ): F[Unit] =
     FE.map(F.parallel(t.delete(a)))(_ => ())
 
   def append[F[_]](t: AsyncTableT, a: HAppend)(
-      implicit
-      F: Par[F]
+    implicit
+    F: Par[F]
   ): F[HResult] =
     F.parallel(t.append(a))
 
   def increment[F[_]](t: AsyncTableT, a: HIncrement)(
-      implicit
-      F: Par[F]
+    implicit
+    F: Par[F]
   ): F[HResult] =
     F.parallel(t.increment(a))
 
   def batch[F[_], C[_]](t: AsyncTableT, as: Seq[_ <: HRow])(
-      implicit
-      apErrorF: ApplicativeError[F, Throwable],
-      parF: Par[F],
-      factoryC: Factory[BatchResult, C[BatchResult]]
+    implicit
+    apErrorF: ApplicativeError[F, Throwable],
+    parF: Par[F],
+    factoryC: Factory[BatchResult, C[BatchResult]]
   ): F[C[BatchResult]] = {
     val itr   = as.iterator
     val itcfo = t.batch[Object](as.asJava).iterator.asScala
@@ -127,10 +127,10 @@ object table {
   }
 
   def batchAll[F[_], C[_]](t: AsyncTableT, as: Seq[_ <: HRow])(
-      implicit
-      FE: ApplicativeError[F, Throwable],
-      F: Par[F],
-      factory: Factory[Option[HResult], C[Option[HResult]]]
+    implicit
+    FE: ApplicativeError[F, Throwable],
+    F: Par[F],
+    factory: Factory[Option[HResult], C[Option[HResult]]]
   ): F[C[Option[HResult]]] =
     FE.map(F.parallel(t.batchAll[Object](as.asJava))) { xs =>
       val it = xs.iterator

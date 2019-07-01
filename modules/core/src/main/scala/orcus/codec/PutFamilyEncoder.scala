@@ -12,9 +12,9 @@ object PutFamilyEncoder extends LowPriorityPutFamilyEncoder {
   @inline def apply[A](implicit A: PutFamilyEncoder[A]): PutFamilyEncoder[A] = A
 
   implicit def encodeMap[K, V](
-      implicit
-      H: ValueCodec[K],
-      V: ValueCodec[V]
+    implicit
+    H: ValueCodec[K],
+    V: ValueCodec[V]
   ): PutFamilyEncoder[Map[K, V]] = new PutFamilyEncoder[Map[K, V]] {
     def apply(acc: Put, cf: Array[Byte], a: Map[K, V]): Put = {
       a.foreach {

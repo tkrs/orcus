@@ -12,8 +12,9 @@ object result {
     import ResultOp._
 
     implicit def resultOpHandler[M[_]](
-        implicit
-        ME: MonadError[M, Throwable]): Handler[M] =
+      implicit
+      ME: MonadError[M, Throwable]
+    ): Handler[M] =
       new Handler[M] {
         override def apply[A](fa: ResultOp[A]): M[A] = fa match {
           case GetRow(result) =>

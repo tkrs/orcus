@@ -24,14 +24,14 @@ install:
 script:
 - |
   if [[ "$TRAVIS_JDK_VERSION" = "openjdk8" && "$TRAVIS_SCALA_VERSION" = 2.12.* ]]; then
-    sbt ++$TRAVIS_SCALA_VERSION clean coverage compile test:compile test coverageReport coverageOff && codecov
+    sbt ++$TRAVIS_SCALA_VERSION clean coverage scalafmtCheckAll compile test:compile test coverageReport coverageOff && codecov
   elif [[ "$TRAVIS_SCALA_VERSION" = 2.13.* ]]; then
     sbt ++$TRAVIS_SCALA_VERSION! clean \
       core/compile core/test:compile core/test \
       cats-effect/compile cats-effect/test:compile cats-effect/test \
       cats-free/compile cats-free/test:compile cats-free/test
   else
-      sbt ++$TRAVIS_SCALA_VERSION clean scalafmt::test test:scalafmt::test compile test:compile test
+      sbt ++$TRAVIS_SCALA_VERSION clean test
   fi
 - |
   if [[ "$TRAVIS_JDK_VERSION" = "openjdk8" && $(cat version.sbt) =~ "-SNAPSHOT" ]]; then
