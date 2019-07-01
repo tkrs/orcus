@@ -157,14 +157,16 @@ class DecoderSpec extends FunSpec with MockitoSugar {
 
   describe("Decoding") {
     it("should derive the map") {
-      case class All(a: Option[Int] = None,
-                     b: Option[Float] = None,
-                     c: Option[Long] = None,
-                     d: Option[Double] = None,
-                     e: Option[String] = None,
-                     g: Option[Boolean] = None,
-                     h: Option[Short] = None,
-                     i: Option[BigDecimal] = None)
+      case class All(
+        a: Option[Int] = None,
+        b: Option[Float] = None,
+        c: Option[Long] = None,
+        d: Option[Double] = None,
+        e: Option[String] = None,
+        g: Option[Boolean] = None,
+        h: Option[Short] = None,
+        i: Option[BigDecimal] = None
+      )
       val f   = Decoder[Map[String, All]]
       val row = Bytes.toBytes("row")
       val cf1 = Bytes.toBytes("cf1")
@@ -195,14 +197,18 @@ class DecoderSpec extends FunSpec with MockitoSugar {
       val result = Result.create(cells)
       val expected = Right(
         Map(
-          "cf1" -> All(1.some,
-                       1.1f.some,
-                       100L.some,
-                       1.9.some,
-                       "s".some,
-                       true.some,
-                       Short.MaxValue.some,
-                       BigDecimal(10).some)))
+          "cf1" -> All(
+            1.some,
+            1.1f.some,
+            100L.some,
+            1.9.some,
+            "s".some,
+            true.some,
+            Short.MaxValue.some,
+            BigDecimal(10).some
+          )
+        )
+      )
 
       assert(f(result) === expected)
     }

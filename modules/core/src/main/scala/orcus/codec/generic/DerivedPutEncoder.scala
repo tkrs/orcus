@@ -19,18 +19,20 @@ private[codec] trait DerivedPutEncoder1 {
   }
 
   implicit def encodeLabelledHCons[K <: Symbol, H, T <: HList](
-      implicit
-      K: Witness.Aux[K],
-      H: PutFamilyEncoder[H],
-      T: DerivedPutEncoder[T]
+    implicit
+    K: Witness.Aux[K],
+    H: PutFamilyEncoder[H],
+    T: DerivedPutEncoder[T]
   ): DerivedPutEncoder[FieldType[K, H] :: T] = new DerivedPutEncoder[FieldType[K, H] :: T] {
     def apply(acc: Put, a: FieldType[K, H] :: T): Put =
       H(T(acc, a.tail), Bytes.toBytes(K.value.name), a.head)
   }
 
-  implicit def encodeLabelledGen[A, R](implicit
-                                       gen: LabelledGeneric.Aux[A, R],
-                                       R: Lazy[DerivedPutEncoder[R]]): DerivedPutEncoder[A] =
+  implicit def encodeLabelledGen[A, R](
+    implicit
+    gen: LabelledGeneric.Aux[A, R],
+    R: Lazy[DerivedPutEncoder[R]]
+  ): DerivedPutEncoder[A] =
     new DerivedPutEncoder[A] {
       def apply(acc: Put, a: A): Put =
         R.value(acc, gen.to(a))

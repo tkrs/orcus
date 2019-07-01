@@ -12,8 +12,9 @@ object resultScanner {
     import ResultScannerOp._
 
     implicit def resultScannerOpHandler[M[_]](
-        implicit
-        ME: MonadError[M, Throwable]): Handler[M] =
+      implicit
+      ME: MonadError[M, Throwable]
+    ): Handler[M] =
       new Handler[M] {
         override def apply[A](fa: ResultScannerOp[A]): M[A] = fa match {
           case NextOne(rs) => nextOne[M](rs)

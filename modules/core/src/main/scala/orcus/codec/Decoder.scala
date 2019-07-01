@@ -62,10 +62,11 @@ object Decoder extends LowPriorityDecoder {
     }
 
   implicit def decodeMapLike[M[_, _] <: Map[String, V], V](
-      implicit
-      K: ValueCodec[String],
-      V: FamilyDecoder[V],
-      factory: Factory[(String, V), M[String, V]]): Decoder[M[String, V]] =
+    implicit
+    K: ValueCodec[String],
+    V: FamilyDecoder[V],
+    factory: Factory[(String, V), M[String, V]]
+  ): Decoder[M[String, V]] =
     new Decoder[M[String, V]] {
 
       def apply(result: Result): Either[Throwable, M[String, V]] = {

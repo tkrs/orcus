@@ -83,9 +83,11 @@ private[free] abstract class ResultOps0[M[_]](implicit inj: InjectK[ResultOp, M]
   override def getValue(result: Result, family: Array[Byte], qualifier: Array[Byte]): ResultF[Option[Array[Byte]]] =
     Free.inject[ResultOp, M](GetValue(result, family, qualifier))
 
-  override def getValueAsByteBuffer(result: Result,
-                                    family: Array[Byte],
-                                    qualifier: Array[Byte]): ResultF[Option[ByteBuffer]] =
+  override def getValueAsByteBuffer(
+    result: Result,
+    family: Array[Byte],
+    qualifier: Array[Byte]
+  ): ResultF[Option[ByteBuffer]] =
     Free.inject[ResultOp, M](GetValueAsByteBuffer(result, family, qualifier))
 
   override def getFamily[A: FamilyDecoder](result: Result, family: Array[Byte]): ResultF[A] =

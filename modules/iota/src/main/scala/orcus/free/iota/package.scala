@@ -16,7 +16,8 @@ package iota {
 
   object ResultScannerOps {
     implicit def resultScannerOpsForIota[M[α] <: CopK[_, α]](
-        implicit inj: CopK.Inject[ResultScannerOp, M]): ResultScannerOps[M] =
+      implicit inj: CopK.Inject[ResultScannerOp, M]
+    ): ResultScannerOps[M] =
       new ResultScannerOps
   }
 

@@ -50,9 +50,11 @@ object TableOp {
   final case class Append(a: HAppend)       extends TableOp[HResult]
   final case class Increment(a: HIncrement) extends TableOp[HResult]
   final case class Batch(a: Seq[_ <: Row]) extends TableOp[Seq[BatchResult]] {
-    def run[M[_]](t: AsyncTableT)(implicit
-                                  apErrorM: ApplicativeError[M, Throwable],
-                                  parM: Par[M]): M[Seq[BatchResult]] =
+    def run[M[_]](t: AsyncTableT)(
+      implicit
+      apErrorM: ApplicativeError[M, Throwable],
+      parM: Par[M]
+    ): M[Seq[BatchResult]] =
       orcus.table.batch[M, Seq](t, a)
   }
 }

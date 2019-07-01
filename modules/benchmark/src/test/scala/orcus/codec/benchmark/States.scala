@@ -14,22 +14,23 @@ import scala.collection.JavaConverters._
 object States {
 
   final case class Table[+A](
-      cf1: A
+    cf1: A
   )
 
   trait Columns
 
-  final case class Columns10(a01: Int = 1,
-                             a02: Int = 2,
-                             a03: Int = 3,
-                             a04: Int = 4,
-                             a05: Int = 5,
-                             a06: Int = 6,
-                             a07: Int = 7,
-                             a08: Int = 8,
-                             a09: Int = 9,
-                             a10: Int = 10)
-      extends Columns
+  final case class Columns10(
+    a01: Int = 1,
+    a02: Int = 2,
+    a03: Int = 3,
+    a04: Int = 4,
+    a05: Int = 5,
+    a06: Int = 6,
+    a07: Int = 7,
+    a08: Int = 8,
+    a09: Int = 9,
+    a10: Int = 10
+  ) extends Columns
 
   object Columns10 {
     def fromResult(cf: Array[Byte], r: Result): Columns10 =
@@ -47,37 +48,38 @@ object States {
       )
   }
 
-  final case class Columns30(a01: Int = 1,
-                             a02: Int = 2,
-                             a03: Int = 3,
-                             a04: Int = 4,
-                             a05: Int = 5,
-                             a06: Int = 6,
-                             a07: Int = 7,
-                             a08: Int = 8,
-                             a09: Int = 9,
-                             a10: Int = 10,
-                             a11: Int = 11,
-                             a12: Int = 12,
-                             a13: Int = 13,
-                             a14: Int = 14,
-                             a15: Int = 15,
-                             a16: Int = 16,
-                             a17: Int = 17,
-                             a18: Int = 18,
-                             a19: Int = 19,
-                             a20: Int = 20,
-                             a21: Int = 21,
-                             a22: Int = 22,
-                             a23: Int = 23,
-                             a24: Int = 24,
-                             a25: Int = 25,
-                             a26: Int = 26,
-                             a27: Int = 27,
-                             a28: Int = 28,
-                             a29: Int = 29,
-                             a30: Int = 30)
-      extends Columns
+  final case class Columns30(
+    a01: Int = 1,
+    a02: Int = 2,
+    a03: Int = 3,
+    a04: Int = 4,
+    a05: Int = 5,
+    a06: Int = 6,
+    a07: Int = 7,
+    a08: Int = 8,
+    a09: Int = 9,
+    a10: Int = 10,
+    a11: Int = 11,
+    a12: Int = 12,
+    a13: Int = 13,
+    a14: Int = 14,
+    a15: Int = 15,
+    a16: Int = 16,
+    a17: Int = 17,
+    a18: Int = 18,
+    a19: Int = 19,
+    a20: Int = 20,
+    a21: Int = 21,
+    a22: Int = 22,
+    a23: Int = 23,
+    a24: Int = 24,
+    a25: Int = 25,
+    a26: Int = 26,
+    a27: Int = 27,
+    a28: Int = 28,
+    a29: Int = 29,
+    a30: Int = 30
+  ) extends Columns
 
   object Columns30 {
     def fromResult(cf: Array[Byte], r: Result): Columns30 =

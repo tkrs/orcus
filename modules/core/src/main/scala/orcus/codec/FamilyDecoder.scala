@@ -57,8 +57,9 @@ object FamilyDecoder extends LowPriorityFamilyDecoder {
   }
 
   implicit def decodeOption[A](
-      implicit
-      A: FamilyDecoder[A]): FamilyDecoder[Option[A]] =
+    implicit
+    A: FamilyDecoder[A]
+  ): FamilyDecoder[Option[A]] =
     new FamilyDecoder[Option[A]] {
       def apply(map: NMap[Array[Byte], Array[Byte]]): Either[Throwable, Option[A]] =
         if (map == null || map.isEmpty)
@@ -70,10 +71,12 @@ object FamilyDecoder extends LowPriorityFamilyDecoder {
           }
     }
 
-  implicit def decodeMapLike[M[_, _] <: Map[K, V], K, V](implicit
-                                                         K: ValueCodec[K],
-                                                         V: ValueCodec[V],
-                                                         factory: Factory[(K, V), M[K, V]]): FamilyDecoder[M[K, V]] =
+  implicit def decodeMapLike[M[_, _] <: Map[K, V], K, V](
+    implicit
+    K: ValueCodec[K],
+    V: ValueCodec[V],
+    factory: Factory[(K, V), M[K, V]]
+  ): FamilyDecoder[M[K, V]] =
     new FamilyDecoder[M[K, V]] {
 
       def apply(map: NMap[Array[Byte], Array[Byte]]): Either[Throwable, M[K, V]] = {

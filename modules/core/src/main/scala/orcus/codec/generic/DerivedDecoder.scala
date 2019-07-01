@@ -20,10 +20,11 @@ private[codec] trait DerivedDecoder1 {
   }
 
   implicit def decodeLabelledHCons[K <: Symbol, H, T <: HList](
-      implicit
-      K: Witness.Aux[K],
-      H: FamilyDecoder[H],
-      T: DerivedDecoder[T]): DerivedDecoder[FieldType[K, H] :: T] =
+    implicit
+    K: Witness.Aux[K],
+    H: FamilyDecoder[H],
+    T: DerivedDecoder[T]
+  ): DerivedDecoder[FieldType[K, H] :: T] =
     new DerivedDecoder[FieldType[K, H] :: T] {
       def apply(result: Result): Either[Throwable, FieldType[K, H] :: T] =
         T(result) match {
@@ -38,9 +39,11 @@ private[codec] trait DerivedDecoder1 {
         }
     }
 
-  implicit def decodeLabelledGen[H <: HList, A](implicit
-                                                gen: LabelledGeneric.Aux[A, H],
-                                                A: Lazy[DerivedDecoder[H]]): DerivedDecoder[A] =
+  implicit def decodeLabelledGen[H <: HList, A](
+    implicit
+    gen: LabelledGeneric.Aux[A, H],
+    A: Lazy[DerivedDecoder[H]]
+  ): DerivedDecoder[A] =
     new DerivedDecoder[A] {
       def apply(result: Result): Either[Throwable, A] =
         A.value(result) match {

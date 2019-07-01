@@ -59,8 +59,9 @@ trait FreeMain extends IOApp with LazyLogging {
     admin.deleteTable[IO](conn, tableName)
 
   final def putProgram[F[a] <: CopK[_, a]](
-      implicit
-      tableOps: TableOps[F]): Free[F, Unit] = {
+    implicit
+    tableOps: TableOps[F]
+  ): Free[F, Unit] = {
 
     def mkPut(author: String, novel: Novel) = {
       val ts     = System.currentTimeMillis()
@@ -82,9 +83,10 @@ trait FreeMain extends IOApp with LazyLogging {
   }
 
   final def scanProgram[F[a] <: CopK[_, a]](numRecords: Int)(
-      implicit
-      tableOps: TableOps[F],
-      resultScannerOps: ResultScannerOps[F]): Free[F, Seq[Result]] = {
+    implicit
+    tableOps: TableOps[F],
+    resultScannerOps: ResultScannerOps[F]
+  ): Free[F, Seq[Result]] = {
 
     def mkScan =
       new Scan()
@@ -94,16 +96,19 @@ trait FreeMain extends IOApp with LazyLogging {
   }
 
   final def resultProgram[F[a] <: CopK[_, a]](results: Seq[Result])(
-      implicit
-      resultOps: ResultOps[F]): Free[F, Vector[Option[Novel]]] =
+    implicit
+    resultOps: ResultOps[F]
+  ): Free[F, Vector[Option[Novel]]] =
     results.toVector
       .map(resultOps.to[Option[Novel]])
       .sequence[Free[F, ?], Option[Novel]]
 
-  final def program[F[a] <: CopK[_, a]](implicit
-                                        T: TableOps[F],
-                                        R: ResultOps[F],
-                                        RS: ResultScannerOps[F]): Free[F, Vector[Option[Novel]]] = {
+  final def program[F[a] <: CopK[_, a]](
+    implicit
+    T: TableOps[F],
+    R: ResultOps[F],
+    RS: ResultScannerOps[F]
+  ): Free[F, Vector[Option[Novel]]] = {
     val numRecords = 100
 
     for {
@@ -116,10 +121,12 @@ trait FreeMain extends IOApp with LazyLogging {
   final type Algebra[A]      = CopK[TableOp ::: ResultOp ::: ResultScannerOp ::: TNilK, A]
   final type TableK[F[_], A] = Kleisli[F, AsyncTableT, A]
 
-  final def interpreter[M[_]](implicit
-                              tableHandlerM: TableHandler[M],
-                              resultHandlerM: ResultHandler[M],
-                              resultScannerHandlerM: ResultScannerHandler[M]): Algebra ~> TableK[M, ?] = {
+  final def interpreter[M[_]](
+    implicit
+    tableHandlerM: TableHandler[M],
+    resultHandlerM: ResultHandler[M],
+    resultScannerHandlerM: ResultScannerHandler[M]
+  ): Algebra ~> TableK[M, ?] = {
     val t: TableOp ~> TableK[M, ?]          = tableHandlerM
     val r: ResultOp ~> TableK[M, ?]         = resultHandlerM.liftF
     val rs: ResultScannerOp ~> TableK[M, ?] = resultScannerHandlerM.liftF

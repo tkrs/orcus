@@ -14,9 +14,11 @@ object table {
     import orcus.table._
     import TableOp._
 
-    implicit def tableOpHandler[M[_]](implicit
-                                      apErrorM: ApplicativeError[M, Throwable],
-                                      asyncHandlerM: AsyncHandler[M]): Handler[M] =
+    implicit def tableOpHandler[M[_]](
+      implicit
+      apErrorM: ApplicativeError[M, Throwable],
+      asyncHandlerM: AsyncHandler[M]
+    ): Handler[M] =
       new Handler[M] {
         def apply[A](fa: TableOp[A]): Kleisli[M, AsyncTableT, A] = fa match {
           case GetName          => kleisli(getName[M])

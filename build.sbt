@@ -4,7 +4,7 @@ ThisBuild / organization := "com.github.tkrs"
 ThisBuild / scalaVersion := Ver.`scala2.12`
 ThisBuild / crossScalaVersions := Seq(
   Ver.`scala2.11`,
-  Ver.`scala2.12`,
+  Ver.`scala2.12`
   // Ver.`scala2.13`,
 )
 ThisBuild / resolvers ++= Seq(
@@ -14,47 +14,50 @@ ThisBuild / resolvers ++= Seq(
 ThisBuild / libraryDependencies ++= Pkg.forTest(scalaVersion.value) ++ {
   CrossVersion.partialVersion(scalaVersion.value) match {
     case Some((2, 13)) => Seq(Pkg.hbase % "provided", compilerPlugin(Pkg.kindProjector))
-    case _ => Seq(Pkg.hbase % "provided", compilerPlugin(Pkg.kindProjector), compilerPlugin(Pkg.macroParadise))
+    case _             => Seq(Pkg.hbase % "provided", compilerPlugin(Pkg.kindProjector), compilerPlugin(Pkg.macroParadise))
   }
 }
 ThisBuild / scalacOptions ++= compilerOptions ++ {
   CrossVersion.partialVersion(scalaVersion.value) match {
     case Some((2, 13)) => Seq("-Ymacro-annotations")
-    case Some((2, 12)) => warnCompilerOptions ++ Seq(
-            "-Ypartial-unification",
-            "-Yno-adapted-args",
-            "-Xfuture",
-            "-Ywarn-inaccessible",
-            "-Ywarn-extra-implicit",
-            "-Ywarn-dead-code",
-            "-Ywarn-nullary-override",
-            "-Ywarn-nullary-unit",
-            "-Ywarn-numeric-widen",
-        )
+    case Some((2, 12)) =>
+      warnCompilerOptions ++ Seq(
+        "-Ypartial-unification",
+        "-Yno-adapted-args",
+        "-Xfuture",
+        "-Ywarn-inaccessible",
+        "-Ywarn-extra-implicit",
+        "-Ywarn-dead-code",
+        "-Ywarn-nullary-override",
+        "-Ywarn-nullary-unit",
+        "-Ywarn-numeric-widen"
+      )
 
-    case _             => Seq("-Ypartial-unification")
+    case _ => Seq("-Ypartial-unification")
   }
 }
 ThisBuild / Test / fork := true
 
 lazy val compilerOptions = Seq(
   "-deprecation",
-  "-encoding", "utf-8",
+  "-encoding",
+  "utf-8",
   "-explaintypes",
   "-feature",
   "-language:_",
   "-unchecked",
-  "-Xcheckinit",
+  "-Xcheckinit"
 )
 
 lazy val warnCompilerOptions = Seq(
   "-Xlint",
   "-Xfatal-warnings",
   "-Ywarn-unused:_",
-  "-Ywarn-value-discard",
+  "-Ywarn-value-discard"
 )
 
-lazy val orcus = project.in(file("."))
+lazy val orcus = project
+  .in(file("."))
   .settings(publishSettings)
   .settings(noPublishSettings)
   .settings(
@@ -71,13 +74,15 @@ lazy val publishSettings = Seq(
   licenses := Seq("MIT License" -> url("http://www.opensource.org/licenses/mit-license.php")),
   publishMavenStyle := true,
   Test / publishArtifact := false,
-  pomIncludeRepository := { _ => false },
+  pomIncludeRepository := { _ =>
+    false
+  },
   publishTo := {
     val nexus = "https://oss.sonatype.org/"
     if (isSnapshot.value)
-      Some("snapshots" at nexus + "content/repositories/snapshots")
+      Some("snapshots".at(nexus + "content/repositories/snapshots"))
     else
-      Some("releases" at nexus + "service/local/staging/deploy/maven2")
+      Some("releases".at(nexus + "service/local/staging/deploy/maven2"))
   },
   scmInfo := Some(
     ScmInfo(
@@ -98,7 +103,7 @@ lazy val publishSettings = Seq(
   Compile / doc / sources := {
     CrossVersion.partialVersion(scalaVersion.value) match {
       case Some((2, 13)) => Nil
-      case _ => (Compile / doc / sources).value
+      case _             => (Compile / doc / sources).value
     }
   }
 )
@@ -111,12 +116,12 @@ lazy val crossVersionSharedSources: Seq[Setting[_]] =
   Seq(Compile, Test).map { sc =>
     (sc / unmanagedSourceDirectories) ++= {
       (sc / unmanagedSourceDirectories).value.flatMap { dir =>
-        if(dir.getName != "scala") Seq(dir)
+        if (dir.getName != "scala") Seq(dir)
         else
           CrossVersion.partialVersion(scalaVersion.value) match {
             case Some((2, 13)) => Seq(file(dir.getPath + "_2.13"))
             case Some((2, 12)) => Seq(file(dir.getPath + "_2.12"))
-            case _ => Seq(file(dir.getPath + "_2.11"))
+            case _             => Seq(file(dir.getPath + "_2.11"))
           }
       }
     }
@@ -128,18 +133,20 @@ lazy val core = project
   .settings(crossVersionSharedSources)
   .settings(
     description := "orcus core",
-    moduleName := "orcus-core",
+    moduleName := "orcus-core"
   )
   .settings(
-    libraryDependencies ++= Seq.concat(
-      Seq(
-        Pkg.catsCore,
-        Pkg.shapeless,
-        Pkg.java8Compat,
-        Pkg.exportHook,
-        Pkg.scalaReflect(scalaVersion.value),
-      ),
-    ).map(_.withSources),
+    libraryDependencies ++= Seq
+      .concat(
+        Seq(
+          Pkg.catsCore,
+          Pkg.shapeless,
+          Pkg.java8Compat,
+          Pkg.exportHook,
+          Pkg.scalaReflect(scalaVersion.value)
+        )
+      )
+      .map(_.withSources)
   )
 
 lazy val monix = project
@@ -148,10 +155,10 @@ lazy val monix = project
   .settings(crossVersionSharedSources)
   .settings(
     description := "orcus monix",
-    moduleName := "orcus-monix",
+    moduleName := "orcus-monix"
   )
   .settings(
-    libraryDependencies += Pkg.monixEval.withSources,
+    libraryDependencies += Pkg.monixEval.withSources
   )
   .dependsOn(core % "compile->compile;test->test")
 
@@ -161,10 +168,10 @@ lazy val `twitter-util` = project
   .settings(crossVersionSharedSources)
   .settings(
     description := "orcus twitter-util",
-    moduleName := "orcus-twitter-util",
+    moduleName := "orcus-twitter-util"
   )
   .settings(
-    libraryDependencies += Pkg.twitterUtil.withSources,
+    libraryDependencies += Pkg.twitterUtil.withSources
   )
   .dependsOn(core % "compile->compile;test->test")
 
@@ -174,10 +181,10 @@ lazy val `arrows-twitter` = project
   .settings(crossVersionSharedSources)
   .settings(
     description := "orcus arrows-twitter",
-    moduleName := "orcus-arrows-twitter",
+    moduleName := "orcus-arrows-twitter"
   )
   .settings(
-    libraryDependencies += Pkg.twitterArrows.withSources,
+    libraryDependencies += Pkg.twitterArrows.withSources
   )
   .dependsOn(core % "compile->compile;test->test")
 
@@ -186,10 +193,10 @@ lazy val `cats-effect` = project
   .settings(publishSettings)
   .settings(
     description := "orcus cats-effect",
-    moduleName := "orcus-cats-effect",
+    moduleName := "orcus-cats-effect"
   )
   .settings(
-    libraryDependencies += Pkg.catsEffect.withSources,
+    libraryDependencies += Pkg.catsEffect.withSources
   )
   .dependsOn(core % "compile->compile;test->test")
 
@@ -199,10 +206,10 @@ lazy val `cats-free` = project
   .settings(crossVersionSharedSources)
   .settings(
     description := "orcus cats-free",
-    moduleName := "orcus-cats-free",
+    moduleName := "orcus-cats-free"
   )
   .settings(
-    libraryDependencies += Pkg.catsFree.withSources,
+    libraryDependencies += Pkg.catsFree.withSources
   )
   .dependsOn(core)
 
@@ -212,10 +219,10 @@ lazy val iota = project
   .settings(crossVersionSharedSources)
   .settings(
     description := "orcus iota",
-    moduleName := "orcus-iota",
+    moduleName := "orcus-iota"
   )
   .settings(
-    libraryDependencies += Pkg.iota.withSources,
+    libraryDependencies += Pkg.iota.withSources
   )
   .dependsOn(`cats-free`)
 
@@ -226,7 +233,7 @@ lazy val example = project
   .settings(crossVersionSharedSources)
   .settings(
     description := "orcus example",
-    moduleName := "orcus-example",
+    moduleName := "orcus-example"
   )
   .settings(
     libraryDependencies ++= Seq(
@@ -240,7 +247,7 @@ lazy val example = project
     coverageEnabled := false
   )
   .settings(
-    scalacOptions -= "-Xfatal-warnings",
+    scalacOptions -= "-Xfatal-warnings"
   )
   .dependsOn(`cats-effect`, `cats-free`, iota)
 
@@ -250,20 +257,22 @@ lazy val benchmark = (project in file("modules/benchmark"))
   .settings(crossVersionSharedSources)
   .settings(
     description := "orcus benchmark",
-    moduleName := "orcus-benchmark",
+    moduleName := "orcus-benchmark"
   )
   .settings(
     libraryDependencies ++= Seq(
       Pkg.java8Compat,
       Pkg.hbase,
-      Pkg.catbirdUtil,
+      Pkg.catbirdUtil
     )
   )
   .enablePlugins(JmhPlugin)
-  .dependsOn(Seq(
-    iota,
-    `twitter-util`,
-    `arrows-twitter`,
-    `cats-effect`,
-    monix,
-  ).map(_ % "test->test"): _*)
+  .dependsOn(
+    Seq(
+      iota,
+      `twitter-util`,
+      `arrows-twitter`,
+      `cats-effect`,
+      monix
+    ).map(_ % "test->test"): _*
+  )
