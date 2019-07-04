@@ -3,7 +3,6 @@ import Dependencies._
 ThisBuild / organization := "com.github.tkrs"
 ThisBuild / scalaVersion := Ver.`scala2.12`
 ThisBuild / crossScalaVersions := Seq(
-  Ver.`scala2.11`,
   Ver.`scala2.12`
   // Ver.`scala2.13`,
 )
@@ -13,14 +12,14 @@ ThisBuild / resolvers ++= Seq(
 )
 ThisBuild / libraryDependencies ++= Pkg.forTest(scalaVersion.value) ++ {
   CrossVersion.partialVersion(scalaVersion.value) match {
-    case Some((2, 13)) => Seq(Pkg.hbase % "provided", compilerPlugin(Pkg.kindProjector))
-    case _             => Seq(Pkg.hbase % "provided", compilerPlugin(Pkg.kindProjector), compilerPlugin(Pkg.macroParadise))
+    case Some((2, n)) if n >= 13 => Seq(Pkg.hbase % "provided", compilerPlugin(Pkg.kindProjector))
+    case _                       => Seq(Pkg.hbase % "provided", compilerPlugin(Pkg.kindProjector), compilerPlugin(Pkg.macroParadise))
   }
 }
 ThisBuild / scalacOptions ++= compilerOptions ++ {
   CrossVersion.partialVersion(scalaVersion.value) match {
-    case Some((2, 13)) => Seq("-Ymacro-annotations")
-    case Some((2, 12)) =>
+    case Some((2, n)) if n >= 13 => Seq("-Ymacro-annotations")
+    case _ =>
       warnCompilerOptions ++ Seq(
         "-Ypartial-unification",
         "-Yno-adapted-args",
@@ -32,8 +31,6 @@ ThisBuild / scalacOptions ++= compilerOptions ++ {
         "-Ywarn-nullary-unit",
         "-Ywarn-numeric-widen"
       )
-
-    case _ => Seq("-Ypartial-unification")
   }
 }
 ThisBuild / Test / fork := true
@@ -119,9 +116,8 @@ lazy val crossVersionSharedSources: Seq[Setting[_]] =
         if (dir.getName != "scala") Seq(dir)
         else
           CrossVersion.partialVersion(scalaVersion.value) match {
-            case Some((2, 13)) => Seq(file(dir.getPath + "_2.13"))
-            case Some((2, 12)) => Seq(file(dir.getPath + "_2.12"))
-            case _             => Seq(file(dir.getPath + "_2.11"))
+            case Some((2, n)) if n >= 13 => Seq(file(dir.getPath + "_2.13+"))
+            case _                       => Seq(file(dir.getPath + "_2.12-"))
           }
       }
     }
