@@ -2,15 +2,13 @@ package example
 
 import java.time.LocalDate
 
-import cats.data.Kleisli
+import cats.data.{EitherK, Kleisli}
 import cats.effect.{ExitCode, IO, IOApp}
 import cats.free.Free
 import cats.implicits._
 import cats.~>
 import com.google.cloud.bigtable.hbase.BigtableConfiguration
 import com.typesafe.scalalogging.LazyLogging
-import iota.TListK.:::
-import iota.{CopK, TNilK}
 import orcus.admin
 import orcus.async.Par
 import orcus.async.catsEffect.concurrent._
@@ -18,8 +16,7 @@ import orcus.codec.{PutEncoder, ValueCodec}
 import orcus.free.handler.result.{Handler => ResultHandler}
 import orcus.free.handler.resultScanner.{Handler => ResultScannerHandler}
 import orcus.free.handler.table.{Handler => TableHandler}
-import orcus.free.iota._
-import orcus.free.{ResultOp, ResultScannerOp, TableOp}
+import orcus.free.{ResultOp, ResultOps, ResultScannerOp, ResultScannerOps, TableOp, TableOps}
 import orcus.table.AsyncTableT
 import org.apache.hadoop.hbase.TableName
 import org.apache.hadoop.hbase.client._
@@ -58,7 +55,7 @@ trait FreeMain extends IOApp with LazyLogging {
   final def deleteTable(conn: AsyncAdmin): IO[Unit] =
     admin.deleteTable[IO](conn, tableName)
 
-  final def putProgram[F[a] <: CopK[_, a]](
+  final def putProgram[F[a]](
     implicit
     tableOps: TableOps[F]
   ): Free[F, Unit] = {
@@ -82,7 +79,7 @@ trait FreeMain extends IOApp with LazyLogging {
       .sequence[Free[F, ?], Unit] *> Free.pure(())
   }
 
-  final def scanProgram[F[a] <: CopK[_, a]](numRecords: Int)(
+  final def scanProgram[F[_]](numRecords: Int)(
     implicit
     tableOps: TableOps[F],
     resultScannerOps: ResultScannerOps[F]
@@ -95,7 +92,7 @@ trait FreeMain extends IOApp with LazyLogging {
     tableOps.getScanner(mkScan) >>= (sc => resultScannerOps.next(sc, numRecords))
   }
 
-  final def resultProgram[F[a] <: CopK[_, a]](results: Seq[Result])(
+  final def resultProgram[F[_]](results: Seq[Result])(
     implicit
     resultOps: ResultOps[F]
   ): Free[F, Vector[Option[Novel]]] =
@@ -103,7 +100,7 @@ trait FreeMain extends IOApp with LazyLogging {
       .map(resultOps.to[Option[Novel]])
       .sequence[Free[F, ?], Option[Novel]]
 
-  final def program[F[a] <: CopK[_, a]](
+  final def program[F[_]](
     implicit
     T: TableOps[F],
     R: ResultOps[F],
@@ -118,7 +115,7 @@ trait FreeMain extends IOApp with LazyLogging {
     } yield ys
   }
 
-  final type Algebra[A]      = CopK[TableOp ::: ResultOp ::: ResultScannerOp ::: TNilK, A]
+  final type Algebra[A]      = EitherK[TableOp, EitherK[ResultOp, ResultScannerOp, ?], A]
   final type TableK[F[_], A] = Kleisli[F, AsyncTableT, A]
 
   final def interpreter[M[_]](
@@ -130,7 +127,8 @@ trait FreeMain extends IOApp with LazyLogging {
     val t: TableOp ~> TableK[M, ?]          = tableHandlerM
     val r: ResultOp ~> TableK[M, ?]         = resultHandlerM.liftF
     val rs: ResultScannerOp ~> TableK[M, ?] = resultScannerHandlerM.liftF
-    CopK.FunctionK.of[Algebra, TableK[M, ?]](t, r, rs)
+
+    t.or(r.or(rs))
   }
 
   final def runExample(conn: AsyncConnection): IO[ExitCode] = {
