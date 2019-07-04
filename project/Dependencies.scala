@@ -6,7 +6,6 @@ object Dependencies {
     val `scala2.12`      = "2.12.8"
     val cats             = "2.0.0-M1"
     val monix            = "3.0.0-RC2"
-    val twitterArrows    = "0.1.23"
     val twitterUtil      = "18.12.0"
     val catsEffect       = "2.0.0-M1"
     val shapeless        = "2.3.3"
@@ -29,7 +28,6 @@ object Dependencies {
     lazy val catsFree       = "org.typelevel" %% "cats-free" % Ver.cats
     lazy val catsEffect     = "org.typelevel" %% "cats-effect" % Ver.catsEffect
     lazy val monixEval      = "io.monix" %% "monix-eval" % Ver.monix
-    lazy val twitterArrows  = "io.trane" %% "arrows-twitter" % Ver.twitterArrows
     lazy val twitterUtil    = "com.twitter" %% "util-core" % Ver.twitterUtil
     lazy val catbirdUtil    = "io.catbird" %% "catbird-util" % Ver.twitterUtil
     lazy val shapeless      = "com.chuusai" %% "shapeless" % Ver.shapeless
