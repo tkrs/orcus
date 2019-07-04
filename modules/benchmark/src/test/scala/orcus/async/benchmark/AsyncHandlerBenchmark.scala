@@ -4,7 +4,7 @@ package benchmark
 import java.util.concurrent._
 import java.util.function.Supplier
 
-import cats.{Applicative, Traverse}
+import cats.Traverse
 import cats.instances.vector._
 import org.openjdk.jmh.annotations._
 import com.twitter.util.{Await => TAwait, Future => TFuture}
@@ -147,25 +147,6 @@ class TwitterAsyncHandler extends AsyncHandlerBenchmark {
   def bench: Vector[Int] = {
     val p = implicitly[Par[TFuture]]
     val f = Traverse[Vector].traverse[TFuture, Int, Int](Xs)(i => p.parallel(compute(i)))
-    TAwait.result(f, 10.seconds)
-  }
-}
-
-class ArrowsTwitterAsyncHandler extends AsyncHandlerBenchmark {
-  import arrows.twitter.Task
-  import com.twitter.conversions.DurationOps._
-  import orcus.async.arrowsTwitter.future._
-
-  implicit val applicativeTask: Applicative[Task] = new Applicative[Task] {
-    def pure[A](x: A): Task[A] = Task.value(x)
-
-    def ap[A, B](ff: Task[A => B])(fa: Task[A]): Task[B] = ff.flatMap(fa.map)
-  }
-
-  @Benchmark
-  def bench: Vector[Int] = {
-    val p = implicitly[Par[Task]]
-    val f = Traverse[Vector].traverse[Task, Int, Int](Xs)(i => p.parallel(compute(i))).run
     TAwait.result(f, 10.seconds)
   }
 }
