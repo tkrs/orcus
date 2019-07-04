@@ -4,8 +4,6 @@ object Dependencies {
   val Ver = new {
     val `scala2.13`      = "2.13.0-RC1"
     val `scala2.12`      = "2.12.8"
-    val `scala2.11`      = "2.11.12"
-    val scalafmt         = "1.5.1"
     val cats             = "2.0.0-M1"
     val monix            = "3.0.0-RC2"
     val twitterArrows    = "0.1.23"
