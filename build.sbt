@@ -64,8 +64,8 @@ lazy val orcus = project
     Compile / console / scalacOptions --= warnCompilerOptions,
     Compile / console / scalacOptions += "-Yrepl-class-based"
   )
-  .aggregate(core, `arrows-twitter`, `twitter-util`, monix, `cats-effect`, `cats-free`, iota, example, benchmark)
-  .dependsOn(core, `arrows-twitter`, `twitter-util`, monix, `cats-effect`, `cats-free`, iota, example, benchmark)
+  .aggregate(core, `arrows-twitter`, `twitter-util`, monix, `cats-effect`, `cats-free`, example, benchmark)
+  .dependsOn(core, `arrows-twitter`, `twitter-util`, monix, `cats-effect`, `cats-free`, example, benchmark)
 
 lazy val publishSettings = Seq(
   releaseCrossBuild := true,
@@ -213,19 +213,6 @@ lazy val `cats-free` = project
   )
   .dependsOn(core)
 
-lazy val iota = project
-  .in(file("modules/iota"))
-  .settings(publishSettings)
-  .settings(crossVersionSharedSources)
-  .settings(
-    description := "orcus iota",
-    moduleName := "orcus-iota"
-  )
-  .settings(
-    libraryDependencies += Pkg.iota.withSources
-  )
-  .dependsOn(`cats-free`)
-
 lazy val example = project
   .in(file("modules/example"))
   .settings(publishSettings)
@@ -249,7 +236,7 @@ lazy val example = project
   .settings(
     scalacOptions -= "-Xfatal-warnings"
   )
-  .dependsOn(`cats-effect`, `cats-free`, iota)
+  .dependsOn(`cats-effect`, `cats-free`)
 
 lazy val benchmark = (project in file("modules/benchmark"))
   .settings(publishSettings)
@@ -269,7 +256,6 @@ lazy val benchmark = (project in file("modules/benchmark"))
   .enablePlugins(JmhPlugin)
   .dependsOn(
     Seq(
-      iota,
       `twitter-util`,
       `arrows-twitter`,
       `cats-effect`,

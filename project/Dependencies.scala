@@ -11,7 +11,6 @@ object Dependencies {
     val twitterArrows    = "0.1.23"
     val twitterUtil      = "18.12.0"
     val catsEffect       = "2.0.0-M1"
-    val iota             = "0.3.10"
     val shapeless        = "2.3.3"
     val exportHook       = "1.2.0"
     val scalacheck       = "1.14.0"
@@ -35,7 +34,6 @@ object Dependencies {
     lazy val twitterArrows  = "io.trane" %% "arrows-twitter" % Ver.twitterArrows
     lazy val twitterUtil    = "com.twitter" %% "util-core" % Ver.twitterUtil
     lazy val catbirdUtil    = "io.catbird" %% "catbird-util" % Ver.twitterUtil
-    lazy val iota           = "io.frees" %% "iota-core" % Ver.iota
     lazy val shapeless      = "com.chuusai" %% "shapeless" % Ver.shapeless
     lazy val exportHook     = "org.typelevel" %% "export-hook" % Ver.exportHook
     lazy val java8Compat    = "org.scala-lang.modules" %% "scala-java8-compat" % Ver.scalaJava8Compat
