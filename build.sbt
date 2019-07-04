@@ -61,8 +61,8 @@ lazy val orcus = project
     Compile / console / scalacOptions --= warnCompilerOptions,
     Compile / console / scalacOptions += "-Yrepl-class-based"
   )
-  .aggregate(core, `arrows-twitter`, `twitter-util`, monix, `cats-effect`, `cats-free`, example, benchmark)
-  .dependsOn(core, `arrows-twitter`, `twitter-util`, monix, `cats-effect`, `cats-free`, example, benchmark)
+  .aggregate(core, `twitter-util`, monix, `cats-effect`, `cats-free`, example, benchmark)
+  .dependsOn(core, `twitter-util`, monix, `cats-effect`, `cats-free`, example, benchmark)
 
 lazy val publishSettings = Seq(
   releaseCrossBuild := true,
@@ -171,19 +171,6 @@ lazy val `twitter-util` = project
   )
   .dependsOn(core % "compile->compile;test->test")
 
-lazy val `arrows-twitter` = project
-  .in(file("modules/arrows-twitter"))
-  .settings(publishSettings)
-  .settings(crossVersionSharedSources)
-  .settings(
-    description := "orcus arrows-twitter",
-    moduleName := "orcus-arrows-twitter"
-  )
-  .settings(
-    libraryDependencies += Pkg.twitterArrows.withSources
-  )
-  .dependsOn(core % "compile->compile;test->test")
-
 lazy val `cats-effect` = project
   .in(file("modules/cats-effect"))
   .settings(publishSettings)
@@ -253,7 +240,6 @@ lazy val benchmark = (project in file("modules/benchmark"))
   .dependsOn(
     Seq(
       `twitter-util`,
-      `arrows-twitter`,
       `cats-effect`,
       monix
     ).map(_ % "test->test"): _*
