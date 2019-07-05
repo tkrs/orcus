@@ -1,7 +1,6 @@
 package orcus.codec
 package generic
 
-import cats.instances.either._
 import export.exports
 import org.apache.hadoop.hbase.client.Result
 import org.apache.hadoop.hbase.util.Bytes
@@ -30,7 +29,7 @@ private[codec] trait DerivedDecoder1 {
         T(result) match {
           case Right(t) =>
             val k = Bytes.toBytes(K.value.name)
-            orcus.result.getFamily[H, Either[Throwable, ?]](result, k) match {
+            H(result.getFamilyMap(k)) match {
               case Right(h) => Right(field[K](h) :: t)
               case Left(e)  => Left(e)
             }

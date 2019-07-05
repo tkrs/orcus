@@ -10,8 +10,8 @@ import scala.collection.mutable
 
 @State(Scope.Thread)
 @BenchmarkMode(Array(Mode.Throughput))
-@Warmup(iterations = 10, time = 5)
-@Measurement(iterations = 10, time = 10)
+@Warmup(iterations = 10, time = 1)
+@Measurement(iterations = 10, time = 1)
 @Threads(1)
 @Fork(2)
 @OutputTimeUnit(TimeUnit.SECONDS)
