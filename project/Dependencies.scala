@@ -2,22 +2,21 @@ import sbt._
 
 object Dependencies {
   val Ver = new {
-    val `scala2.13`      = "2.13.0-RC1"
+    val `scala2.13`      = "2.13.0"
     val `scala2.12`      = "2.12.8"
-    val cats             = "2.0.0-M1"
+    val cats             = "2.0.0-M4"
     val monix            = "3.0.0-RC2"
     val twitterUtil      = "18.12.0"
-    val catsEffect       = "2.0.0-M1"
+    val catsEffect       = "2.0.0-M4"
     val shapeless        = "2.3.3"
     val scalacheck       = "1.14.0"
-    val scalatest        = "3.0.7"
-    val scalatestSnap    = "3.0.8-RC2"
+    val scalatest        = "3.0.8"
     val mockito          = "2.23.0"
-    val kindProjector    = "0.10.0"
+    val kindProjector    = "0.10.3"
     val hbase            = "2.1.3"
     val bigtable         = "1.11.0"
     val logback          = "1.2.3"
-    val scalaLogging     = "3.9.0"
+    val scalaLogging     = "3.9.2"
     val scalaJava8Compat = "0.9.0"
   }
 
@@ -37,10 +36,9 @@ object Dependencies {
     lazy val bigtable       = "com.google.cloud.bigtable"  % "bigtable-hbase-2.x"  % Ver.bigtable
     lazy val logbackClassic = "ch.qos.logback"             % "logback-classic"     % Ver.logback
     lazy val logging        = "com.typesafe.scala-logging" %% "scala-logging"      % Ver.scalaLogging
+    lazy val scalatest      = "org.scalatest"              %% "scalatest"          % Ver.scalatest
 
-    def scalatest(v: String) =
-      "org.scalatest" %% "scalatest" % (if (v == Ver.`scala2.13`) Ver.scalatestSnap else Ver.scalatest)
     def scalaReflect(v: String) = "org.scala-lang" % "scala-reflect" % v % Provided
-    def forTest(v: String)      = Seq(scalatest(v), scalacheck, mockito).map(_ % Test)
+    def forTest(v: String)      = Seq(scalatest, scalacheck, mockito).map(_ % Test)
   }
 }
