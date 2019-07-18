@@ -3,7 +3,7 @@ dist: xenial
 sudo: false
 scala:
 - 2.12.8
-- 2.13.0-RC1
+- 2.13.0
 jdk:
 - openjdk8
 - openjdk11
@@ -22,15 +22,12 @@ install:
 - pip install --user codecov
 script:
 - |
-  if [[ "$TRAVIS_JDK_VERSION" = "openjdk8" && "$TRAVIS_SCALA_VERSION" = 2.12.* ]]; then
+  if [[ "$TRAVIS_JDK_VERSION" = "openjdk8" && "$TRAVIS_SCALA_VERSION" = 2.13.* ]]; then
     sbt ++$TRAVIS_SCALA_VERSION clean coverage scalafmtCheckAll scalafmtSbtCheck compile test:compile test coverageReport coverageOff && codecov
   elif [[ "$TRAVIS_SCALA_VERSION" = 2.13.* ]]; then
-    sbt ++$TRAVIS_SCALA_VERSION! clean \
-      core/compile core/test:compile core/test \
-      cats-effect/compile cats-effect/test:compile cats-effect/test \
-      cats-free/compile cats-free/test:compile cats-free/test
+    sbt ++$TRAVIS_SCALA_VERSION clean test
   else
-      sbt ++$TRAVIS_SCALA_VERSION clean test
+    sbt ++$TRAVIS_SCALA_VERSION clean test monix/test twitter-util/test benchmark/test
   fi
 - |
   if [[ "$TRAVIS_JDK_VERSION" = "openjdk8" && $(cat version.sbt) =~ "-SNAPSHOT" ]]; then
@@ -38,23 +35,29 @@ script:
     mkdir -p $(dirname "${PGP_SECRET_RING}")
     echo $GPG_KEY | base64 --decode > "${PGP_SECRET_RING}"
     if [ "$TRAVIS_BRANCH" = "master" ]; then
+      command=
       if [ "$TRAVIS_PULL_REQUEST" = "false" ]; then
         if [[ "$TRAVIS_SCALA_VERSION" = 2.13.* ]]; then
-          sbt ++$TRAVIS_SCALA_VERSION! core/publishSigned cats-effect/publishSigned cats-free/publishSigned
+          command="publishSigned"
         else
-          sbt ++$TRAVIS_SCALA_VERSION publishSigned
+          command="publishSigned monix/publishSigned twitter-util/publishSigned"
         fi
       else
         if [ "$TRAVIS_SECURE_ENV_VARS" = "true" ]; then
           if [[ "$TRAVIS_SCALA_VERSION" = 2.13.* ]]; then
-            sbt ++$TRAVIS_SCALA_VERSION! core/publishLocalSigned cats-effect/publishLocalSigned cats-free/publishLocalSigned
+            command="publishLocalSigned"
           else
-            sbt ++$TRAVIS_SCALA_VERSION publishLocalSigned
+            command="publishLocalSigned monix/publishLocalSigned twitter-util/publishLocalSigned"
           fi
         else
-          sbt ++$TRAVIS_SCALA_VERSION publishLocal
+          if [[ "$TRAVIS_SCALA_VERSION" = 2.13.* ]]; then
+            command="publishLocal"
+          else
+            command="publishLocal monix/publishLocal twitter-util/publishLocal"
+          fi
         fi
       fi
+      sbt ++$TRAVIS_SCALA_VERSION ${command[@]}
     fi
   fi
 after_script:

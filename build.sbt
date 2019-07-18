@@ -1,10 +1,10 @@
 import Dependencies._
 
 ThisBuild / organization := "com.github.tkrs"
-ThisBuild / scalaVersion := Ver.`scala2.12`
+ThisBuild / scalaVersion := Ver.`scala2.13`
 ThisBuild / crossScalaVersions := Seq(
+  Ver.`scala2.13`,
   Ver.`scala2.12`
-  // Ver.`scala2.13`,
 )
 ThisBuild / resolvers ++= Seq(
   Resolver.sonatypeRepo("releases"),
@@ -55,8 +55,8 @@ lazy val orcus = project
     Compile / console / scalacOptions --= warnCompilerOptions,
     Compile / console / scalacOptions += "-Yrepl-class-based"
   )
-  .aggregate(core, `twitter-util`, monix, `cats-effect`, `cats-free`, example, benchmark)
-  .dependsOn(core, `twitter-util`, monix, `cats-effect`, `cats-free`, example, benchmark)
+  .aggregate(core, `cats-effect`, `cats-free`, example)
+  .dependsOn(core, `cats-effect`, `cats-free`, example)
 
 lazy val publishSettings = Seq(
   releaseCrossBuild := true,
@@ -147,6 +147,8 @@ lazy val monix = project
     moduleName := "orcus-monix"
   )
   .settings(
+    scalaVersion := Ver.`scala2.12`,
+    crossScalaVersions := Seq(Ver.`scala2.12`),
     libraryDependencies += Pkg.monixEval.withSources
   )
   .dependsOn(core % "compile->compile;test->test")
@@ -160,6 +162,8 @@ lazy val `twitter-util` = project
     moduleName := "orcus-twitter-util"
   )
   .settings(
+    scalaVersion := Ver.`scala2.12`,
+    crossScalaVersions := Seq(Ver.`scala2.12`),
     libraryDependencies += Pkg.twitterUtil.withSources
   )
   .dependsOn(core % "compile->compile;test->test")
@@ -223,6 +227,8 @@ lazy val benchmark = (project in file("modules/benchmark"))
     moduleName := "orcus-benchmark"
   )
   .settings(
+    scalaVersion := Ver.`scala2.12`,
+    crossScalaVersions := Seq(Ver.`scala2.12`),
     libraryDependencies ++= Seq(
       Pkg.java8Compat,
       Pkg.hbase,
