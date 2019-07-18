@@ -1,6 +1,5 @@
 package orcus.codec
 
-import export.imports
 import org.apache.hadoop.hbase.client.Put
 
 trait PutFamilyEncoder[A] {
@@ -10,6 +9,9 @@ trait PutFamilyEncoder[A] {
 object PutFamilyEncoder extends LowPriorityPutFamilyEncoder {
 
   @inline def apply[A](implicit A: PutFamilyEncoder[A]): PutFamilyEncoder[A] = A
+}
+
+trait LowPriorityPutFamilyEncoder {
 
   implicit def encodeMap[K, V](
     implicit
@@ -25,6 +27,3 @@ object PutFamilyEncoder extends LowPriorityPutFamilyEncoder {
     }
   }
 }
-
-@imports[PutFamilyEncoder]
-trait LowPriorityPutFamilyEncoder

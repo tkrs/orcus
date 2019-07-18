@@ -1,7 +1,6 @@
 package orcus.codec
 package generic
 
-import export.exports
 import org.apache.hadoop.hbase.client.Put
 import org.apache.hadoop.hbase.util.Bytes
 import shapeless._
@@ -9,7 +8,6 @@ import shapeless.labelled.FieldType
 
 trait DerivedPutEncoder[A] extends PutEncoder[A]
 
-@exports
 object DerivedPutEncoder extends DerivedPutEncoder1
 
 private[codec] trait DerivedPutEncoder1 {

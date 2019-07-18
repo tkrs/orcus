@@ -3,14 +3,12 @@ package generic
 
 import java.util.{NavigableMap => NMap}
 
-import export.exports
 import org.apache.hadoop.hbase.util.Bytes
 import shapeless.labelled._
 import shapeless._
 
 trait DerivedFamilyDecoder[A] extends FamilyDecoder[A]
 
-@exports
 object DerivedFamilyDecoder extends DerivedFamilyDecoder1
 
 private[codec] trait DerivedFamilyDecoder1 {

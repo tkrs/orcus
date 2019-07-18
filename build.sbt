@@ -10,27 +10,14 @@ ThisBuild / resolvers ++= Seq(
   Resolver.sonatypeRepo("releases"),
   Resolver.sonatypeRepo("snapshots")
 )
-ThisBuild / libraryDependencies ++= Pkg.forTest(scalaVersion.value) ++ {
-  CrossVersion.partialVersion(scalaVersion.value) match {
-    case Some((2, n)) if n >= 13 => Seq(Pkg.hbase % "provided", compilerPlugin(Pkg.kindProjector))
-    case _                       => Seq(Pkg.hbase % "provided", compilerPlugin(Pkg.kindProjector), compilerPlugin(Pkg.macroParadise))
-  }
-}
+ThisBuild / libraryDependencies ++= Pkg.forTest(scalaVersion.value) ++ Seq(
+  Pkg.hbase % Provided,
+  compilerPlugin(Pkg.kindProjector)
+)
 ThisBuild / scalacOptions ++= compilerOptions ++ {
   CrossVersion.partialVersion(scalaVersion.value) match {
-    case Some((2, n)) if n >= 13 => Seq("-Ymacro-annotations")
-    case _ =>
-      warnCompilerOptions ++ Seq(
-        "-Ypartial-unification",
-        "-Yno-adapted-args",
-        "-Xfuture",
-        "-Ywarn-inaccessible",
-        "-Ywarn-extra-implicit",
-        "-Ywarn-dead-code",
-        "-Ywarn-nullary-override",
-        "-Ywarn-nullary-unit",
-        "-Ywarn-numeric-widen"
-      )
+    case Some((2, n)) if n >= 13 => Nil
+    case _                       => warnCompilerOptions ++ Seq("-Ypartial-unification", "-Yno-adapted-args")
   }
 }
 ThisBuild / Test / fork := true
@@ -41,16 +28,23 @@ lazy val compilerOptions = Seq(
   "utf-8",
   "-explaintypes",
   "-feature",
-  "-language:_",
-  "-unchecked",
-  "-Xcheckinit"
+  "-language:higherKinds",
+  "-unchecked"
 )
 
 lazy val warnCompilerOptions = Seq(
   "-Xlint",
+  "-Xcheckinit",
   "-Xfatal-warnings",
+  "-Xfuture",
   "-Ywarn-unused:_",
-  "-Ywarn-value-discard"
+  "-Ywarn-value-discard",
+  "-Ywarn-nullary-unit",
+  "-Ywarn-nullary-override",
+  "-Ywarn-extra-implicit",
+  "-Ywarn-dead-code",
+  "-Ywarn-numeric-widen",
+  "-Ywarn-inaccessible"
 )
 
 lazy val orcus = project
@@ -138,7 +132,6 @@ lazy val core = project
           Pkg.catsCore,
           Pkg.shapeless,
           Pkg.java8Compat,
-          Pkg.exportHook,
           Pkg.scalaReflect(scalaVersion.value)
         )
       )
