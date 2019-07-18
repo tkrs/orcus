@@ -3,7 +3,6 @@ package orcus.codec
 import java.util.{NavigableMap => NMap}
 
 import cats.Eval
-import export.imports
 import orcus.internal.ScalaVersionSpecifics._
 
 import scala.annotation.tailrec
@@ -55,6 +54,9 @@ object FamilyDecoder extends LowPriorityFamilyDecoder {
   def liftF[A](a: Either[Throwable, A]): FamilyDecoder[A] = new FamilyDecoder[A] {
     def apply(map: NMap[Array[Byte], Array[Byte]]): Either[Throwable, A] = a
   }
+}
+
+trait LowPriorityFamilyDecoder {
 
   implicit def decodeOption[A](
     implicit
@@ -110,6 +112,3 @@ object FamilyDecoder extends LowPriorityFamilyDecoder {
       }
     }
 }
-
-@imports[FamilyDecoder]
-trait LowPriorityFamilyDecoder

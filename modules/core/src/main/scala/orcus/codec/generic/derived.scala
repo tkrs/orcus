@@ -1,7 +1,4 @@
 package orcus.codec
 package generic
 
-import export.reexports
-
-@reexports[DerivedPutEncoder, DerivedPutFamilyEncoder, DerivedDecoder, DerivedFamilyDecoder]
-object derived
+object derived extends DerivedDecoder1 with DerivedFamilyDecoder1 with DerivedPutEncoder1 with DerivedPutFamilyEncoder1

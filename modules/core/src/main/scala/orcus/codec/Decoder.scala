@@ -1,7 +1,6 @@
 package orcus.codec
 
 import cats.Eval
-import export.imports
 import orcus.internal.ScalaVersionSpecifics._
 import org.apache.hadoop.hbase.client.Result
 
@@ -49,6 +48,9 @@ object Decoder extends LowPriorityDecoder {
   def liftF[A](a: Either[Throwable, A]): Decoder[A] = new Decoder[A] {
     def apply(result: Result): Either[Throwable, A] = a
   }
+}
+
+trait LowPriorityDecoder {
 
   implicit def decodeOption[A](implicit A: Decoder[A]): Decoder[Option[A]] =
     new Decoder[Option[A]] {
@@ -97,6 +99,3 @@ object Decoder extends LowPriorityDecoder {
       }
     }
 }
-
-@imports[Decoder]
-trait LowPriorityDecoder

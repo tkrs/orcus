@@ -1,7 +1,6 @@
 package orcus.codec
 package generic
 
-import export.exports
 import org.apache.hadoop.hbase.client.Result
 import org.apache.hadoop.hbase.util.Bytes
 import shapeless.labelled._
@@ -9,7 +8,6 @@ import shapeless._
 
 trait DerivedDecoder[A] extends Decoder[A]
 
-@exports
 object DerivedDecoder extends DerivedDecoder1
 
 private[codec] trait DerivedDecoder1 {
