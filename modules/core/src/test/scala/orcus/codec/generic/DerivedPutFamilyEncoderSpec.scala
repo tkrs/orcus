@@ -6,7 +6,6 @@ import org.apache.hadoop.hbase.util.Bytes
 import org.scalatest.FlatSpec
 
 class DerivedPutFamilyEncoderSpec extends FlatSpec {
-  import derived._
 
   case class Foo(a: Int, b: String, c: Double)
 

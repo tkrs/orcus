@@ -10,7 +10,6 @@ import org.scalatest.FlatSpec
 import scala.collection.JavaConverters._
 
 class DerivedDecoderSpec extends FlatSpec with CodecSpec {
-  import derived._
 
   it should "decode a nested case class" in {
     case class All(

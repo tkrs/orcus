@@ -28,6 +28,9 @@ import scala.concurrent.duration._
 trait FreeMain extends IOApp with LazyLogging {
   import Syntax._
 
+  implicit val releaseDateCodec: orcus.codec.ValueCodec[LocalDate] =
+    ValueCodec[Long].imap(_.toEpochDay, LocalDate.ofEpochDay)
+
   final val tableName: TableName = TableName.valueOf("novelist")
   final val keyPrefix: String    = "novel"
   final val novels = Map(
@@ -166,12 +169,6 @@ object BigtableMain extends FreeMain {
 
 final case class Work(name: String, releaseDate: LocalDate)
 object Work {
-  implicit val releaseDateCodec: orcus.codec.ValueCodec[LocalDate] =
-    ValueCodec[Long].imap(_.toEpochDay, LocalDate.ofEpochDay)
-  implicit val encodeWork: orcus.codec.PutFamilyEncoder[Work] =
-    orcus.codec.generic.derivedPutFamilyEncoder[Work]
-  implicit val decodeWork: orcus.codec.FamilyDecoder[Work] =
-    orcus.codec.generic.derivedFamilyDecoder[Work]
 
   implicit class WorkOps(val a: Work) extends AnyVal {
     def key(prefix: String, author: String): Array[Byte] = {
@@ -183,12 +180,6 @@ object Work {
 }
 
 final case class Novel(work: Work)
-object Novel {
-  implicit val encodeNovel: orcus.codec.PutEncoder[Novel] =
-    orcus.codec.generic.derivedPutEncoder[Novel]
-  implicit val decodeNovel: orcus.codec.Decoder[Novel] =
-    orcus.codec.generic.derivedDecoder[Novel]
-}
 
 object Syntax {
 

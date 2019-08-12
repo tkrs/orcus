@@ -3,7 +3,6 @@ package orcus.codec.benchmark
 import java.{util => ju}
 
 import orcus.codec.{Decoder, PutEncoder}
-import orcus.codec.generic.derived._
 import org.apache.hadoop.hbase.client.{Put, Result}
 import org.apache.hadoop.hbase.{Cell, CellBuilderType, ExtendedCellBuilderFactory}
 import org.apache.hadoop.hbase.util.Bytes
