@@ -17,7 +17,6 @@ import scala.collection.mutable
 @OutputTimeUnit(TimeUnit.SECONDS)
 class DecoderBench {
   import States._
-  import orcus.codec.generic.derived._
 
   @Benchmark
   def decodeToCaseClass(data: Data): Table[Columns] =

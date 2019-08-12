@@ -4,6 +4,9 @@ import java.util.{NavigableMap => NMap}
 
 import cats.Eval
 import orcus.internal.ScalaVersionSpecifics._
+import org.apache.hadoop.hbase.util.Bytes
+import shapeless.labelled._
+import shapeless._
 
 import scala.annotation.tailrec
 import scala.collection.mutable
@@ -37,7 +40,7 @@ trait FamilyDecoder[A] { self =>
   }
 }
 
-object FamilyDecoder extends LowPriorityFamilyDecoder {
+object FamilyDecoder extends HighPriorityFamilyDecoder {
 
   @inline def apply[A](implicit A: FamilyDecoder[A]): FamilyDecoder[A] = A
 
@@ -56,7 +59,7 @@ object FamilyDecoder extends LowPriorityFamilyDecoder {
   }
 }
 
-trait LowPriorityFamilyDecoder {
+trait HighPriorityFamilyDecoder extends LowPriorityFamilyDecoder {
 
   implicit def decodeOption[A](
     implicit
@@ -110,5 +113,43 @@ trait LowPriorityFamilyDecoder {
           loop(builder)
         }
       }
+    }
+}
+
+trait LowPriorityFamilyDecoder {
+
+  implicit val familyDecodeHNil: FamilyDecoder[HNil] = new FamilyDecoder[HNil] {
+    def apply(map: NMap[Array[Byte], Array[Byte]]): Either[Throwable, HNil] = Right(HNil)
+  }
+
+  implicit def familyDecodeLabelledHCons[K <: Symbol, H, T <: HList](
+    implicit
+    K: Witness.Aux[K],
+    H: ValueCodec[H],
+    T: Lazy[FamilyDecoder[T]]
+  ): FamilyDecoder[FieldType[K, H] :: T] =
+    new FamilyDecoder[FieldType[K, H] :: T] {
+      def apply(map: NMap[Array[Byte], Array[Byte]]): Either[Throwable, FieldType[K, H] :: T] =
+        T.value(map) match {
+          case Right(t) =>
+            H.decode(map.get(Bytes.toBytes(K.value.name))) match {
+              case Right(h) => Right(field[K](h) :: t)
+              case Left(e)  => Left(e)
+            }
+          case Left(e) => Left(e)
+        }
+    }
+
+  implicit def familyDecodeLabelledGen[H <: HList, A](
+    implicit
+    gen: LabelledGeneric.Aux[A, H],
+    A: Lazy[FamilyDecoder[H]]
+  ): FamilyDecoder[A] =
+    new FamilyDecoder[A] {
+      def apply(map: NMap[Array[Byte], Array[Byte]]): Either[Throwable, A] =
+        A.value(map) match {
+          case Right(v) => Right(gen.from(v))
+          case Left(e)  => Left(e)
+        }
     }
 }
