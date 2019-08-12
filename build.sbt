@@ -10,7 +10,7 @@ ThisBuild / resolvers ++= Seq(
   Resolver.sonatypeRepo("releases"),
   Resolver.sonatypeRepo("snapshots")
 )
-ThisBuild / libraryDependencies ++= Pkg.forTest(scalaVersion.value) ++ Seq(
+ThisBuild / libraryDependencies ++= Pkg.forTest ++ Seq(
   Pkg.hbase % Provided,
   compilerPlugin(Pkg.kindProjector)
 )
@@ -131,8 +131,7 @@ lazy val core = project
         Seq(
           Pkg.catsCore,
           Pkg.shapeless,
-          Pkg.java8Compat,
-          Pkg.scalaReflect(scalaVersion.value)
+          Pkg.java8Compat
         )
       )
       .map(_.withSources)
