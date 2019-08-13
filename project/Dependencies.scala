@@ -38,7 +38,6 @@ object Dependencies {
     lazy val logging        = "com.typesafe.scala-logging" %% "scala-logging"      % Ver.scalaLogging
     lazy val scalatest      = "org.scalatest"              %% "scalatest"          % Ver.scalatest
 
-    def scalaReflect(v: String) = "org.scala-lang" % "scala-reflect" % v % Provided
-    def forTest(v: String)      = Seq(scalatest, scalacheck, mockito).map(_ % Test)
+    lazy val forTest = Seq(scalatest, scalacheck, mockito).map(_ % Test)
   }
 }
