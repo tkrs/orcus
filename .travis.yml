@@ -2,7 +2,7 @@ language: scala
 dist: xenial
 sudo: false
 scala:
-- 2.12.8
+- 2.12.10
 - 2.13.0
 jdk:
 - openjdk12
@@ -10,7 +10,7 @@ jdk:
 matrix:
   include:
   - jdk: openjdk11
-    scala: 2.12.8
+    scala: 2.12.10
     env: COV=false RELEASE=true
   - jdk: openjdk11
     scala: 2.13.0
@@ -23,13 +23,12 @@ cache:
   - "$HOME/.sbt/boot"
   - "$HOME/.sbt/launchers"
   - "$HOME/.coursier"
+  - "$HOME/.cache"
 install:
 - pip install --user codecov
 script:
 - |
-  if [[ "$TRAVIS_SCALA_VERSION" = 2.12.* ]]; then
-    sbt ++$TRAVIS_SCALA_VERSION clean test monix/test twitter-util/test benchmark/test
-  elif [[ "${COV:-""}" = "true" ]]; then
+  if [[ "${COV:-""}" = "true" ]]; then
     sbt ++$TRAVIS_SCALA_VERSION clean coverage scalafmtCheckAll scalafmtSbtCheck compile test:compile test coverageReport coverageOff && codecov
   else
     sbt ++$TRAVIS_SCALA_VERSION clean test
@@ -42,24 +41,12 @@ script:
     if [ "$TRAVIS_BRANCH" = "master" ]; then
       command=
       if [ "$TRAVIS_PULL_REQUEST" = "false" ]; then
-        if [[ "$TRAVIS_SCALA_VERSION" = 2.13.* ]]; then
-          command="publishSigned"
-        else
-          command="publishSigned monix/publishSigned twitter-util/publishSigned"
-        fi
+        command="publishSigned"
       else
         if [ "$TRAVIS_SECURE_ENV_VARS" = "true" ]; then
-          if [[ "$TRAVIS_SCALA_VERSION" = 2.13.* ]]; then
-            command="publishLocalSigned"
-          else
-            command="publishLocalSigned monix/publishLocalSigned twitter-util/publishLocalSigned"
-          fi
+          command="publishLocalSigned"
         else
-          if [[ "$TRAVIS_SCALA_VERSION" = 2.13.* ]]; then
-            command="publishLocal"
-          else
-            command="publishLocal monix/publishLocal twitter-util/publishLocal"
-          fi
+          command="publishLocal"
         fi
       fi
       sbt ++$TRAVIS_SCALA_VERSION ${command[@]}
