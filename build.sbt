@@ -55,8 +55,8 @@ lazy val orcus = project
     Compile / console / scalacOptions --= warnCompilerOptions,
     Compile / console / scalacOptions += "-Yrepl-class-based"
   )
-  .aggregate(core, `cats-effect`, `cats-free`, monix, `twitter-util`, example, benchmark)
-  .dependsOn(core, `cats-effect`, `cats-free`, monix, `twitter-util`, example, benchmark)
+  .aggregate(core, `cats-effect`, `cats-free`, monix, `twitter-util`, bigtable, example, `example-bigtable`, benchmark)
+  .dependsOn(core, `cats-effect`, `cats-free`, monix, `twitter-util`, bigtable, example, `example-bigtable`, benchmark)
 
 lazy val publishSettings = Seq(
   releaseCrossBuild := true,
@@ -186,6 +186,18 @@ lazy val `cats-free` = project
   )
   .dependsOn(core)
 
+lazy val bigtable = project
+  .in(file("modules/bigtable"))
+  .settings(publishSettings)
+  .settings(
+    description := "orcus bigtable",
+    moduleName := "orcus-bigtable"
+  )
+  .settings(
+    libraryDependencies ++= Seq(Pkg.catsEffect, Pkg.bigtable).map(_.withSources)
+  )
+  .dependsOn(core)
+
 lazy val example = project
   .in(file("modules/example"))
   .settings(publishSettings)
@@ -197,7 +209,7 @@ lazy val example = project
   )
   .settings(
     libraryDependencies ++= Seq(
-      Pkg.bigtable,
+      Pkg.bigtableHBase,
       Pkg.logging,
       Pkg.logbackClassic
     ).map(_.withSources)
@@ -210,6 +222,31 @@ lazy val example = project
     scalacOptions -= "-Xfatal-warnings"
   )
   .dependsOn(`cats-effect`, `cats-free`)
+
+lazy val `example-bigtable` = project
+  .in(file("modules/example-bigtable"))
+  .settings(publishSettings)
+  .settings(noPublishSettings)
+  .settings(crossVersionSharedSources)
+  .settings(
+    description := "orcus example-bigtable",
+    moduleName := "orcus-example-bigtable"
+  )
+  .settings(
+    libraryDependencies ++= Seq(
+      Pkg.hbase,
+      Pkg.logging,
+      Pkg.logbackClassic
+    ).map(_.withSources)
+  )
+  .settings(
+    fork := true,
+    coverageEnabled := false
+  )
+  .settings(
+    scalacOptions -= "-Xfatal-warnings"
+  )
+  .dependsOn(bigtable, `cats-effect`)
 
 lazy val benchmark = (project in file("modules/benchmark"))
   .settings(publishSettings)

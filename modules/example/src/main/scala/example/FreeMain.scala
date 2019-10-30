@@ -1,6 +1,7 @@
 package example
 
 import java.time.LocalDate
+import java.util.concurrent.CompletableFuture
 
 import cats.data.{EitherK, Kleisli}
 import cats.effect.{ExitCode, IO, IOApp}
@@ -156,7 +157,7 @@ trait FreeMain extends IOApp with LazyLogging {
 
 object HBaseMain extends FreeMain {
   def getConnection: IO[AsyncConnection] =
-    Par[IO].parallel(ConnectionFactory.createAsyncConnection())
+    Par[CompletableFuture, IO].parallel(ConnectionFactory.createAsyncConnection())
 }
 
 object BigtableMain extends FreeMain {

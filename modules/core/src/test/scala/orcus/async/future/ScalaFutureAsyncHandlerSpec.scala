@@ -12,11 +12,11 @@ class ScalaFutureAsyncHandlerSpec extends FunSpec with AsyncSpec {
 
   describe("AsyncHandler[scala.concurrent.Future]") {
     it("should get a value as-is when its CompletableFuture is succeed") {
-      def run = Par[Future].parallel(CompletableFuture.completedFuture(10))
+      def run = Par[CompletableFuture, Future].parallel(CompletableFuture.completedFuture(10))
       assert(10 === Await.result(run, 3.seconds))
     }
     it("should throw CompletionException as-is when its CompletableFuture is fail") {
-      def run = Par[Future].parallel(failedFuture[Int])
+      def run = Par[CompletableFuture, Future].parallel(failedFuture[Int])
       assertThrows[CompletionException](Await.result(run, 3.seconds))
     }
   }

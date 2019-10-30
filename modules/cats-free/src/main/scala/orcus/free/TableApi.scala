@@ -1,5 +1,7 @@
 package orcus.free
 
+import java.util.concurrent.CompletableFuture
+
 import cats.{ApplicativeError, InjectK}
 import cats.free.Free
 import orcus.BatchResult
@@ -53,7 +55,7 @@ object TableOp {
     def run[M[_]](t: AsyncTableT)(
       implicit
       apErrorM: ApplicativeError[M, Throwable],
-      parM: Par[M]
+      parM: Par.Aux[CompletableFuture, M]
     ): M[Seq[BatchResult]] =
       orcus.table.batch[M, Seq](t, a)
   }
