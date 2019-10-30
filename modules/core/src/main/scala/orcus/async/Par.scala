@@ -1,13 +1,16 @@
 package orcus.async
 
-import java.util.concurrent.CompletableFuture
-
 import cats.~>
 
 trait Par[F[_]] {
-  def parallel: CompletableFuture ~> F
+  type G[_]
+
+  def parallel: F ~> G
 }
 
 object Par {
-  @inline def apply[F[_]](implicit F: Par[F]): Par[F] = F
+
+  type Aux[F[_], G0[_]] = Par[F] { type G[α] = G0[α] }
+
+  @inline def apply[F[_], G[_]](implicit F: Par.Aux[F, G]): Par.Aux[F, G] = F
 }

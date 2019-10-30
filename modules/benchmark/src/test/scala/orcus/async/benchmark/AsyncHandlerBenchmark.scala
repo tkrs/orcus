@@ -87,7 +87,7 @@ class CatsAsyncHandler extends AsyncHandlerBenchmark {
 
   @Benchmark
   def bench: Vector[Int] = {
-    val p = implicitly[Par[IO]]
+    val p = implicitly[Par.Aux[CompletableFuture, IO]]
     val f = Traverse[Vector].traverse[IO, Int, Int](Xs)(i => p.parallel(compute(i)))
     SAwait.result(f.unsafeToFuture(), 10.seconds)
   }
@@ -101,7 +101,7 @@ class MonixAsyncHandler extends AsyncHandlerBenchmark {
 
   @Benchmark
   def bench: Vector[Int] = {
-    val p = implicitly[Par[Task]]
+    val p = implicitly[Par.Aux[CompletableFuture, Task]]
     val f = Traverse[Vector].traverse[Task, Int, Int](Xs)(i => p.parallel(compute(i)))
     SAwait.result(f.runToFuture, 10.seconds)
   }
@@ -117,7 +117,7 @@ class ScalaAsyncHandler extends AsyncHandlerBenchmark {
 
   @Benchmark
   def bench: Vector[Int] = {
-    val p = implicitly[Par[SFuture]]
+    val p = implicitly[Par.Aux[CompletableFuture, SFuture]]
     val f = Traverse[Vector].traverse[SFuture, Int, Int](Xs)(i => p.parallel(compute(i)))
     SAwait.result(f, 10.seconds)
   }
@@ -145,7 +145,7 @@ class TwitterAsyncHandler extends AsyncHandlerBenchmark {
 
   @Benchmark
   def bench: Vector[Int] = {
-    val p = implicitly[Par[TFuture]]
+    val p = implicitly[Par.Aux[CompletableFuture, TFuture]]
     val f = Traverse[Vector].traverse[TFuture, Int, Int](Xs)(i => p.parallel(compute(i)))
     TAwait.result(f, 10.seconds)
   }
