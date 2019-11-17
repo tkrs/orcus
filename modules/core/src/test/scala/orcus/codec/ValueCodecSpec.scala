@@ -8,8 +8,8 @@ import org.scalatestplus.scalacheck.Checkers
 class ValueCodecSpec extends FunSuite with Checkers with Matchers {
 
   private def _roundTrip[A: ValueCodec](a: A): Boolean = {
-    val encoded = ValueCodec[A].encode(a)
-    val decoded = ValueCodec[A].decode(encoded).right.get
+    val encoded        = ValueCodec[A].encode(a)
+    val Right(decoded) = ValueCodec[A].decode(encoded)
     decoded === a
   }
 
@@ -39,9 +39,9 @@ class ValueCodecSpec extends FunSuite with Checkers with Matchers {
   }
 
   test("imap") {
-    val f  = ValueCodec[Int].imap[String](_.toInt, _.toString)
-    val v0 = f.decode(Bytes.toBytes(10)).right.get
-    val v1 = f.encode("10")
+    val f         = ValueCodec[Int].imap[String](_.toInt, _.toString)
+    val Right(v0) = f.decode(Bytes.toBytes(10))
+    val v1        = f.encode("10")
     assert(v0 === "10")
     assert(Bytes.toInt(v1) === 10)
   }

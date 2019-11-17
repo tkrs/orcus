@@ -19,22 +19,30 @@ class DecoderBench {
   import States._
 
   @Benchmark
-  def decodeToCaseClass(data: Data): Table[Columns] =
-    if (data.size == 10)
-      Decoder[Table[Columns10]].apply(data.genResult).right.get
-    else
-      Decoder[Table[Columns30]].apply(data.genResult).right.get
+  def decodeToCaseClass(data: Data): Table[Columns] = {
+    val Right(v) =
+      if (data.size == 10)
+        Decoder[Table[Columns10]].apply(data.genResult)
+      else
+        Decoder[Table[Columns30]].apply(data.genResult)
+    v
+  }
 
   @Benchmark
-  def decodeToCaseClassCachedDecoder(data: Data): Table[Columns] =
-    if (data.size == 10)
-      data.decode10(data.genResult).right.get
-    else
-      data.decode30(data.genResult).right.get
+  def decodeToCaseClassCachedDecoder(data: Data): Table[Columns] = {
+    val Right(v) =
+      if (data.size == 10)
+        data.decode10(data.genResult)
+      else
+        data.decode30(data.genResult)
+    v
+  }
 
   @Benchmark
-  def decodeToMap(data: Data): Map[String, Map[String, Int]] =
-    Decoder[Map[String, Map[String, Int]]].apply(data.genResult).right.get
+  def decodeToMap(data: Data): Map[String, Map[String, Int]] = {
+    val Right(v) = Decoder[Map[String, Map[String, Int]]].apply(data.genResult)
+    v
+  }
 
   @Benchmark
   def decodeSelf(data: Data): Map[String, Columns] = {
