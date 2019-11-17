@@ -2,8 +2,11 @@ import sbt._
 
 object Dependencies {
   val Ver = new {
-    val `scala2.13`      = "2.13.1"
-    val `scala2.12`      = "2.12.10"
+    val `scala2.13` = "2.13.1"
+    val `scala2.12` = "2.12.10"
+
+    val kindProjector = "0.11.0"
+
     val cats             = "2.0.0"
     val fs2              = "2.0.1"
     val monix            = "3.1.0"
@@ -13,7 +16,6 @@ object Dependencies {
     val scalacheck       = "1.14.2"
     val scalatest        = "3.0.8"
     val mockito          = "2.23.0"
-    val kindProjector    = "0.11.0"
     val hbase            = "2.1.4"
     val bigtableHBase    = "1.12.1"
     val bigtable         = "1.7.1"
@@ -23,6 +25,8 @@ object Dependencies {
   }
 
   val Pkg = new {
+    lazy val kindProjector = ("org.typelevel" %% "kind-projector" % Ver.kindProjector).cross(CrossVersion.full)
+
     lazy val catsCore       = "org.typelevel"              %% "cats-core"            % Ver.cats
     lazy val catsFree       = "org.typelevel"              %% "cats-free"            % Ver.cats
     lazy val catsEffect     = "org.typelevel"              %% "cats-effect"          % Ver.catsEffect
@@ -40,8 +44,6 @@ object Dependencies {
     lazy val logbackClassic = "ch.qos.logback"             % "logback-classic"       % Ver.logback
     lazy val logging        = "com.typesafe.scala-logging" %% "scala-logging"        % Ver.scalaLogging
     lazy val scalatest      = "org.scalatest"              %% "scalatest"            % Ver.scalatest
-
-    lazy val kindProjector = ("org.typelevel" %% "kind-projector" % Ver.kindProjector).cross(CrossVersion.full)
 
     lazy val forTest = Seq(scalatest, scalacheck, mockito).map(_ % Test)
   }
