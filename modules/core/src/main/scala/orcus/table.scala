@@ -26,7 +26,6 @@ import org.apache.hadoop.hbase.{TableName => HTableName}
 import scala.collection.JavaConverters._
 
 object table {
-
   type AsyncTableT = AsyncTable[T] forSome { type T <: ScanResultConsumerBase }
 
   def getName[F[_]](t: AsyncTableT)(

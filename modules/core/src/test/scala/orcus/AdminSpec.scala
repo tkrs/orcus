@@ -24,8 +24,10 @@ class AdminSpec extends FlatSpec with MockitoSugar {
     CompletableFuture.runAsync(new Runnable {
       def run(): Unit = ()
     })
+
   def jTrueFuture: CompletableFuture[java.lang.Boolean] =
     CompletableFuture.completedFuture(java.lang.Boolean.TRUE)
+
   def jFalseFuture: CompletableFuture[java.lang.Boolean] =
     CompletableFuture.completedFuture(java.lang.Boolean.FALSE)
 

@@ -18,7 +18,6 @@ import org.scalatestplus.mockito.MockitoSugar
 import scala.collection.JavaConverters._
 
 class ResultSpec extends FunSpec with MockitoSugar with Matchers {
-
   type F[A] = Either[Throwable, A]
 
   def interpreter[M[_], A](implicit H: Handler[M]): ResultOp ~> M = H

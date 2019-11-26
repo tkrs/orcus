@@ -6,7 +6,6 @@ import org.apache.hadoop.hbase.util.Bytes
 import org.scalatest.FunSuite
 
 class RowDecoderTest extends FunSuite {
-
   case class Foo(c1: Bar, c2: Option[Baz])
   case class Bar(a: Int, b: String, c: Option[Double])
   case class Baz(d: Long, e: Boolean, f: Float, g: BigDecimal)

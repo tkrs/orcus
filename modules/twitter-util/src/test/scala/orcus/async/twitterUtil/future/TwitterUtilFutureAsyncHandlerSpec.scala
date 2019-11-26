@@ -9,7 +9,6 @@ import org.scalatest.FunSpec
 import scala.concurrent.CancellationException
 
 class TwitterUtilFutureAsyncHandlerSpec extends FunSpec with AsyncSpec {
-
   describe("AsyncHandler[Future]") {
     it("should get a value as-is when its CompletableFuture is succeed") {
       def run = Par[CompletableFuture, Future].parallel(CompletableFuture.completedFuture(10))

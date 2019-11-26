@@ -15,7 +15,6 @@ import org.mockito.ArgumentMatchers._
 import scala.collection.JavaConverters._
 
 class ResultSpec extends FunSpec with MockitoSugar with Matchers {
-
   type F[A] = Either[Throwable, A]
 
   describe("getRow") {
@@ -240,7 +239,6 @@ class ResultSpec extends FunSpec with MockitoSugar with Matchers {
       assert(v === Some(foo))
     }
     it("should convert to typed Map obtained from getFamilyMap") {
-
       val m   = mock[Result]
       val cfn = Bytes.toBytes("1")
 

@@ -19,5 +19,4 @@ trait CodecSpec {
       .setValue(v)
       .build()
   }
-
 }

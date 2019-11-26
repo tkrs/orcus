@@ -12,7 +12,6 @@ import org.scalatest.{FunSpec, Matchers}
 import org.scalatestplus.mockito.MockitoSugar
 
 class ResultScannerSpec extends FunSpec with MockitoSugar with Matchers {
-
   type F[A] = Either[Throwable, A]
 
   def interpreter[M[_], A](implicit H: Handler[M]): ResultScannerOp ~> M = H

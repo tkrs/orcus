@@ -7,6 +7,7 @@ private[effect] trait AsyncHandlerInstances {
 
   implicit def handleEffect[F[_]](implicit F: Effect[F]): AsyncHandler[F] =
     new AsyncHandler[F] {
+
       def handle[A](callback: Callback[A], cancel: => Unit): F[A] =
         F.async(callback)
     }

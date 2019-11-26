@@ -34,6 +34,7 @@ trait FreeMain extends IOApp with LazyLogging {
 
   final val tableName: TableName = TableName.valueOf("novelist")
   final val keyPrefix: String    = "novel"
+
   final val novels = Map(
     "Ryunosuke Akutagawa" -> List(
       Novel(Work("Rashomon", LocalDate.of(1915, 11, 1))),
@@ -63,7 +64,6 @@ trait FreeMain extends IOApp with LazyLogging {
     implicit
     tableOps: TableOps[F]
   ): Free[F, Unit] = {
-
     def mkPut(author: String, novel: Novel) = {
       val ts     = System.currentTimeMillis()
       val rowKey = novel.work.key(keyPrefix, author)
@@ -88,7 +88,6 @@ trait FreeMain extends IOApp with LazyLogging {
     tableOps: TableOps[F],
     resultScannerOps: ResultScannerOps[F]
   ): Free[F, Seq[Result]] = {
-
     def mkScan =
       new Scan()
         .setRowPrefixFilter(Bytes.toBytes(keyPrefix))
@@ -156,11 +155,13 @@ trait FreeMain extends IOApp with LazyLogging {
 }
 
 object HBaseMain extends FreeMain {
+
   def getConnection: IO[AsyncConnection] =
     Par[CompletableFuture, IO].parallel(ConnectionFactory.createAsyncConnection())
 }
 
 object BigtableMain extends FreeMain {
+
   def getConnection: IO[AsyncConnection] = {
     val projectId  = sys.props.getOrElse("bigtable.project-id", "fake")
     val instanceId = sys.props.getOrElse("bigtable.instance-id", "fake")
@@ -169,9 +170,11 @@ object BigtableMain extends FreeMain {
 }
 
 final case class Work(name: String, releaseDate: LocalDate)
+
 object Work {
 
   implicit class WorkOps(val a: Work) extends AnyVal {
+
     def key(prefix: String, author: String): Array[Byte] = {
       val b = StringBuilder.newBuilder
       val v = b.append(prefix).append(Long.MaxValue - a.releaseDate.toEpochDay).append(author).append(a.name)

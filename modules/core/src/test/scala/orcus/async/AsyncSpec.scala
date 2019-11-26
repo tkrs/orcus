@@ -18,5 +18,4 @@ trait AsyncSpec { _: TestSuite =>
     CompletableFuture.supplyAsync(new Supplier[A] {
       def get(): A = blocking { Thread.sleep(Int.MaxValue); fail() }
     })
-
 }

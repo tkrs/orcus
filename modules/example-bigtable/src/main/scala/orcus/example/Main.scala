@@ -19,6 +19,7 @@ import org.apache.hadoop.hbase.util.Bytes
 import scala.util.control.NonFatal
 
 object Main extends IOApp {
+
   private[this] val dataSettings = {
     if (sys.env.contains("BIGTABLE_EMULATOR_HOST"))
       BigtableDataSettings.newBuilder().setProjectId("fake").setInstanceId("fake").build()

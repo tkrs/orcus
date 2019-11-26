@@ -5,7 +5,6 @@ import org.apache.hadoop.hbase.util.Bytes
 import org.scalatest.FlatSpec
 
 class PutFamilyEncoderSpec extends FlatSpec {
-
   it should "encode to Put from family's Map" in {
     val row = Bytes.toBytes("row")
     val cf  = Bytes.toBytes("cf")
