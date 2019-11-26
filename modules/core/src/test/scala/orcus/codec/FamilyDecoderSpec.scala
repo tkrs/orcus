@@ -7,7 +7,6 @@ import org.apache.hadoop.hbase.util.Bytes
 import org.scalatest.FunSuite
 
 class FamilyDecoderSpec extends FunSuite {
-
   test("pure") {
     val f = FamilyDecoder.pure(10)
     assert(f(new ju.TreeMap) === Right(10))

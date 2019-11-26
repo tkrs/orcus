@@ -15,6 +15,7 @@ trait Decoder[A] extends Serializable { self =>
   def apply(result: Result): Either[Throwable, A]
 
   def flatMap[B](f: A => Decoder[B]): Decoder[B] = new Decoder[B] {
+
     def apply(result: Result): Either[Throwable, B] = self(result) match {
       case Right(a)    => f(a)(result)
       case l @ Left(_) => l.asInstanceOf[Either[Throwable, B]]
@@ -22,6 +23,7 @@ trait Decoder[A] extends Serializable { self =>
   }
 
   def map[B](f: A => B): Decoder[B] = new Decoder[B] {
+
     def apply(result: Result): Either[Throwable, B] = self(result) match {
       case Right(a)    => Right(f(a))
       case l @ Left(_) => l.asInstanceOf[Either[Throwable, B]]
@@ -29,6 +31,7 @@ trait Decoder[A] extends Serializable { self =>
   }
 
   def mapF[B](f: A => Either[Throwable, B]): Decoder[B] = new Decoder[B] {
+
     def apply(result: Result): Either[Throwable, B] = self(result) match {
       case Right(a)    => f(a)
       case l @ Left(_) => l.asInstanceOf[Either[Throwable, B]]
@@ -37,7 +40,6 @@ trait Decoder[A] extends Serializable { self =>
 }
 
 object Decoder extends HighPriorityDecoder {
-
   @inline def apply[A](implicit A: Decoder[A]): Decoder[A] = A
 
   def pure[A](a: A): Decoder[A] = new Decoder[A] {
@@ -57,6 +59,7 @@ trait HighPriorityDecoder extends LowPriorityDecoder {
 
   implicit def decodeOption[A](implicit A: Decoder[A]): Decoder[Option[A]] =
     new Decoder[Option[A]] {
+
       def apply(result: Result): Either[Throwable, Option[A]] =
         if (result.isEmpty) Right(None)
         else
@@ -116,6 +119,7 @@ trait LowPriorityDecoder {
     T: Lazy[Decoder[T]]
   ): Decoder[FieldType[K, H] :: T] =
     new Decoder[FieldType[K, H] :: T] {
+
       def apply(result: Result): Either[Throwable, FieldType[K, H] :: T] =
         T.value(result) match {
           case Right(t) =>
@@ -135,6 +139,7 @@ trait LowPriorityDecoder {
     A: Lazy[Decoder[H]]
   ): Decoder[A] =
     new Decoder[A] {
+
       def apply(result: Result): Either[Throwable, A] =
         A.value(result) match {
           case Right(v) => Right(gen.from(v))

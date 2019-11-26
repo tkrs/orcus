@@ -17,7 +17,6 @@ object RowDecoder extends RowDecoder1 {
 }
 
 trait RowDecoder1 extends RowDecoder2 {
-
   implicit val decodeRowAsRow: RowDecoder[CRow] = row => Right(row)
 
   implicit def decodeRowAsMap[V, M[_, _] <: Map[String, V]](
@@ -55,7 +54,6 @@ trait RowDecoder1 extends RowDecoder2 {
 }
 
 trait RowDecoder2 {
-
   import shapeless._
   import shapeless.labelled._
 
@@ -137,7 +135,6 @@ trait FamilyDecoder1 extends FamilyDecoder2 {
 }
 
 trait FamilyDecoder2 {
-
   import shapeless._
   import shapeless.labelled._
 

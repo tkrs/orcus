@@ -7,7 +7,6 @@ import orcus.free.TableOp
 import orcus.table.AsyncTableT
 
 object table {
-
   trait Handler[M[_]] extends (TableOp ~> Kleisli[M, AsyncTableT, ?])
 
   object Handler {
@@ -20,6 +19,7 @@ object table {
       asyncHandlerM: AsyncHandler[M]
     ): Handler[M] =
       new Handler[M] {
+
         def apply[A](fa: TableOp[A]): Kleisli[M, AsyncTableT, A] = fa match {
           case GetName          => kleisli(getName[M])
           case GetConfiguration => kleisli(getConfiguration[M])

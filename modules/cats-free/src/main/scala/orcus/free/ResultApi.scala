@@ -38,25 +38,35 @@ sealed trait ResultOp[A]
 object ResultOp {
   final case class GetRow(result: Result)   extends ResultOp[Option[Array[Byte]]]
   final case class RawCells(result: Result) extends ResultOp[Seq[Cell]]
+
   final case class GetColumnCells(result: Result, family: Array[Byte], qualifier: Array[Byte])
       extends ResultOp[Seq[Cell]]
+
   final case class GetColumnLatestCell(result: Result, family: Array[Byte], qualifier: Array[Byte])
       extends ResultOp[Option[Cell]]
+
   final case class Get[A: ValueCodec](result: Result, family: Array[Byte], qualifier: Array[Byte])
       extends ResultOp[Option[A]] {
+
     def run[M[_]](implicit M: MonadError[M, Throwable]): M[Option[A]] =
       orcus.result.get[A, M](result, family, qualifier)
   }
+
   final case class GetValue(result: Result, family: Array[Byte], qualifier: Array[Byte])
       extends ResultOp[Option[Array[Byte]]]
+
   final case class GetValueAsByteBuffer(result: Result, family: Array[Byte], qualifier: Array[Byte])
       extends ResultOp[Option[ByteBuffer]]
+
   final case class GetFamily[A: FamilyDecoder](result: Result, family: Array[Byte]) extends ResultOp[A] {
+
     def run[M[_]](implicit M: MonadError[M, Throwable]): M[A] =
       orcus.result.getFamily[A, M](result, family)
   }
   final case class GetFamilyMap(result: Result, family: Array[Byte]) extends ResultOp[Map[Array[Byte], Array[Byte]]]
+
   final case class To[A: Decoder](result: Result) extends ResultOp[A] {
+
     def run[M[_]](implicit M: MonadError[M, Throwable]): M[A] =
       orcus.result.to[A, M](result)
   }

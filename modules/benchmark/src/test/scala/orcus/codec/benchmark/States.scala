@@ -32,6 +32,7 @@ object States {
   ) extends Columns
 
   object Columns10 {
+
     def fromResult(cf: Array[Byte], r: Result): Columns10 =
       Columns10(
         Bytes.toInt(r.getValue(cf, Bytes.toBytes("a01"))),
@@ -81,6 +82,7 @@ object States {
   ) extends Columns
 
   object Columns30 {
+
     def fromResult(cf: Array[Byte], r: Result): Columns30 =
       Columns30(
         Bytes.toInt(r.getValue(cf, Bytes.toBytes("a01"))),
@@ -159,5 +161,4 @@ object States {
     lazy val encode10: PutEncoder[Table[Columns10]] = PutEncoder[Table[Columns10]]
     lazy val encode30: PutEncoder[Table[Columns30]] = PutEncoder[Table[Columns30]]
   }
-
 }

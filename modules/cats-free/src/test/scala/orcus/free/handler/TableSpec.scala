@@ -34,7 +34,6 @@ import scala.concurrent.duration._
 import scala.concurrent.{Await, Future}
 
 class TableSpec extends FunSpec with MockitoSugar with Matchers {
-
   type F[A] = Future[A]
 
   def interpreter[M[_]](implicit H: Handler[M]): Handler[M] = H

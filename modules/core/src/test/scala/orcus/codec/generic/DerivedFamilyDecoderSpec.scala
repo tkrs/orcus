@@ -7,7 +7,6 @@ import org.apache.hadoop.hbase.util.Bytes
 import org.scalatest.FlatSpec
 
 class DerivedFamilyDecoderSpec extends FlatSpec {
-
   case class Foo(a: Int)
 
   it should "decode a case class" in {

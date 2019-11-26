@@ -7,7 +7,6 @@ import orcus.async.{AsyncSpec, Par}
 import org.scalatest.FunSpec
 
 class CatsEffectHandlerSpec extends FunSpec with AsyncSpec {
-
   describe("AsyncHandler[Effect[F]") {
     it("should get a value as-is when its CompletableFuture is succeed") {
       def run = Par[CompletableFuture, IO].parallel(CompletableFuture.completedFuture(10))

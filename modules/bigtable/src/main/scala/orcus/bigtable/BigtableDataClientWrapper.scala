@@ -17,7 +17,6 @@ class BigtableDataClientWrapper[F[_]](client: BigtableDataClient)(
   F: MonadError[F, Throwable],
   parF: Par.Aux[ApiFuture, F]
 ) {
-
   private[this] val adapter = BigtableDataClientAdapter
 
   def readRowAsync[A: RowDecoder](query: Query): F[Option[A]] =
@@ -50,7 +49,6 @@ class BigtableDataClientWrapperK[F[_]]()(
   F: MonadError[F, Throwable],
   parF: Par.Aux[ApiFuture, F]
 ) {
-
   private[this] val adapter = BigtableDataClientAdapter
 
   def readRowAsync[A: RowDecoder](query: Query): Kleisli[F, BigtableDataClient, Option[A]] =
@@ -82,7 +80,6 @@ class BigtableDataClientWrapperK[F[_]]()(
 }
 
 object BigtableDataClientAdapter {
-
   import cats.implicits._
 
   def readRowAsync[F[_], A: RowDecoder](

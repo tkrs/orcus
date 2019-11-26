@@ -32,6 +32,7 @@ abstract private[free] class ResultScannerOps0[M[_]](implicit inj: InjectK[Resul
 class ResultScannerOps[M[_]](implicit inj: InjectK[ResultScannerOp, M]) extends ResultScannerOps0[M]
 
 object ResultScannerOps {
+
   implicit def resultScannerOps[M[_]](implicit inj: InjectK[ResultScannerOp, M]): ResultScannerOps[M] =
     new ResultScannerOps
 }

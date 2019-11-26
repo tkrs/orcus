@@ -4,7 +4,6 @@ import cats.{~>, MonadError}
 import orcus.free.ResultOp
 
 object result {
-
   trait Handler[M[_]] extends (ResultOp ~> M)
 
   object Handler {
@@ -16,6 +15,7 @@ object result {
       ME: MonadError[M, Throwable]
     ): Handler[M] =
       new Handler[M] {
+
         override def apply[A](fa: ResultOp[A]): M[A] = fa match {
           case GetRow(result) =>
             getRow[M](result)

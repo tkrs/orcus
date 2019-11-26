@@ -5,7 +5,6 @@ import org.apache.hadoop.hbase.util.Bytes
 import org.scalatest.FlatSpec
 
 class PutEncoderSpec extends FlatSpec {
-
   case class X(a: A, b: B, c: C, d: D)
   case class A(x: Int)
   case class B(y: String)

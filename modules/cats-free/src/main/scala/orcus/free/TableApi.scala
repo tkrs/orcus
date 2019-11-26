@@ -51,7 +51,9 @@ object TableOp {
   final case class Delete(a: HDelete)       extends TableOp[Unit]
   final case class Append(a: HAppend)       extends TableOp[HResult]
   final case class Increment(a: HIncrement) extends TableOp[HResult]
+
   final case class Batch(a: Seq[_ <: Row]) extends TableOp[Seq[BatchResult]] {
+
     def run[M[_]](t: AsyncTableT)(
       implicit
       apErrorM: ApplicativeError[M, Throwable],
@@ -103,6 +105,7 @@ abstract private[free] class TableOps0[M[_]](implicit inj: InjectK[TableOp, M]) 
 class TableOps[M[_]](implicit inj: InjectK[TableOp, M]) extends TableOps0[M]
 
 object TableOps {
+
   implicit def tableApiOps[M[_]](implicit inj: InjectK[TableOp, M]): TableOps[M] =
     new TableOps
 }

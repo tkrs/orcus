@@ -1,17 +1,16 @@
-package orcus.async
-package monix
+package orcus.async.monix
 
 import java.util.concurrent.{CompletableFuture, CompletionException}
 
 import _root_.monix.eval.Task
 import _root_.monix.execution.Scheduler.Implicits.global
+import orcus.async.{AsyncSpec, Par}
 import org.scalatest.FunSpec
 
 import scala.concurrent.duration._
 import scala.concurrent.{Await, TimeoutException}
 
 class MonixTaskAsyncHandlerSpec extends FunSpec with AsyncSpec {
-
   describe("AsyncHandler[Task]") {
     it("should get a value as-is when its CompletableFuture is succeed") {
       def run = Par[CompletableFuture, Task].parallel(CompletableFuture.completedFuture(10)).runToFuture

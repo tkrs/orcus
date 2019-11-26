@@ -6,7 +6,6 @@ import org.apache.hadoop.hbase.util.Bytes
 import org.scalatest.FlatSpec
 
 class DerivedPutFamilyEncoderSpec extends FlatSpec {
-
   case class Foo(a: Int, b: String, c: Double)
 
   it should "encode to Put from case class" in {

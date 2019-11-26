@@ -7,7 +7,6 @@ import org.scalatestplus.mockito.MockitoSugar
 import org.mockito.Mockito._
 
 class ResultScannerSpec extends FunSpec with MockitoSugar with Matchers {
-
   type F[A] = Either[Throwable, A]
 
   describe("nextOne") {

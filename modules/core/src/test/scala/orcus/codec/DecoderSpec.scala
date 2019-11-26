@@ -10,7 +10,6 @@ import org.scalatest.FlatSpec
 import scala.collection.JavaConverters._
 
 class DecoderSpec extends FlatSpec with CodecSpec {
-
   "decodeMapLike" should "decode the nested map" in {
     val cells = Seq(
       cell("row", "cf1", "a", Bytes.toBytes("a")),

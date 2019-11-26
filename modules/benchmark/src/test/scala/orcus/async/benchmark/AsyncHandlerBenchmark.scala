@@ -1,16 +1,16 @@
-package orcus.async
-package benchmark
+package orcus.async.benchmark
 
 import java.util.concurrent._
 import java.util.function.Supplier
 
-import cats.Traverse
-import cats.instances.vector._
-import org.openjdk.jmh.annotations._
-import com.twitter.util.{Await => TAwait, Future => TFuture}
-import _root_.monix.execution.Scheduler
 import _root_.monix.eval.Task
+import _root_.monix.execution.Scheduler
+import cats.Traverse
 import cats.effect.{ContextShift, IO}
+import cats.instances.vector._
+import com.twitter.util.{Await => TAwait, Future => TFuture}
+import orcus.async.Par
+import org.openjdk.jmh.annotations._
 
 import scala.concurrent.{ExecutionContext, Await => SAwait, Future => SFuture}
 import scala.util.Random
@@ -37,7 +37,6 @@ import scala.util.Random
   )
 )
 abstract class AsyncHandlerBenchmark {
-
   final val Xs: Vector[Int] = Vector.range(1, 50)
   final val Rnd: Random     = new Random
 
@@ -47,6 +46,7 @@ abstract class AsyncHandlerBenchmark {
   var backgroundService: ExecutorService = _
 
   def daemonThreadFactory: ThreadFactory = new ThreadFactory {
+
     def newThread(r: Runnable): Thread = {
       val t = new Thread(r)
       t.setDaemon(true)
@@ -78,6 +78,7 @@ abstract class AsyncHandlerBenchmark {
 
 class CatsAsyncHandler extends AsyncHandlerBenchmark {
   import orcus.async.catsEffect.concurrent._
+
   import scala.concurrent.duration._
 
   implicit val ec: ExecutionContext =
@@ -95,6 +96,7 @@ class CatsAsyncHandler extends AsyncHandlerBenchmark {
 
 class MonixAsyncHandler extends AsyncHandlerBenchmark {
   import orcus.async.monix._
+
   import scala.concurrent.duration._
 
   implicit val scheduler: Scheduler = Scheduler.computation()
@@ -110,6 +112,7 @@ class MonixAsyncHandler extends AsyncHandlerBenchmark {
 class ScalaAsyncHandler extends AsyncHandlerBenchmark {
   import cats.instances.future._
   import orcus.async.future._
+
   import scala.concurrent.duration._
 
   implicit val ec: ExecutionContext =
@@ -125,8 +128,9 @@ class ScalaAsyncHandler extends AsyncHandlerBenchmark {
 
 class ScalaJavaConverter extends AsyncHandlerBenchmark {
   import cats.instances.future._
-  import scala.concurrent.duration._
+
   import scala.compat.java8.FutureConverters._
+  import scala.concurrent.duration._
 
   implicit val ec: ExecutionContext =
     ExecutionContext.fromExecutorService(Executors.newWorkStealingPool())

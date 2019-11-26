@@ -20,7 +20,6 @@ import scala.concurrent.duration._
 import scala.collection.JavaConverters._
 
 class TableSpec extends FunSpec with MockitoSugar with Matchers {
-
   describe("getName") {
     it("should return table name") {
       val m = mock[AsyncTable[ScanResultConsumer]]
@@ -230,5 +229,4 @@ class TableSpec extends FunSpec with MockitoSugar with Matchers {
       verify(m).batchAll[Result](rows.asJava)
     }
   }
-
 }

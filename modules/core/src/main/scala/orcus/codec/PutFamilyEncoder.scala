@@ -10,7 +10,6 @@ trait PutFamilyEncoder[A] {
 }
 
 object PutFamilyEncoder extends HighPriorityPutFamilyEncoder {
-
   @inline def apply[A](implicit A: PutFamilyEncoder[A]): PutFamilyEncoder[A] = A
 }
 
@@ -21,6 +20,7 @@ trait HighPriorityPutFamilyEncoder extends LowPriorityPutFamilyEncoder {
     H: ValueCodec[K],
     V: ValueCodec[V]
   ): PutFamilyEncoder[Map[K, V]] = new PutFamilyEncoder[Map[K, V]] {
+
     def apply(acc: Put, cf: Array[Byte], a: Map[K, V]): Put = {
       a.foreach {
         case (k, v) =>
@@ -44,6 +44,7 @@ trait LowPriorityPutFamilyEncoder {
     T: Lazy[PutFamilyEncoder[T]]
   ): PutFamilyEncoder[FieldType[K, H] :: T] =
     new PutFamilyEncoder[FieldType[K, H] :: T] {
+
       def apply(acc: Put, cf: Array[Byte], a: FieldType[K, H] :: T): Put =
         T.value(acc, cf, a.tail).addColumn(cf, Bytes.toBytes(K.value.name), H.encode(a.head))
     }
@@ -53,6 +54,7 @@ trait LowPriorityPutFamilyEncoder {
     gen: LabelledGeneric.Aux[A, R],
     R: Lazy[PutFamilyEncoder[R]]
   ): PutFamilyEncoder[A] = new PutFamilyEncoder[A] {
+
     def apply(acc: Put, cf: Array[Byte], a: A): Put =
       R.value(acc, cf, gen.to(a))
   }

@@ -16,6 +16,7 @@ trait FamilyDecoder[A] { self =>
   def apply(map: NMap[Array[Byte], Array[Byte]]): Either[Throwable, A]
 
   def flatMap[B](f: A => FamilyDecoder[B]): FamilyDecoder[B] = new FamilyDecoder[B] {
+
     def apply(map: NMap[Array[Byte], Array[Byte]]): Either[Throwable, B] =
       self(map) match {
         case Right(a)    => f(a)(map)
@@ -24,6 +25,7 @@ trait FamilyDecoder[A] { self =>
   }
 
   def map[B](f: A => B): FamilyDecoder[B] = new FamilyDecoder[B] {
+
     def apply(map: NMap[Array[Byte], Array[Byte]]): Either[Throwable, B] =
       self(map) match {
         case Right(a)    => Right(f(a))
@@ -32,6 +34,7 @@ trait FamilyDecoder[A] { self =>
   }
 
   def mapF[B](f: A => Either[Throwable, B]): FamilyDecoder[B] = new FamilyDecoder[B] {
+
     def apply(map: NMap[Array[Byte], Array[Byte]]): Either[Throwable, B] =
       self(map) match {
         case Right(a)    => f(a)
@@ -41,15 +44,16 @@ trait FamilyDecoder[A] { self =>
 }
 
 object FamilyDecoder extends HighPriorityFamilyDecoder {
-
   @inline def apply[A](implicit A: FamilyDecoder[A]): FamilyDecoder[A] = A
 
   def pure[A](a: A): FamilyDecoder[A] = new FamilyDecoder[A] {
+
     def apply(map: NMap[Array[Byte], Array[Byte]]): Either[Throwable, A] =
       Right(a)
   }
 
   def eval[A](a: Eval[A]): FamilyDecoder[A] = new FamilyDecoder[A] {
+
     def apply(map: NMap[Array[Byte], Array[Byte]]): Either[Throwable, A] =
       Right(a.value)
   }
@@ -66,6 +70,7 @@ trait HighPriorityFamilyDecoder extends LowPriorityFamilyDecoder {
     A: FamilyDecoder[A]
   ): FamilyDecoder[Option[A]] =
     new FamilyDecoder[Option[A]] {
+
       def apply(map: NMap[Array[Byte], Array[Byte]]): Either[Throwable, Option[A]] =
         if (map == null || map.isEmpty)
           Right(None)
@@ -129,6 +134,7 @@ trait LowPriorityFamilyDecoder {
     T: Lazy[FamilyDecoder[T]]
   ): FamilyDecoder[FieldType[K, H] :: T] =
     new FamilyDecoder[FieldType[K, H] :: T] {
+
       def apply(map: NMap[Array[Byte], Array[Byte]]): Either[Throwable, FieldType[K, H] :: T] =
         T.value(map) match {
           case Right(t) =>
@@ -146,6 +152,7 @@ trait LowPriorityFamilyDecoder {
     A: Lazy[FamilyDecoder[H]]
   ): FamilyDecoder[A] =
     new FamilyDecoder[A] {
+
       def apply(map: NMap[Array[Byte], Array[Byte]]): Either[Throwable, A] =
         A.value(map) match {
           case Right(v) => Right(gen.from(v))
