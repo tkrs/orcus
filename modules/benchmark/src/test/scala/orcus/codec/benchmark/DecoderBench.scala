@@ -3,6 +3,7 @@ package orcus.codec.benchmark
 import java.util.concurrent.TimeUnit
 
 import orcus.codec.Decoder
+import orcus.codec.auto._
 import org.apache.hadoop.hbase.util.Bytes
 import org.openjdk.jmh.annotations._
 

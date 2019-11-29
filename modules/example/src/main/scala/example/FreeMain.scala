@@ -13,7 +13,8 @@ import com.typesafe.scalalogging.LazyLogging
 import orcus.admin
 import orcus.async.Par
 import orcus.async.catsEffect.concurrent._
-import orcus.codec.{PutEncoder, ValueCodec}
+import orcus.codec.{Decoder, FamilyDecoder, PutEncoder, ValueCodec}
+import orcus.codec.semiauto._
 import orcus.free.handler.result.{Handler => ResultHandler}
 import orcus.free.handler.resultScanner.{Handler => ResultScannerHandler}
 import orcus.free.handler.table.{Handler => TableHandler}
@@ -173,6 +174,11 @@ final case class Work(name: String, releaseDate: LocalDate)
 
 object Work {
 
+  implicit val releaseDateCodec: orcus.codec.ValueCodec[LocalDate] =
+    ValueCodec[Long].imap(_.toEpochDay, LocalDate.ofEpochDay)
+
+  implicit val decodeWork: FamilyDecoder[Work] = derivedFamilyDecoder[Work]
+
   implicit class WorkOps(val a: Work) extends AnyVal {
 
     def key(prefix: String, author: String): Array[Byte] = {
@@ -184,6 +190,10 @@ object Work {
 }
 
 final case class Novel(work: Work)
+
+object Novel {
+  implicit val decodeNovel: Decoder[Novel] = derivedDecoder[Novel]
+}
 
 object Syntax {
 

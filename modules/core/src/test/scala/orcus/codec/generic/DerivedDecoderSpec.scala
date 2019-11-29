@@ -1,7 +1,8 @@
 package orcus.codec.generic
 
 import cats.syntax.option._
-import orcus.codec.{CodecSpec, Decoder}
+import orcus.codec.semiauto._
+import orcus.codec.{CodecSpec, Decoder, FamilyDecoder}
 import org.apache.hadoop.hbase.client.Result
 import org.apache.hadoop.hbase.util.Bytes
 import org.apache.hadoop.hbase.{Cell, CellBuilderType, ExtendedCellBuilderFactory}
@@ -10,20 +11,29 @@ import org.scalatest.FlatSpec
 import scala.collection.JavaConverters._
 
 class DerivedDecoderSpec extends FlatSpec with CodecSpec {
-  it should "decode a nested case class" in {
-    case class All(
-      a: Option[Int] = None,
-      b: Option[Float] = None,
-      c: Option[Long] = None,
-      d: Option[Double] = None,
-      e: Option[String] = None,
-      g: Option[Boolean] = None,
-      h: Option[Short] = None,
-      i: Option[BigDecimal] = None
-    )
-    case class Table(cf1: All)
 
-    val f   = Decoder[Table]
+  case class All(
+    a: Option[Int] = None,
+    b: Option[Float] = None,
+    c: Option[Long] = None,
+    d: Option[Double] = None,
+    e: Option[String] = None,
+    g: Option[Boolean] = None,
+    h: Option[Short] = None,
+    i: Option[BigDecimal] = None
+  )
+
+  object All {
+    implicit val decodeAll: FamilyDecoder[All] = derivedFamilyDecoder[All]
+  }
+  case class Table0(cf1: All)
+
+  object Table0 {
+    implicit val decodeTable: Decoder[Table0] = derivedDecoder
+  }
+
+  it should "decode a nested case class" in {
+    val f   = Decoder[Table0]
     val row = Bytes.toBytes("row")
     val cf1 = Bytes.toBytes("cf1")
 
@@ -52,7 +62,7 @@ class DerivedDecoderSpec extends FlatSpec with CodecSpec {
 
     val result = Result.create(cells)
     val expected = Right(
-      Table(
+      Table0(
         cf1 = All(
           1.some,
           1.1f.some,
@@ -69,14 +79,22 @@ class DerivedDecoderSpec extends FlatSpec with CodecSpec {
     assert(f(result) === expected)
   }
 
-  it should "fail decode when the require property is absent" in {
-    case class Foo(
-      a: Short,
-      b: String
-    )
-    case class Table(cf: Foo)
+  case class Foo(
+    a: Short,
+    b: String
+  )
 
-    val f = Decoder[Table]
+  object Foo {
+    implicit val decode: FamilyDecoder[Foo] = derivedFamilyDecoder[Foo]
+  }
+  case class Table1(cf: Foo)
+
+  object Table1 {
+    implicit val decode: Decoder[Table1] = derivedDecoder[Table1]
+  }
+
+  it should "fail decode when the require property is absent" in {
+    val f = Decoder[Table1]
 
     val cells = Seq(
       cell("row", "fc", "a", Bytes.toBytes(1)),

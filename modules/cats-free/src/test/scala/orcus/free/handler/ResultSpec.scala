@@ -5,6 +5,7 @@ import java.util
 
 import cats.instances.either._
 import cats.~>
+import orcus.codec.auto._
 import orcus.free.handler.result.Handler
 import orcus.free.{ResultOp, ResultOps}
 import org.apache.hadoop.hbase.Cell
@@ -194,6 +195,7 @@ class ResultSpec extends FunSpec with MockitoSugar with Matchers {
       it("should take the value successfully") {
         case class Bar(x: Option[String], y: Option[Int])
         case class Foo(a: Option[Bar])
+
         val m = mock[Result]
 
         val value = new util.TreeMap[Array[Byte], Array[Byte]](Bytes.BYTES_COMPARATOR)
