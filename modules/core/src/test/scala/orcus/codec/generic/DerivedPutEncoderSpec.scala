@@ -1,12 +1,17 @@
 package orcus.codec.generic
 
 import orcus.codec.PutEncoder
+import orcus.codec.semiauto._
 import org.apache.hadoop.hbase.client.Put
 import org.apache.hadoop.hbase.util.Bytes
 import org.scalatest.FlatSpec
 
 class DerivedPutEncoderSpec extends FlatSpec {
   case class X(a: A, b: B, c: C, d: D)
+
+  object X {
+    implicit val encodeX: PutEncoder[X] = derivedPutEncoder[X]
+  }
   case class A(x: Int)
   case class B(y: String)
   case class C(z: Long)

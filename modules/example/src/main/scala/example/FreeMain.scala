@@ -30,9 +30,6 @@ import scala.concurrent.duration._
 trait FreeMain extends IOApp with LazyLogging {
   import Syntax._
 
-  implicit val releaseDateCodec: orcus.codec.ValueCodec[LocalDate] =
-    ValueCodec[Long].imap(_.toEpochDay, LocalDate.ofEpochDay)
-
   final val tableName: TableName = TableName.valueOf("novelist")
   final val keyPrefix: String    = "novel"
 
@@ -192,7 +189,12 @@ object Work {
 final case class Novel(work: Work)
 
 object Novel {
-  implicit val decodeNovel: Decoder[Novel] = derivedDecoder[Novel]
+
+  implicit val releaseDateCodec: orcus.codec.ValueCodec[LocalDate] =
+    ValueCodec[Long].imap(_.toEpochDay, LocalDate.ofEpochDay)
+
+  implicit val decodeNovel: Decoder[Novel]       = derivedDecoder[Novel]
+  implicit val encodePutNovel: PutEncoder[Novel] = derivedPutEncoder[Novel]
 }
 
 object Syntax {
