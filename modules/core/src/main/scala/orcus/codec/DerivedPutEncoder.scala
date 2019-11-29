@@ -9,7 +9,6 @@ trait DerivedPutEncoder[A] extends PutEncoder[A]
 object DerivedPutEncoder extends DerivedPutEncoder1
 
 trait DerivedPutEncoder1 {
-
   implicit val encodeHNil: DerivedPutEncoder[HNil] = (acc, _) => acc
 
   implicit def encodeLabelledHCons[K <: Symbol, H, T <: HList](

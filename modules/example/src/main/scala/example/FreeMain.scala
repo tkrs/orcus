@@ -13,12 +13,12 @@ import com.typesafe.scalalogging.LazyLogging
 import orcus.admin
 import orcus.async.Par
 import orcus.async.catsEffect.concurrent._
-import orcus.codec.{Decoder, FamilyDecoder, PutEncoder, ValueCodec}
 import orcus.codec.semiauto._
+import orcus.codec._
+import orcus.free._
 import orcus.free.handler.result.{Handler => ResultHandler}
 import orcus.free.handler.resultScanner.{Handler => ResultScannerHandler}
 import orcus.free.handler.table.{Handler => TableHandler}
-import orcus.free.{ResultOp, ResultOps, ResultScannerOp, ResultScannerOps, TableOp, TableOps}
 import orcus.table.AsyncTableT
 import org.apache.hadoop.hbase.TableName
 import org.apache.hadoop.hbase.client._
@@ -174,7 +174,8 @@ object Work {
   implicit val releaseDateCodec: orcus.codec.ValueCodec[LocalDate] =
     ValueCodec[Long].imap(_.toEpochDay, LocalDate.ofEpochDay)
 
-  implicit val decodeWork: FamilyDecoder[Work] = derivedFamilyDecoder[Work]
+  implicit val encodeWork: PutFamilyEncoder[Work] = derivedPutFamilyEncoder[Work]
+  implicit val decodeWork: FamilyDecoder[Work]    = derivedFamilyDecoder[Work]
 
   implicit class WorkOps(val a: Work) extends AnyVal {
 
@@ -189,10 +190,6 @@ object Work {
 final case class Novel(work: Work)
 
 object Novel {
-
-  implicit val releaseDateCodec: orcus.codec.ValueCodec[LocalDate] =
-    ValueCodec[Long].imap(_.toEpochDay, LocalDate.ofEpochDay)
-
   implicit val decodeNovel: Decoder[Novel]       = derivedDecoder[Novel]
   implicit val encodePutNovel: PutEncoder[Novel] = derivedPutEncoder[Novel]
 }

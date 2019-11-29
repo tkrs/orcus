@@ -1,9 +1,6 @@
 package orcus.codec
 
 import org.apache.hadoop.hbase.client.Put
-import org.apache.hadoop.hbase.util.Bytes
-import shapeless._
-import shapeless.labelled.FieldType
 
 trait PutEncoder[A] {
   def apply(acc: Put, a: A): Put

@@ -1,6 +1,6 @@
 package orcus.codec.generic
 
-import orcus.codec.PutEncoder
+import orcus.codec.{PutEncoder, PutFamilyEncoder}
 import orcus.codec.semiauto._
 import org.apache.hadoop.hbase.client.Put
 import org.apache.hadoop.hbase.util.Bytes
@@ -10,12 +10,32 @@ class DerivedPutEncoderSpec extends FlatSpec {
   case class X(a: A, b: B, c: C, d: D)
 
   object X {
-    implicit val encodeX: PutEncoder[X] = derivedPutEncoder[X]
+    implicit val encode: PutEncoder[X] = derivedPutEncoder[X]
   }
+
   case class A(x: Int)
+
+  object A {
+    implicit val encode: PutFamilyEncoder[A] = derivedPutFamilyEncoder[A]
+  }
+
   case class B(y: String)
+
+  object B {
+    implicit val encode: PutFamilyEncoder[B] = derivedPutFamilyEncoder[B]
+  }
+
   case class C(z: Long)
+
+  object C {
+    implicit val encode: PutFamilyEncoder[C] = derivedPutFamilyEncoder[C]
+  }
+
   case class D(w: Option[Long])
+
+  object D {
+    implicit val encode: PutFamilyEncoder[D] = derivedPutFamilyEncoder[D]
+  }
 
   it should "encode to Put from case class" in {
     val row = Bytes.toBytes("row")
