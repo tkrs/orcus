@@ -190,6 +190,7 @@ lazy val `cats-free` = project
 lazy val bigtable = project
   .in(file("modules/bigtable"))
   .settings(publishSettings)
+  .settings(crossVersionSharedSources)
   .settings(
     description := "orcus bigtable",
     moduleName := "orcus-bigtable"
