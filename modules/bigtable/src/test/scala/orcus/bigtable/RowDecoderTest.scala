@@ -4,6 +4,7 @@ import com.google.cloud.bigtable.data.v2.models.RowCell
 import com.google.protobuf.ByteString
 import org.apache.hadoop.hbase.util.Bytes
 import org.scalatest.FunSuite
+import orcus.bigtable.codec.RowDecoder
 
 class RowDecoderTest extends FunSuite {
   case class Foo(c1: Bar, c2: Option[Baz])

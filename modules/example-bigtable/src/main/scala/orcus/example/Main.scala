@@ -13,7 +13,8 @@ import com.google.cloud.bigtable.data.v2.{BigtableDataClient, BigtableDataSettin
 import com.google.protobuf.ByteString
 import orcus.async.catsEffect.effect._
 import orcus.bigtable.async.implicits._
-import orcus.bigtable.{BigtableDataClientWrapper, PrimitiveDecoder}
+import orcus.bigtable.BigtableDataClientWrapper
+import orcus.bigtable.codec.PrimitiveDecoder
 import org.apache.hadoop.hbase.util.Bytes
 
 import scala.util.control.NonFatal

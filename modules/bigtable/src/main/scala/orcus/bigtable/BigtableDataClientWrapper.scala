@@ -7,6 +7,7 @@ import com.google.api.gax.rpc.{ResponseObserver, StreamController}
 import com.google.cloud.bigtable.data.v2.BigtableDataClient
 import com.google.cloud.bigtable.data.v2.models._
 import orcus.async.Par
+import orcus.bigtable.codec.RowDecoder
 
 import scala.annotation.tailrec
 import scala.collection.JavaConverters._
