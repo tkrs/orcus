@@ -4,6 +4,7 @@ import java.nio.ByteBuffer
 import java.util
 
 import cats.instances.either._
+import orcus.codec.auto._
 import org.apache.hadoop.hbase.Cell
 import org.apache.hadoop.hbase.client.Result
 import org.apache.hadoop.hbase.util.Bytes

@@ -1,14 +1,28 @@
-package orcus.bigtable
+package orcus.bigtable.codec
 
 import com.google.cloud.bigtable.data.v2.models.RowCell
 import com.google.protobuf.ByteString
+import orcus.bigtable.CRow
+import orcus.bigtable.codec.semiauto._
 import org.apache.hadoop.hbase.util.Bytes
 import org.scalatest.FunSuite
 
 class RowDecoderTest extends FunSuite {
   case class Foo(c1: Bar, c2: Option[Baz])
+
+  object Foo {
+    implicit val decode: RowDecoder[Foo] = derivedRowDecoder[Foo]
+  }
   case class Bar(a: Int, b: String, c: Option[Double])
+
+  object Bar {
+    implicit val decode: FamilyDecoder[Bar] = derivedFamilyDecoder[Bar]
+  }
   case class Baz(d: Long, e: Boolean, f: Float, g: BigDecimal)
+
+  object Baz {
+    implicit val decode: FamilyDecoder[Baz] = derivedFamilyDecoder[Baz]
+  }
 
   test("decodeFoo") {
     val ts = System.currentTimeMillis() * 1000L

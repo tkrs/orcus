@@ -12,8 +12,10 @@ import com.google.cloud.bigtable.data.v2.models.{Filters, Query, RowMutation}
 import com.google.cloud.bigtable.data.v2.{BigtableDataClient, BigtableDataSettings}
 import com.google.protobuf.ByteString
 import orcus.async.catsEffect.effect._
+import orcus.bigtable.BigtableDataClientWrapper
 import orcus.bigtable.async.implicits._
-import orcus.bigtable.{BigtableDataClientWrapper, PrimitiveDecoder}
+import orcus.bigtable.codec.semiauto._
+import orcus.bigtable.codec.{FamilyDecoder, PrimitiveDecoder, RowDecoder}
 import org.apache.hadoop.hbase.util.Bytes
 
 import scala.util.control.NonFatal
@@ -101,12 +103,6 @@ object Main extends IOApp {
   private def runRead(dataClient: BigtableDataClient): IO[Unit] =
     readRows(dataClient).map(_.map(_.toString)).map(_.foreach(println(_)))
 
-  implicit val decodeTags: PrimitiveDecoder[List[String]] = bs =>
-    try if (bs == null) Right(Nil) else Right(Bytes.toString(bs.toByteArray).split(",").toList.map(_.trim))
-    catch {
-      case NonFatal(e) => Left(e)
-    }
-
   private def readRows(dataClient: BigtableDataClient): IO[List[(String, CPU)]] = {
     val wrapped = new BigtableDataClientWrapper[IO](dataClient)
 
@@ -122,4 +118,20 @@ object Main extends IOApp {
 
 final case class CPU(metric: Metric)
 
+object CPU {
+  implicit val decode: RowDecoder[CPU] = derivedRowDecoder[CPU]
+}
+
 final case class Metric(percentage: Int, tags: List[String])
+
+object Metric {
+
+  implicit val decodeTags: PrimitiveDecoder[List[String]] = bs =>
+    try if (bs == null) Right(Nil)
+    else Right(Bytes.toString(bs.toByteArray).split(",").toList.map(_.trim))
+    catch {
+      case NonFatal(e) => Left(e)
+    }
+
+  implicit val decode: FamilyDecoder[Metric] = derivedFamilyDecoder[Metric]
+}
