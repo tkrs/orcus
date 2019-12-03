@@ -4,8 +4,8 @@ import java.util.concurrent.CompletableFuture
 import java.util.regex.Pattern
 
 import cats.instances.future._
-import orcus.async._
-import orcus.async.future._
+import orcus.async.implicits._
+import orcus.async.instances.future._
 import org.apache.hadoop.hbase.client._
 import org.apache.hadoop.hbase.util.Bytes
 import org.apache.hadoop.hbase.{NamespaceDescriptor, ServerName, TableName}
@@ -19,7 +19,6 @@ import scala.concurrent.duration._
 import scala.concurrent.{Await, Future}
 
 class AdminSpec extends FlatSpec with MockitoSugar {
-
   def voidFuture: CompletableFuture[Void] =
     CompletableFuture.runAsync(new Runnable {
       def run(): Unit = ()

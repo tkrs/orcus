@@ -11,7 +11,7 @@ import com.google.cloud.ServiceOptions
 import com.google.cloud.bigtable.data.v2.models.{Filters, Query, RowMutation}
 import com.google.cloud.bigtable.data.v2.{BigtableDataClient, BigtableDataSettings}
 import com.google.protobuf.ByteString
-import orcus.async.catsEffect.effect._
+import orcus.async.instances.catsEffect.effect._
 import orcus.bigtable.BigtableDataClientWrapper
 import orcus.bigtable.async.implicits._
 import orcus.bigtable.codec.semiauto._

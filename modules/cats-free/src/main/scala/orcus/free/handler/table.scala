@@ -3,6 +3,7 @@ package orcus.free.handler
 import cats.{~>, ApplicativeError}
 import cats.data.Kleisli
 import orcus.async._
+import orcus.async.implicits._
 import orcus.free.TableOp
 import orcus.table.AsyncTableT
 

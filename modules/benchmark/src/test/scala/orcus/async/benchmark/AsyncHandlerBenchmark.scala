@@ -9,7 +9,8 @@ import cats.Traverse
 import cats.effect.{ContextShift, IO}
 import cats.instances.vector._
 import com.twitter.util.{Await => TAwait, Future => TFuture}
-import orcus.async.Par
+import orcus.async._
+import orcus.async.implicits._
 import org.openjdk.jmh.annotations._
 
 import scala.concurrent.{ExecutionContext, Await => SAwait, Future => SFuture}
@@ -46,7 +47,6 @@ abstract class AsyncHandlerBenchmark {
   var backgroundService: ExecutorService = _
 
   def daemonThreadFactory: ThreadFactory = new ThreadFactory {
-
     def newThread(r: Runnable): Thread = {
       val t = new Thread(r)
       t.setDaemon(true)
@@ -76,8 +76,8 @@ abstract class AsyncHandlerBenchmark {
   }
 }
 
-class CatsAsyncHandler extends AsyncHandlerBenchmark {
-  import orcus.async.catsEffect.concurrent._
+class CatsEffectAsyncHandler extends AsyncHandlerBenchmark {
+  import orcus.async.instances.catsEffect.concurrent._
 
   import scala.concurrent.duration._
 
@@ -94,8 +94,8 @@ class CatsAsyncHandler extends AsyncHandlerBenchmark {
   }
 }
 
-class MonixAsyncHandler extends AsyncHandlerBenchmark {
-  import orcus.async.monix._
+class MonixTaskAsyncHandler extends AsyncHandlerBenchmark {
+  import orcus.async.instances.monix.task._
 
   import scala.concurrent.duration._
 
@@ -109,9 +109,9 @@ class MonixAsyncHandler extends AsyncHandlerBenchmark {
   }
 }
 
-class ScalaAsyncHandler extends AsyncHandlerBenchmark {
+class ScalaFutureAsyncHandler extends AsyncHandlerBenchmark {
   import cats.instances.future._
-  import orcus.async.future._
+  import orcus.async.instances.future._
 
   import scala.concurrent.duration._
 
@@ -142,10 +142,10 @@ class ScalaJavaConverter extends AsyncHandlerBenchmark {
   }
 }
 
-class TwitterAsyncHandler extends AsyncHandlerBenchmark {
+class TwitterFutureAsyncHandler extends AsyncHandlerBenchmark {
   import com.twitter.conversions.DurationOps._
   import io.catbird.util._
-  import orcus.async.twitterUtil.future._
+  import orcus.async.instances.twitterUtil.future._
 
   @Benchmark
   def bench: Vector[Int] = {

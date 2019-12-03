@@ -6,7 +6,6 @@ import org.scalatest.{FunSuite, Matchers}
 import org.scalatestplus.scalacheck.Checkers
 
 class ValueCodecSpec extends FunSuite with Checkers with Matchers {
-
   private def _roundTrip[A: ValueCodec](a: A): Boolean = {
     val encoded        = ValueCodec[A].encode(a)
     val Right(decoded) = ValueCodec[A].decode(encoded)
