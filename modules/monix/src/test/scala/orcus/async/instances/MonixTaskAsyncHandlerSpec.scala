@@ -1,10 +1,12 @@
-package orcus.async.monix
+package orcus.async.instances
 
 import java.util.concurrent.{CompletableFuture, CompletionException}
 
 import _root_.monix.eval.Task
 import _root_.monix.execution.Scheduler.Implicits.global
 import orcus.async.{AsyncSpec, Par}
+import orcus.async.implicits._
+import orcus.async.instances.monix.task._
 import org.scalatest.FunSpec
 
 import scala.concurrent.duration._

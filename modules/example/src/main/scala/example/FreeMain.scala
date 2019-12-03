@@ -11,10 +11,11 @@ import cats.~>
 import com.google.cloud.bigtable.hbase.BigtableConfiguration
 import com.typesafe.scalalogging.LazyLogging
 import orcus.admin
-import orcus.async.Par
-import orcus.async.catsEffect.concurrent._
-import orcus.codec.semiauto._
+import orcus.async._
+import orcus.async.implicits._
+import orcus.async.instances.catsEffect.concurrent._
 import orcus.codec._
+import orcus.codec.semiauto._
 import orcus.free._
 import orcus.free.handler.result.{Handler => ResultHandler}
 import orcus.free.handler.resultScanner.{Handler => ResultScannerHandler}

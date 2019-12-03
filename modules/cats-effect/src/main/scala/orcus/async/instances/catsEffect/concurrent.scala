@@ -1,0 +1,3 @@
+package orcus.async.instances.catsEffect
+
+object concurrent extends AsyncHandlerConcurrentEffectInstances

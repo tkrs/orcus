@@ -5,7 +5,7 @@ import java.{lang => jl}
 
 import cats.instances.future._
 import orcus.BatchResult
-import orcus.async.future._
+import orcus.async.instances.future._
 import orcus.free.handler.table.Handler
 import orcus.free.{TableOp, TableOps}
 import org.apache.hadoop.conf.Configuration

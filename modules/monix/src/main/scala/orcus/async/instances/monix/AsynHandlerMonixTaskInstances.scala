@@ -1,11 +1,11 @@
-package orcus.async.monix
+package orcus.async.instances.monix
 
 import _root_.monix.eval.Task
-import orcus.async.{AsyncHandler, Callback}
+import orcus.async.AsyncHandler
 
-private[monix] trait AsynHandlerInstances {
+private[monix] trait AsynHandlerMonixTaskInstances {
   implicit val handleMonixTask: AsyncHandler[Task] = new AsyncHandler[Task] {
-    def handle[A](callback: Callback[A], cancel: => Unit): Task[A] =
+    def handle[A](callback: AsyncHandler.Callback[A], cancel: => Unit): Task[A] =
       Task
         .cancelable0[A] { (scheduler, cb) =>
           scheduler.execute(new Runnable {

@@ -12,7 +12,6 @@ import org.openjdk.jmh.annotations._
 import scala.collection.JavaConverters._
 
 object States {
-
   final case class Table[+A](
     cf1: A
   )
@@ -33,7 +32,6 @@ object States {
   ) extends Columns
 
   object Columns10 {
-
     def fromResult(cf: Array[Byte], r: Result): Columns10 =
       Columns10(
         Bytes.toInt(r.getValue(cf, Bytes.toBytes("a01"))),
@@ -83,7 +81,6 @@ object States {
   ) extends Columns
 
   object Columns30 {
-
     def fromResult(cf: Array[Byte], r: Result): Columns30 =
       Columns30(
         Bytes.toInt(r.getValue(cf, Bytes.toBytes("a01"))),
@@ -121,7 +118,6 @@ object States {
 
   @State(Scope.Thread)
   class Data {
-
     @Param(Array("10", "30"))
     var size: Int = _
 

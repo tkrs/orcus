@@ -11,7 +11,6 @@ import org.scalatest.FlatSpec
 import scala.collection.JavaConverters._
 
 class DerivedDecoderSpec extends FlatSpec with CodecSpec {
-
   case class All(
     a: Option[Int] = None,
     b: Option[Float] = None,

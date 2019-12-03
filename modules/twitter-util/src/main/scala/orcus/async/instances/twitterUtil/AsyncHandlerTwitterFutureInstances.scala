@@ -1,12 +1,12 @@
-package orcus.async.twitterUtil.future
+package orcus.async.instances.twitterUtil
 
 import com.twitter.util.{Future, Promise}
-import orcus.async.{AsyncHandler, Callback}
+import orcus.async.AsyncHandler
 
-private[future] trait AsyncHandlerInstances {
+private[twitterUtil] trait AsyncHandlerTwitterFutureInstances {
   implicit val handleTwitterUtilFuture: AsyncHandler[Future] =
     new AsyncHandler[Future] {
-      def handle[A](callback: Callback[A], cancel: => Unit): Future[A] = {
+      def handle[A](callback: AsyncHandler.Callback[A], cancel: => Unit): Future[A] = {
         val p = Promise[A]
 
         p.setInterruptHandler {

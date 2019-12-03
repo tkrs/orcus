@@ -3,6 +3,8 @@ package orcus.async.future
 import java.util.concurrent.{CompletableFuture, CompletionException}
 
 import orcus.async.{AsyncSpec, Par}
+import orcus.async.implicits._
+import orcus.async.instances.future._
 import org.scalatest.FunSpec
 
 import scala.concurrent.duration._

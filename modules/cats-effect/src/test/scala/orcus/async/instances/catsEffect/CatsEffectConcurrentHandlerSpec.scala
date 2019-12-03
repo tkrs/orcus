@@ -1,9 +1,11 @@
-package orcus.async.catsEffect.concurrent
+package orcus.async.instances.catsEffect
 
 import java.util.concurrent.{CompletableFuture, CompletionException}
 
 import cats.effect.{ContextShift, IO, Timer}
 import orcus.async._
+import orcus.async.implicits._
+import concurrent._
 import org.scalatest.FunSpec
 
 import scala.concurrent._

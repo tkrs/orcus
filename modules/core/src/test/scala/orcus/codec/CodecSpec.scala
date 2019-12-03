@@ -4,7 +4,6 @@ import org.apache.hadoop.hbase.util.Bytes
 import org.apache.hadoop.hbase.{Cell, CellBuilderType, ExtendedCellBuilderFactory}
 
 trait CodecSpec {
-
   def cell(row: String, cf: String, q: String, v: Array[Byte]): Cell =
     cell(row, Bytes.toBytes(cf), Bytes.toBytes(q), v)
 

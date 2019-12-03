@@ -1,9 +1,11 @@
-package orcus.async.catsEffect.effect
+package orcus.async.instances.catsEffect
 
 import java.util.concurrent.{CompletableFuture, CompletionException}
 
 import cats.effect.IO
-import orcus.async.{AsyncSpec, Par}
+import orcus.async._
+import orcus.async.implicits._
+import effect._
 import org.scalatest.FunSpec
 
 class CatsEffectHandlerSpec extends FunSpec with AsyncSpec {
