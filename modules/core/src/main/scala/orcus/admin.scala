@@ -27,7 +27,6 @@ import scala.collection.JavaConverters._
 // import scala.compat.java8.FunctionConverters._
 
 object admin {
-
   def tableExists[F[_]](t: AsyncAdmin, tableName: TableName)(
     implicit
     M: Functor[F],

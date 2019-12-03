@@ -15,7 +15,6 @@ object resultScanner {
       ME: MonadError[M, Throwable]
     ): Handler[M] =
       new Handler[M] {
-
         override def apply[A](fa: ResultScannerOp[A]): M[A] = fa match {
           case NextOne(rs) => nextOne[M](rs)
           case Next(rs, i) => next[M](rs, i)

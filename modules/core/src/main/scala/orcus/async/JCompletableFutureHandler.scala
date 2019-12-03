@@ -6,7 +6,6 @@ import java.util.function.BiConsumer
 import cats.~>
 
 trait JCompletableFutureHandler {
-
   implicit def handleJavaCompletableFuture[F[_]](implicit F: AsyncHandler[F]): Par.Aux[CompletableFuture, F] =
     new Par[CompletableFuture] {
       type G[α] = F[α]

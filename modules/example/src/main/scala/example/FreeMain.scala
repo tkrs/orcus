@@ -153,13 +153,11 @@ trait FreeMain extends IOApp with LazyLogging {
 }
 
 object HBaseMain extends FreeMain {
-
   def getConnection: IO[AsyncConnection] =
     Par[CompletableFuture, IO].parallel(ConnectionFactory.createAsyncConnection())
 }
 
 object BigtableMain extends FreeMain {
-
   def getConnection: IO[AsyncConnection] = {
     val projectId  = sys.props.getOrElse("bigtable.project-id", "fake")
     val instanceId = sys.props.getOrElse("bigtable.instance-id", "fake")
@@ -170,7 +168,6 @@ object BigtableMain extends FreeMain {
 final case class Work(name: String, releaseDate: LocalDate)
 
 object Work {
-
   implicit val releaseDateCodec: orcus.codec.ValueCodec[LocalDate] =
     ValueCodec[Long].imap(_.toEpochDay, LocalDate.ofEpochDay)
 
@@ -178,7 +175,6 @@ object Work {
   implicit val decodeWork: FamilyDecoder[Work]    = derivedFamilyDecoder[Work]
 
   implicit class WorkOps(val a: Work) extends AnyVal {
-
     def key(prefix: String, author: String): Array[Byte] = {
       val b = StringBuilder.newBuilder
       val v = b.append(prefix).append(Long.MaxValue - a.releaseDate.toEpochDay).append(author).append(a.name)
@@ -195,7 +191,6 @@ object Novel {
 }
 
 object Syntax {
-
   implicit final class Nat[F[_], G[_]](val nat: F ~> G) extends AnyVal {
     def liftF[E]: F ~> Kleisli[G, E, ?] = λ[F ~> Kleisli[G, E, ?]](fa => Kleisli(_ => nat(fa)))
   }

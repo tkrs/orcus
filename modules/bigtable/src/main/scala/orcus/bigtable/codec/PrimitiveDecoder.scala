@@ -14,7 +14,6 @@ object PrimitiveDecoder extends PrimitiveDecoder1 {
 }
 
 trait PrimitiveDecoder1 {
-
   implicit val decodeString: PrimitiveDecoder[String] = bs =>
     try Right(bs.toStringUtf8)
     catch {

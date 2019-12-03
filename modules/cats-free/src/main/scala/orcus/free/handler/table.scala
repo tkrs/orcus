@@ -19,7 +19,6 @@ object table {
       asyncHandlerM: AsyncHandler[M]
     ): Handler[M] =
       new Handler[M] {
-
         def apply[A](fa: TableOp[A]): Kleisli[M, AsyncTableT, A] = fa match {
           case GetName          => kleisli(getName[M])
           case GetConfiguration => kleisli(getConfiguration[M])

@@ -21,7 +21,6 @@ import org.apache.hadoop.hbase.util.Bytes
 import scala.util.control.NonFatal
 
 object Main extends IOApp {
-
   private[this] val dataSettings = {
     if (sys.env.contains("BIGTABLE_EMULATOR_HOST"))
       BigtableDataSettings.newBuilder().setProjectId("fake").setInstanceId("fake").build()
@@ -125,7 +124,6 @@ object CPU {
 final case class Metric(percentage: Int, tags: List[String])
 
 object Metric {
-
   implicit val decodeTags: PrimitiveDecoder[List[String]] = bs =>
     try if (bs == null) Right(Nil)
     else Right(Bytes.toString(bs.toByteArray).split(",").toList.map(_.trim))

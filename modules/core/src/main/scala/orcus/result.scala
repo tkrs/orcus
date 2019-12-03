@@ -10,7 +10,6 @@ import org.apache.hadoop.hbase.client.Result
 import scala.collection.JavaConverters._
 
 object result {
-
   def getRow[M[_]](r: Result)(
     implicit
     M: Applicative[M]

@@ -12,7 +12,6 @@ trait Decoder[A] extends Serializable { self =>
   def apply(result: Result): Either[Throwable, A]
 
   def flatMap[B](f: A => Decoder[B]): Decoder[B] = new Decoder[B] {
-
     def apply(result: Result): Either[Throwable, B] = self(result) match {
       case Right(a)    => f(a)(result)
       case l @ Left(_) => l.asInstanceOf[Either[Throwable, B]]
@@ -20,7 +19,6 @@ trait Decoder[A] extends Serializable { self =>
   }
 
   def map[B](f: A => B): Decoder[B] = new Decoder[B] {
-
     def apply(result: Result): Either[Throwable, B] = self(result) match {
       case Right(a)    => Right(f(a))
       case l @ Left(_) => l.asInstanceOf[Either[Throwable, B]]
@@ -28,7 +26,6 @@ trait Decoder[A] extends Serializable { self =>
   }
 
   def mapF[B](f: A => Either[Throwable, B]): Decoder[B] = new Decoder[B] {
-
     def apply(result: Result): Either[Throwable, B] = self(result) match {
       case Right(a)    => f(a)
       case l @ Left(_) => l.asInstanceOf[Either[Throwable, B]]
@@ -53,10 +50,8 @@ object Decoder extends Decoder1 {
 }
 
 trait Decoder1 {
-
   implicit def decodeOption[A](implicit A: Decoder[A]): Decoder[Option[A]] =
     new Decoder[Option[A]] {
-
       def apply(result: Result): Either[Throwable, Option[A]] =
         if (result.isEmpty) Right(None)
         else
@@ -73,7 +68,6 @@ trait Decoder1 {
     factory: Factory[(String, V), M[String, V]]
   ): Decoder[M[String, V]] =
     new Decoder[M[String, V]] {
-
       def apply(result: Result): Either[Throwable, M[String, V]] = {
         val builder = factory.newBuilder
         val map     = result.getMap

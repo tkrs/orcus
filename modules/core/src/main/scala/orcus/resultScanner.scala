@@ -4,7 +4,6 @@ import cats.ApplicativeError
 import org.apache.hadoop.hbase.client.{Result, ResultScanner}
 
 object resultScanner {
-
   def nextOne[F[_]](resultScanner: ResultScanner)(
     implicit
     ME: ApplicativeError[F, Throwable]

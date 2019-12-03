@@ -14,7 +14,6 @@ object FamilyDecoder extends FamilyDecoder1 {
 }
 
 trait FamilyDecoder1 {
-
   implicit def decodeMap[K, V, M[_, _] <: Map[K, V]](
     implicit
     decodeK: PrimitiveDecoder[K],
