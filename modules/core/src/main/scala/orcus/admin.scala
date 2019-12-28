@@ -4,10 +4,12 @@ package orcus
 import java.util.concurrent.CompletableFuture
 import java.util.regex.Pattern
 
-import cats.{Applicative, Functor}
 import cats.syntax.apply._
+import cats.{Applicative, Functor}
 import orcus.async.Par
+import orcus.internal.Utils
 //import com.google.protobuf.RpcChannel
+import org.apache.hadoop.hbase.client._
 import org.apache.hadoop.hbase.{
 //  CacheEvictionStats,
 //  ClusterMetrics,
@@ -16,14 +18,12 @@ import org.apache.hadoop.hbase.{
   ServerName,
   TableName
 }
-import org.apache.hadoop.hbase.client._
 //import org.apache.hadoop.hbase.ClusterMetrics.{Option => CMOption}
 //import org.apache.hadoop.hbase.client.replication.TableCFs
 //import org.apache.hadoop.hbase.client.security.SecurityCapability
 //import org.apache.hadoop.hbase.quotas.{QuotaFilter, QuotaSettings}
 //import org.apache.hadoop.hbase.replication.{ReplicationPeerConfig, ReplicationPeerDescription}
 
-import scala.collection.JavaConverters._
 // import scala.compat.java8.FunctionConverters._
 
 object admin {
@@ -39,35 +39,35 @@ object admin {
     M: Functor[F],
     F: Par.Aux[CompletableFuture, F]
   ): F[Seq[TableDescriptor]] =
-    M.map(F.parallel(t.listTableDescriptors(includeSysTables)))(_.asScala.toSeq)
+    M.map(F.parallel(t.listTableDescriptors(includeSysTables)))(Utils.toSeq)
 
   def listTableDescriptorsByPattern[F[_]](t: AsyncAdmin, pattern: Pattern, includeSysTables: Boolean = false)(
     implicit
     M: Functor[F],
     F: Par.Aux[CompletableFuture, F]
   ): F[Seq[TableDescriptor]] =
-    M.map(F.parallel(t.listTableDescriptors(pattern, includeSysTables)))(_.asScala.toSeq)
+    M.map(F.parallel(t.listTableDescriptors(pattern, includeSysTables)))(Utils.toSeq)
 
   def listTableDescriptorsByNamespace[F[_]](t: AsyncAdmin, namespace: String)(
     implicit
     M: Functor[F],
     F: Par.Aux[CompletableFuture, F]
   ): F[Seq[TableDescriptor]] =
-    M.map(F.parallel(t.listTableDescriptorsByNamespace(namespace)))(_.asScala.toSeq)
+    M.map(F.parallel(t.listTableDescriptorsByNamespace(namespace)))(Utils.toSeq)
 
   def listTableNames[F[_]](t: AsyncAdmin, includeSysTables: Boolean)(
     implicit
     M: Functor[F],
     F: Par.Aux[CompletableFuture, F]
   ): F[Seq[TableName]] =
-    M.map(F.parallel(t.listTableNames(includeSysTables)))(_.asScala.toSeq)
+    M.map(F.parallel(t.listTableNames(includeSysTables)))(Utils.toSeq)
 
   def listTableNamesByPattern[F[_]](t: AsyncAdmin, pattern: Pattern, includeSysTables: Boolean)(
     implicit
     M: Functor[F],
     F: Par.Aux[CompletableFuture, F]
   ): F[Seq[TableName]] =
-    M.map(F.parallel(t.listTableNames(pattern, includeSysTables)))(_.asScala.toSeq)
+    M.map(F.parallel(t.listTableNames(pattern, includeSysTables)))(Utils.toSeq)
 
   def getDescriptor[F[_]](t: AsyncAdmin, tableName: TableName)(
     implicit
@@ -211,21 +211,21 @@ object admin {
     M: Applicative[F],
     F: Par.Aux[CompletableFuture, F]
   ): F[Seq[NamespaceDescriptor]] =
-    M.map(F.parallel(t.listNamespaceDescriptors))(_.asScala.toSeq)
+    M.map(F.parallel(t.listNamespaceDescriptors))(Utils.toSeq)
 
   def getRegions[F[_]](t: AsyncAdmin, serverName: ServerName)(
     implicit
     M: Applicative[F],
     F: Par.Aux[CompletableFuture, F]
   ): F[Seq[RegionInfo]] =
-    M.map(F.parallel(t.getRegions(serverName)))(_.asScala.toSeq)
+    M.map(F.parallel(t.getRegions(serverName)))(Utils.toSeq)
 
   def getRegionsByTableName[F[_]](t: AsyncAdmin, tableName: TableName)(
     implicit
     M: Applicative[F],
     F: Par.Aux[CompletableFuture, F]
   ): F[Seq[RegionInfo]] =
-    M.map(F.parallel(t.getRegions(tableName)))(_.asScala.toSeq)
+    M.map(F.parallel(t.getRegions(tableName)))(Utils.toSeq)
 
   def flush[F[_]](t: AsyncAdmin, tableName: TableName)(
     implicit

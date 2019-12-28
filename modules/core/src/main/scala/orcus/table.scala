@@ -2,10 +2,11 @@ package orcus
 
 import java.util.concurrent.CompletableFuture
 
-import cats.{Applicative, ApplicativeError}
 import cats.data.Kleisli
+import cats.{Applicative, ApplicativeError}
 import orcus.async.Par
 import orcus.internal.ScalaVersionSpecifics._
+import orcus.internal.Utils
 import org.apache.hadoop.conf.{Configuration => HConfig}
 import org.apache.hadoop.hbase.client.{
   AsyncTable,
@@ -22,8 +23,6 @@ import org.apache.hadoop.hbase.client.{
   Scan => HScan
 }
 import org.apache.hadoop.hbase.{TableName => HTableName}
-
-import scala.collection.JavaConverters._
 
 object table {
   type AsyncTableT = AsyncTable[T] forSome { type T <: ScanResultConsumerBase }
@@ -65,7 +64,7 @@ object table {
     FE: ApplicativeError[F, Throwable],
     F: Par.Aux[CompletableFuture, F]
   ): F[Seq[HResult]] =
-    FE.map(F.parallel(t.scanAll(a)))(_.asScala.toSeq)
+    FE.map(F.parallel(t.scanAll(a)))(Utils.toSeq)
 
   def getScanner[F[_]](t: AsyncTableT, a: HScan)(
     implicit
@@ -99,7 +98,7 @@ object table {
     factoryC: Factory[BatchResult, C[BatchResult]]
   ): F[C[BatchResult]] = {
     val itr   = as.iterator
-    val itcfo = t.batch[Object](as.asJava).iterator.asScala
+    val itcfo = Utils.toIterator(t.batch[Object](Utils.toJavaList(as)))
     val itfb = itr
       .zip(itcfo.map(parF.parallel.apply))
       .map {
@@ -133,7 +132,7 @@ object table {
     F: Par.Aux[CompletableFuture, F],
     factory: Factory[Option[HResult], C[Option[HResult]]]
   ): F[C[Option[HResult]]] =
-    FE.map(F.parallel(t.batchAll[Object](as.asJava))) { xs =>
+    FE.map(F.parallel(t.batchAll[Object](Utils.toJavaList(as)))) { xs =>
       val it = xs.iterator
       val c  = factory.newBuilder
       while (it.hasNext) c += (it.next match { case r: HResult => Option(r); case null => None })

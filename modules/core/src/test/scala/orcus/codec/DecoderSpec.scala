@@ -3,19 +3,20 @@ package orcus.codec
 import java.util
 
 import cats.Eval
+import orcus.internal.Utils
 import org.apache.hadoop.hbase.client.Result
 import org.apache.hadoop.hbase.util.Bytes
 import org.scalatest.FlatSpec
 
-import scala.collection.JavaConverters._
-
 class DecoderSpec extends FlatSpec with CodecSpec {
   "decodeMapLike" should "decode the nested map" in {
-    val cells = Seq(
-      cell("row", "cf1", "a", Bytes.toBytes("a")),
-      cell("row", "cf1", "b", Bytes.toBytes("")),
-      cell("row", "cf1", "c", null)
-    ).asJava
+    val cells = Utils.toJavaList(
+      Seq(
+        cell("row", "cf1", "a", Bytes.toBytes("a")),
+        cell("row", "cf1", "b", Bytes.toBytes("")),
+        cell("row", "cf1", "c", null)
+      )
+    )
 
     val f        = Decoder[Map[String, Map[String, String]]]
     val expected = Right(Map("cf1" -> Map("a" -> "a", "b" -> "", "c" -> "")))
@@ -33,7 +34,7 @@ class DecoderSpec extends FlatSpec with CodecSpec {
     class E
     implicit val decodeE: FamilyDecoder[E] =
       (_: util.NavigableMap[Array[Byte], Array[Byte]]) => Left(expected)
-    val cells = Seq(cell("row", "cf1", "a", Bytes.toBytes("a"))).asJava
+    val cells = Utils.toJavaList(Seq(cell("row", "cf1", "a", Bytes.toBytes("a"))))
     val f     = Decoder[Map[String, E]]
 
     assert(f(Result.create(cells)) === Left(expected))
@@ -44,7 +45,7 @@ class DecoderSpec extends FlatSpec with CodecSpec {
     class E
     implicit val decodeE: Decoder[E] =
       (_: Result) => Left(expected)
-    val cells = Seq(cell("row", "cf1", "a", Bytes.toBytes("a"))).asJava
+    val cells = Utils.toJavaList(Seq(cell("row", "cf1", "a", Bytes.toBytes("a"))))
     val f     = Decoder[Option[E]]
 
     assert(f(Result.create(cells)) === Left(expected))

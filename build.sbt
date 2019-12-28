@@ -14,10 +14,10 @@ ThisBuild / libraryDependencies ++= Pkg.forTest ++ Seq(
   Pkg.hbase % Provided,
   compilerPlugin(Pkg.kindProjector)
 )
-ThisBuild / scalacOptions ++= compilerOptions ++ {
+ThisBuild / scalacOptions ++= compilerOptions ++ warnCompilerOptions ++ {
   CrossVersion.partialVersion(scalaVersion.value) match {
     case Some((2, n)) if n >= 13 => Nil
-    case _                       => warnCompilerOptions ++ Seq("-Ypartial-unification", "-Yno-adapted-args")
+    case _                       => List("-Xfuture", "-Ypartial-unification", "-Yno-adapted-args", "-Ywarn-inaccessible")
   }
 }
 ThisBuild / Test / fork := true
@@ -37,15 +37,10 @@ lazy val warnCompilerOptions = Seq(
   "-Xlint",
   "-Xcheckinit",
   "-Xfatal-warnings",
-  "-Xfuture",
   "-Ywarn-unused:_",
-  "-Ywarn-value-discard",
-  "-Ywarn-nullary-unit",
-  "-Ywarn-nullary-override",
   "-Ywarn-extra-implicit",
   "-Ywarn-dead-code",
-  "-Ywarn-numeric-widen",
-  "-Ywarn-inaccessible"
+  "-Ywarn-numeric-widen"
 )
 
 lazy val orcus = project

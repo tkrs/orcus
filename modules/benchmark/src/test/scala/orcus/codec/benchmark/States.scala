@@ -2,14 +2,13 @@ package orcus.codec.benchmark
 
 import java.{util => ju}
 
-import orcus.codec.{Decoder, PutEncoder}
 import orcus.codec.auto._
+import orcus.codec.{Decoder, PutEncoder}
+import orcus.internal.Utils
 import org.apache.hadoop.hbase.client.{Put, Result}
-import org.apache.hadoop.hbase.{Cell, CellBuilderType, ExtendedCellBuilderFactory}
 import org.apache.hadoop.hbase.util.Bytes
+import org.apache.hadoop.hbase.{Cell, CellBuilderType, ExtendedCellBuilderFactory}
 import org.openjdk.jmh.annotations._
-
-import scala.collection.JavaConverters._
 
 object States {
   final case class Table[+A](
@@ -127,7 +126,7 @@ object States {
     @Setup(Level.Iteration)
     def setup(): Unit = {
       val cs = (1 to size).map(i => cell(f"a$i%02d", Bytes.toBytes(i)))
-      cells = cs.asJava
+      cells = Utils.toJavaList(cs)
 
       map = Map("cf1" -> (1 to size).map(i => f"a$i%02d" -> i).toMap)
     }

@@ -8,9 +8,9 @@ import com.google.cloud.bigtable.data.v2.BigtableDataClient
 import com.google.cloud.bigtable.data.v2.models._
 import orcus.async.Par
 import orcus.bigtable.codec.RowDecoder
+import orcus.internal.Utils
 
 import scala.annotation.tailrec
-import scala.collection.JavaConverters._
 import scala.collection.mutable
 
 class BigtableDataClientWrapper[F[_]](client: BigtableDataClient)(
@@ -129,7 +129,7 @@ object BigtableDataClientAdapter {
     client: BigtableDataClient,
     tableId: String
   )(implicit F: Monad[F], parF: Par.Aux[ApiFuture, F]): F[List[KeyOffset]] =
-    parF.parallel(client.sampleRowKeysAsync(tableId)).map(_.asScala.toList)
+    parF.parallel(client.sampleRowKeysAsync(tableId)).map(Utils.toList)
 
   def mutateRowAsync[F[_]](client: BigtableDataClient, rowMutation: RowMutation)(
     implicit

@@ -5,15 +5,14 @@ import java.util
 
 import cats.instances.either._
 import orcus.codec.auto._
+import orcus.internal.Utils
 import org.apache.hadoop.hbase.Cell
 import org.apache.hadoop.hbase.client.Result
 import org.apache.hadoop.hbase.util.Bytes
+import org.mockito.ArgumentMatchers._
+import org.mockito.Mockito._
 import org.scalatest._
 import org.scalatestplus.mockito.MockitoSugar
-import org.mockito.Mockito._
-import org.mockito.ArgumentMatchers._
-
-import scala.collection.JavaConverters._
 
 class ResultSpec extends FunSpec with MockitoSugar with Matchers {
   type F[A] = Either[Throwable, A]
@@ -27,9 +26,11 @@ class ResultSpec extends FunSpec with MockitoSugar with Matchers {
 
       when(m.getRow).thenReturn(row)
 
-      val Right(Some(v)) = result.getRow[F](m)
+      val v = result
+        .getRow[F](m)
+        .map(_.map(_.array).map(Bytes.toString))
 
-      assert(expected === Bytes.toString(v))
+      assert(v === Right(Some(expected)))
       verify(m).getRow
     }
     it("should return empty when Result.getRow() returns null") {
@@ -37,9 +38,9 @@ class ResultSpec extends FunSpec with MockitoSugar with Matchers {
 
       when(m.getRow).thenReturn(null)
 
-      val Right(v) = result.getRow[F](m)
+      val v = result.getRow[F](m)
 
-      assert(v.isEmpty)
+      assert(v === Right(None))
       verify(m).getRow
     }
   }
@@ -51,9 +52,9 @@ class ResultSpec extends FunSpec with MockitoSugar with Matchers {
 
       when(m.rawCells()).thenReturn(cells)
 
-      val Right(v) = result.rawCells[F](m)
+      val v = result.rawCells[F](m)
 
-      assert(v === cells.toSeq)
+      assert(v === Right(cells.toSeq))
       verify(m).rawCells()
     }
     it("should return empty when Result.rawCells() returns null") {
@@ -62,9 +63,9 @@ class ResultSpec extends FunSpec with MockitoSugar with Matchers {
 
       when(m.rawCells()).thenReturn(cells)
 
-      val Right(v) = result.rawCells[F](m)
+      val v = result.rawCells[F](m)
 
-      assert(v.isEmpty)
+      assert(v === Right(Vector.empty))
       verify(m).rawCells()
     }
   }
@@ -75,13 +76,13 @@ class ResultSpec extends FunSpec with MockitoSugar with Matchers {
       val cfn = Bytes.toBytes("1")
       val cn  = Bytes.toBytes("2")
 
-      val cells = Iterator.continually(mock[Cell]).take(10).toList.asJava
+      val cells = Iterator.continually(mock[Cell]).take(10).toList
 
-      when(m.getColumnCells(cfn, cn)).thenReturn(cells)
+      when(m.getColumnCells(cfn, cn)).thenReturn(Utils.toJavaList(cells))
 
-      val Right(v) = result.getColumnCells[F](m, cfn, cn)
+      val v = result.getColumnCells[F](m, cfn, cn)
 
-      assert(v === cells.asScala)
+      assert(v === Right(cells))
       verify(m).getColumnCells(cfn, cn)
     }
   }
@@ -96,9 +97,9 @@ class ResultSpec extends FunSpec with MockitoSugar with Matchers {
 
       when(m.getColumnLatestCell(cfn, cn)).thenReturn(cell)
 
-      val Right(Some(v)) = result.getColumnLatestCell[F](m, cfn, cn)
+      val v = result.getColumnLatestCell[F](m, cfn, cn)
 
-      assert(v === cell)
+      assert(v === Right(Some(cell)))
       verify(m).getColumnLatestCell(cfn, cn)
     }
     it("should return empty when Result.getColumnLatestCell(Array[Byte], Array[Byte]) returns null") {
@@ -108,9 +109,9 @@ class ResultSpec extends FunSpec with MockitoSugar with Matchers {
 
       when(m.getColumnLatestCell(cfn, cn)).thenReturn(null)
 
-      val Right(v) = result.getColumnLatestCell[F](m, cfn, cn)
+      val v = result.getColumnLatestCell[F](m, cfn, cn)
 
-      assert(v.isEmpty)
+      assert(v === Right(None))
       verify(m).getColumnLatestCell(cfn, cn)
     }
   }
@@ -126,9 +127,9 @@ class ResultSpec extends FunSpec with MockitoSugar with Matchers {
 
       when(m.getValue(cfn, cn)).thenReturn(value)
 
-      val Right(Some(v)) = result.get[Double, F](m, cfn, cn)
+      val v = result.get[Double, F](m, cfn, cn)
 
-      assert(v === expected)
+      assert(v === Right(Some(expected)))
     }
   }
 
@@ -143,9 +144,11 @@ class ResultSpec extends FunSpec with MockitoSugar with Matchers {
 
       when(m.getValue(cfn, cn)).thenReturn(value)
 
-      val Right(Some(v)) = result.getValue[F](m, cfn, cn)
+      val v = result
+        .getValue[F](m, cfn, cn)
+        .map(_.map(Bytes.toString))
 
-      assert(Bytes.toString(v) === expected)
+      assert(v === Right(Some(expected)))
       verify(m).getValue(cfn, cn)
     }
     it("should return empty when Result.getValue(Array[Byte], Array[Byte]) returns null") {
@@ -155,9 +158,9 @@ class ResultSpec extends FunSpec with MockitoSugar with Matchers {
 
       when(m.getValue(cfn, cn)).thenReturn(null)
 
-      val Right(v) = result.getValue[F](m, cfn, cn)
+      val v = result.getValue[F](m, cfn, cn)
 
-      assert(v.isEmpty)
+      assert(v === Right(None))
       verify(m).getValue(cfn, cn)
     }
   }
@@ -173,9 +176,11 @@ class ResultSpec extends FunSpec with MockitoSugar with Matchers {
 
       when(m.getValueAsByteBuffer(cfn, cn)).thenReturn(value)
 
-      val Right(Some(v)) = result.getValueAsByteBuffer[F](m, cfn, cn)
+      val v = result
+        .getValueAsByteBuffer[F](m, cfn, cn)
+        .map(_.map(_.array()).map(Bytes.toString))
 
-      assert(Bytes.toString(v.array()) === expected)
+      assert(v === Right(Some(expected)))
       verify(m).getValueAsByteBuffer(cfn, cn)
     }
     it("should return empty when Result.getValueAsByteBuffer(Array[Byte], Array[Byte]) return null") {
@@ -185,9 +190,9 @@ class ResultSpec extends FunSpec with MockitoSugar with Matchers {
 
       when(m.getValueAsByteBuffer(cfn, cn)).thenReturn(null)
 
-      val Right(e) = result.getValueAsByteBuffer[F](m, cfn, cn)
+      val e = result.getValueAsByteBuffer[F](m, cfn, cn)
 
-      assert(e.isEmpty)
+      assert(e === Right(None))
       verify(m).getValueAsByteBuffer(cfn, cn)
     }
   }
@@ -201,9 +206,9 @@ class ResultSpec extends FunSpec with MockitoSugar with Matchers {
 
       when(m.getFamilyMap(cfn)).thenReturn(map)
 
-      val Right(v) = result.getFamilyMap[F](m, cfn)
+      val v = result.getFamilyMap[F](m, cfn)
 
-      assert(v === map.asScala.toMap)
+      assert(v === Right(Utils.toMap(map)))
       verify(m).getFamilyMap(cfn)
     }
     it("should return empty when Result.getFamilyMap(Array[Byte]) returns null") {
@@ -212,9 +217,9 @@ class ResultSpec extends FunSpec with MockitoSugar with Matchers {
 
       when(m.getFamilyMap(cfn)).thenReturn(null)
 
-      val Right(v) = result.getFamilyMap[F](m, cfn)
+      val v = result.getFamilyMap[F](m, cfn)
 
-      assert(v.isEmpty)
+      assert(v === Right(Map.empty))
       verify(m).getFamilyMap(cfn)
     }
   }
@@ -235,9 +240,9 @@ class ResultSpec extends FunSpec with MockitoSugar with Matchers {
 
       when(m.getFamilyMap(cfn)).thenReturn(map)
 
-      val Right(v) = result.getFamily[Option[Foo], F](m, cfn)
+      val v = result.getFamily[Option[Foo], F](m, cfn)
 
-      assert(v === Some(foo))
+      assert(v === Right(Some(foo)))
     }
     it("should convert to typed Map obtained from getFamilyMap") {
       val m   = mock[Result]
@@ -252,9 +257,9 @@ class ResultSpec extends FunSpec with MockitoSugar with Matchers {
 
       when(m.getFamilyMap(cfn)).thenReturn(map)
 
-      val Right(v) = result.getFamily[Map[Int, String], F](m, cfn)
+      val v = result.getFamily[Map[Int, String], F](m, cfn)
 
-      assert(v === foo)
+      assert(v === Right(foo))
     }
     it("should return empty when getFamilyMap returns null") {
       final case class Foo(x: Int, y: String, z: Boolean)
@@ -264,9 +269,9 @@ class ResultSpec extends FunSpec with MockitoSugar with Matchers {
 
       when(m.getFamilyMap(cfn)).thenReturn(null)
 
-      val Right(v) = result.getFamily[Option[Foo], F](m, cfn)
+      val v = result.getFamily[Option[Foo], F](m, cfn)
 
-      assert(v.isEmpty)
+      assert(v === Right(None))
     }
   }
 
@@ -289,9 +294,9 @@ class ResultSpec extends FunSpec with MockitoSugar with Matchers {
 
       when(m.getFamilyMap(any[Array[Byte]])).thenReturn(map)
 
-      val Right(v) = result.to[Option[Foo], F](m)
+      val v = result.to[Option[Foo], F](m)
 
-      assert(v === Some(Foo(bar, Some(quux))))
+      assert(v === Right(Some(Foo(bar, Some(quux)))))
     }
   }
 }

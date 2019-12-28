@@ -8,8 +8,8 @@ import orcus.BatchResult
 import orcus.async.instances.future._
 import orcus.free.handler.table.Handler
 import orcus.free.{TableOp, TableOps}
+import orcus.internal.Utils
 import org.apache.hadoop.conf.Configuration
-import org.apache.hadoop.hbase.TableName
 import org.apache.hadoop.hbase.client.{
   AsyncTable,
   Result,
@@ -23,12 +23,12 @@ import org.apache.hadoop.hbase.client.{
   Put => HPut,
   Scan => HScan
 }
+import org.apache.hadoop.hbase.TableName
 import org.apache.hadoop.hbase.util.Bytes
 import org.mockito.Mockito._
 import org.scalatest.{FunSpec, Matchers}
 import org.scalatestplus.mockito.MockitoSugar
 
-import scala.collection.JavaConverters._
 import scala.concurrent.ExecutionContext.Implicits.global
 import scala.concurrent.duration._
 import scala.concurrent.{Await, Future}
@@ -127,7 +127,7 @@ class TableSpec extends FunSpec with MockitoSugar with Matchers {
           mock[Result]
         )
 
-        when(m.scanAll(scan)).thenReturn(CompletableFuture.completedFuture(expected.asJava))
+        when(m.scanAll(scan)).thenReturn(CompletableFuture.completedFuture(Utils.toJavaList(expected)))
 
         val f = ops[TableOp].scanAll(scan).foldMap(interpreter[F]).run(m)
         val v = Await.result(f, 3.seconds)
@@ -243,15 +243,15 @@ class TableSpec extends FunSpec with MockitoSugar with Matchers {
           BatchResult.Error(new Exception("Unexpected class is returned: String"), new HGet(Bytes.toBytes("error")))
         )
 
-        when(m.batch[Object](a.asJava))
-          .thenReturn(returns.map {
+        when(m.batch[Object](Utils.toJavaList(a)))
+          .thenReturn(Utils.toJavaList(returns.map {
             case r: Exception =>
               val cf = new CompletableFuture[Object]
               cf.completeExceptionally(r)
               cf
             case r =>
               CompletableFuture.completedFuture(r)
-          }.asJava)
+          }))
 
         val f = ops[TableOp]
           .batch(a)

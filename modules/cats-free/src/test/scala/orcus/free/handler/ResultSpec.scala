@@ -8,6 +8,7 @@ import cats.~>
 import orcus.codec.auto._
 import orcus.free.handler.result.Handler
 import orcus.free.{ResultOp, ResultOps}
+import orcus.internal.Utils
 import org.apache.hadoop.hbase.Cell
 import org.apache.hadoop.hbase.client.Result
 import org.apache.hadoop.hbase.util.Bytes
@@ -15,8 +16,6 @@ import org.mockito.ArgumentMatchers._
 import org.mockito.Mockito._
 import org.scalatest.{FunSpec, Matchers}
 import org.scalatestplus.mockito.MockitoSugar
-
-import scala.collection.JavaConverters._
 
 class ResultSpec extends FunSpec with MockitoSugar with Matchers {
   type F[A] = Either[Throwable, A]
@@ -34,11 +33,12 @@ class ResultSpec extends FunSpec with MockitoSugar with Matchers {
         val _row = Bytes.toBytes(row)
         when(m.getRow).thenReturn(_row)
 
-        val Right(Some(v)) = ops[ResultOp]
+        val v = ops[ResultOp]
           .getRow(m)
           .foldMap(interpreter[F, Array[Byte]])
+          .map(_.map(_.array).map(Bytes.toString))
 
-        assert(Bytes.toString(v) === row)
+        assert(v === Right(Some(row)))
       }
     }
     describe("rawCells") {
@@ -49,11 +49,11 @@ class ResultSpec extends FunSpec with MockitoSugar with Matchers {
 
         when(m.rawCells()).thenReturn(cells.toArray[Cell])
 
-        val Right(v) = ops[ResultOp]
+        val v = ops[ResultOp]
           .rawCells(m)
           .foldMap(interpreter[F, Seq[Cell]])
 
-        assert(v === cells)
+        assert(v === Right(cells))
       }
     }
     describe("getColumnCells") {
@@ -66,13 +66,13 @@ class ResultSpec extends FunSpec with MockitoSugar with Matchers {
         val _family    = Bytes.toBytes(family)
         val _qualifier = Bytes.toBytes(qualifier)
 
-        when(m.getColumnCells(_family, _qualifier)).thenReturn(cells.asJava)
+        when(m.getColumnCells(_family, _qualifier)).thenReturn(Utils.toJavaList(cells))
 
-        val Right(v) = ops[ResultOp]
+        val v = ops[ResultOp]
           .getColumnCells(m, _family, _qualifier)
           .foldMap(interpreter[F, Seq[Cell]])
 
-        assert(v === cells)
+        assert(v === Right(cells))
       }
     }
     describe("getColumnLatestCell") {
@@ -87,11 +87,11 @@ class ResultSpec extends FunSpec with MockitoSugar with Matchers {
 
         when(m.getColumnLatestCell(_family, _qualifier)).thenReturn(cell)
 
-        val Right(Some(v)) = ops[ResultOp]
+        val v = ops[ResultOp]
           .getColumnLatestCell(m, _family, _qualifier)
           .foldMap(interpreter[F, Cell])
 
-        assert(v === cell)
+        assert(v === Right(Some(cell)))
       }
     }
     describe("get") {
@@ -107,11 +107,11 @@ class ResultSpec extends FunSpec with MockitoSugar with Matchers {
 
         when(m.getValue(_family, _qualifier)).thenReturn(_value)
 
-        val Right(Some(v)) = ops[ResultOp]
+        val v = ops[ResultOp]
           .get[String](m, _family, _qualifier)
           .foldMap(interpreter[F, String])
 
-        assert(v === value)
+        assert(v === Right(Some(value)))
       }
     }
     describe("getValue") {
@@ -127,11 +127,12 @@ class ResultSpec extends FunSpec with MockitoSugar with Matchers {
 
         when(m.getValue(_family, _qualifier)).thenReturn(_value)
 
-        val Right(Some(v)) = ops[ResultOp]
+        val v = ops[ResultOp]
           .getValue(m, _family, _qualifier)
           .foldMap(interpreter[F, Array[Byte]])
+          .map(_.map(_.array).map(Bytes.toString))
 
-        assert(Bytes.toString(v) === value)
+        assert(v === Right(Some(value)))
       }
     }
     describe("getValueAsByteBuffer") {
@@ -147,11 +148,12 @@ class ResultSpec extends FunSpec with MockitoSugar with Matchers {
 
         when(m.getValueAsByteBuffer(_family, _qualifier)).thenReturn(_value)
 
-        val Right(Some(v)) = ops[ResultOp]
+        val v = ops[ResultOp]
           .getValueAsByteBuffer(m, _family, _qualifier)
           .foldMap(interpreter[F, ByteBuffer])
+          .map(_.map(_.array()).map(Bytes.toString))
 
-        assert(Bytes.toString(v.array()) === value)
+        assert(v === Right(Some(value)))
       }
     }
     describe("getFamilyMap") {
@@ -164,11 +166,11 @@ class ResultSpec extends FunSpec with MockitoSugar with Matchers {
 
         when(m.getFamilyMap(_family)).thenReturn(value)
 
-        val Right(v) = ops[ResultOp]
+        val v = ops[ResultOp]
           .getFamilyMap(m, _family)
           .foldMap(interpreter[F, Map[Array[Byte], Array[Byte]]])
 
-        assert(v === value.asScala.toMap)
+        assert(v === Right(Utils.toMap(value)))
       }
     }
     describe("getFamily") {
@@ -184,11 +186,11 @@ class ResultSpec extends FunSpec with MockitoSugar with Matchers {
 
         when(m.getFamilyMap(_family)).thenReturn(value)
 
-        val Right(v) = ops[ResultOp]
+        val v = ops[ResultOp]
           .getFamily[Foo](m, _family)
           .foldMap(interpreter[F, Foo])
 
-        assert(v === Foo(x = Some(1), None))
+        assert(v === Right(Foo(x = Some(1), None)))
       }
     }
     describe("to") {
@@ -204,11 +206,11 @@ class ResultSpec extends FunSpec with MockitoSugar with Matchers {
 
         when(m.getFamilyMap(any[Array[Byte]])).thenReturn(value)
 
-        val Right(v) = ops[ResultOp]
+        val v = ops[ResultOp]
           .to[Foo](m)
           .foldMap(interpreter[F, Foo])
 
-        assert(v === Foo(Some(Bar(Some("*"), None))))
+        assert(v === Right(Foo(Some(Bar(Some("*"), None)))))
       }
     }
   }

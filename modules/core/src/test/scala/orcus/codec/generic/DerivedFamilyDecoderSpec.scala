@@ -17,9 +17,9 @@ class DerivedFamilyDecoderSpec extends FlatSpec {
   it should "decode a case class" in {
     val t = new ju.TreeMap[Array[Byte], Array[Byte]](Bytes.BYTES_COMPARATOR)
     t.put(Bytes.toBytes("a"), Bytes.toBytes(10))
-    val Right(x) = FamilyDecoder[Foo].apply(t)
+    val x = FamilyDecoder[Foo].apply(t)
 
-    assert(x === Foo(10))
+    assert(x === Right(Foo(10)))
   }
 
   it should "fail decode when the require property is absent" in {

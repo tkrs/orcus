@@ -1,7 +1,6 @@
 package orcus.async
 
 import java.util.concurrent.CompletableFuture
-import java.util.function.BiConsumer
 
 import cats.~>
 
@@ -14,15 +13,8 @@ trait JCompletableFutureHandler {
 
       private def toF[A](cf: CompletableFuture[A]): F[A] =
         F.handle[A](
-          { cb =>
-            val f = new BiConsumer[A, Throwable] {
-              def accept(t: A, u: Throwable): Unit =
-                if (u != null) cb(Left(u)) else cb(Right(t))
-            }
-            val _ = cf.whenComplete(f)
-          }, {
-            val _ = cf.cancel(false)
-          }
+          cb => cf.whenComplete((t, u) => cb(if (u != null) Left(u) else Right(t))),
+          cf.cancel(false)
         )
     }
 }
