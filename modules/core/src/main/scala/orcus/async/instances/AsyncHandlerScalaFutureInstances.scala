@@ -11,10 +11,10 @@ private[instances] trait AsyncHandlerScalaFutureInstances {
         val p = Promise[A]
 
         callback {
-          case Left(e) =>
-            val _ = p.failure(e)
           case Right(v) =>
             val _ = p.success(v)
+          case Left(e) =>
+            val _ = p.failure(e)
         }
 
         p.future

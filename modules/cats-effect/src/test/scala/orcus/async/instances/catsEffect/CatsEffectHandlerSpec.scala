@@ -1,22 +1,20 @@
 package orcus.async.instances.catsEffect
 
-import java.util.concurrent.{CompletableFuture, CompletionException}
+import java.util.concurrent.CompletableFuture
 
 import cats.effect.IO
 import orcus.async._
 import orcus.async.implicits._
 import effect._
-import org.scalatest.FunSpec
+import org.scalatest._
 
-class CatsEffectHandlerSpec extends FunSpec with AsyncSpec {
-  describe("AsyncHandler[Effect[F]") {
-    it("should get a value as-is when its CompletableFuture is succeed") {
-      def run = Par[CompletableFuture, IO].parallel(CompletableFuture.completedFuture(10))
-      assert(10 === run.unsafeRunSync())
-    }
-    it("should throw CompletionException as-is when its CompletableFuture is fail") {
-      def run = Par[CompletableFuture, IO].parallel(failedFuture[Int])
-      assertThrows[CompletionException](run.unsafeRunSync())
-    }
+class CatsEffectHandlerSpec extends FlatSpec with AsyncSpec {
+  it should "convert to a IO" in {
+    def run = Par[CompletableFuture, IO].parallel(CompletableFuture.completedFuture(10))
+    assert(10 === run.unsafeRunSync())
+  }
+  it should "convert to a failed IO" in {
+    def run = Par[CompletableFuture, IO].parallel(failedFuture[Int](new Exception))
+    assertThrows[Exception](run.unsafeRunSync())
   }
 }
