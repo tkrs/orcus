@@ -3,12 +3,11 @@ package orcus.codec.generic
 import cats.syntax.option._
 import orcus.codec.semiauto._
 import orcus.codec.{CodecSpec, Decoder, FamilyDecoder}
+import orcus.internal.Utils
 import org.apache.hadoop.hbase.client.Result
 import org.apache.hadoop.hbase.util.Bytes
 import org.apache.hadoop.hbase.{Cell, CellBuilderType, ExtendedCellBuilderFactory}
 import org.scalatest.FlatSpec
-
-import scala.collection.JavaConverters._
 
 class DerivedDecoderSpec extends FlatSpec with CodecSpec {
   case class All(
@@ -48,16 +47,18 @@ class DerivedDecoderSpec extends FlatSpec with CodecSpec {
         .build()
     }
 
-    val cells = Seq(
-      cell("a", Bytes.toBytes(1)),
-      cell("b", Bytes.toBytes(1.1f)),
-      cell("c", Bytes.toBytes(100L)),
-      cell("d", Bytes.toBytes(1.9)),
-      cell("e", Bytes.toBytes("s")),
-      cell("g", Bytes.toBytes(true)),
-      cell("h", Bytes.toBytes(Short.MaxValue)),
-      cell("i", Bytes.toBytes(BigDecimal(10).bigDecimal))
-    ).asJava
+    val cells = Utils.toJavaList(
+      Seq(
+        cell("a", Bytes.toBytes(1)),
+        cell("b", Bytes.toBytes(1.1f)),
+        cell("c", Bytes.toBytes(100L)),
+        cell("d", Bytes.toBytes(1.9)),
+        cell("e", Bytes.toBytes("s")),
+        cell("g", Bytes.toBytes(true)),
+        cell("h", Bytes.toBytes(Short.MaxValue)),
+        cell("i", Bytes.toBytes(BigDecimal(10).bigDecimal))
+      )
+    )
 
     val result = Result.create(cells)
     val expected = Right(
@@ -95,10 +96,12 @@ class DerivedDecoderSpec extends FlatSpec with CodecSpec {
   it should "fail decode when the require property is absent" in {
     val f = Decoder[Table1]
 
-    val cells = Seq(
-      cell("row", "fc", "a", Bytes.toBytes(1)),
-      cell("row", "fc", "b", Bytes.toBytes("1"))
-    ).asJava
+    val cells = Utils.toJavaList(
+      Seq(
+        cell("row", "fc", "a", Bytes.toBytes(1)),
+        cell("row", "fc", "b", Bytes.toBytes("1"))
+      )
+    )
 
     assert(f(Result.create(cells)).isLeft)
   }

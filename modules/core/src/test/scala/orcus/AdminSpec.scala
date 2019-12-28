@@ -6,6 +6,7 @@ import java.util.regex.Pattern
 import cats.instances.future._
 import orcus.async.implicits._
 import orcus.async.instances.future._
+import orcus.internal.Utils
 import org.apache.hadoop.hbase.client._
 import org.apache.hadoop.hbase.util.Bytes
 import org.apache.hadoop.hbase.{NamespaceDescriptor, ServerName, TableName}
@@ -13,7 +14,6 @@ import org.mockito.Mockito._
 import org.scalatest.FlatSpec
 import org.scalatestplus.mockito.MockitoSugar
 
-import scala.collection.JavaConverters._
 import scala.concurrent.ExecutionContext.Implicits.global
 import scala.concurrent.duration._
 import scala.concurrent.{Await, Future}
@@ -43,7 +43,7 @@ class AdminSpec extends FlatSpec with MockitoSugar {
     val l = java.util.Arrays.asList(TableDescriptorBuilder.NAMESPACE_TABLEDESC)
     when(m.listTableDescriptors(true)).thenReturn(CompletableFuture.completedFuture(l))
     val r = Await.result(admin.listTableDescriptors[Future](m, true), 3.seconds)
-    assert(r === l.asScala)
+    assert(r === Utils.toSeq(l))
     verify(m).listTableDescriptors(true)
   }
 
@@ -53,7 +53,7 @@ class AdminSpec extends FlatSpec with MockitoSugar {
     val l = java.util.Arrays.asList(TableDescriptorBuilder.NAMESPACE_TABLEDESC)
     when(m.listTableDescriptors(p, true)).thenReturn(CompletableFuture.completedFuture(l))
     val r = Await.result(admin.listTableDescriptorsByPattern[Future](m, p, true), 3.seconds)
-    assert(r === l.asScala)
+    assert(r === Utils.toSeq(l))
     verify(m).listTableDescriptors(p, true)
   }
 
@@ -62,7 +62,7 @@ class AdminSpec extends FlatSpec with MockitoSugar {
     val l = java.util.Arrays.asList(TableDescriptorBuilder.NAMESPACE_TABLEDESC)
     when(m.listTableDescriptorsByNamespace("ns")).thenReturn(CompletableFuture.completedFuture(l))
     val r = Await.result(admin.listTableDescriptorsByNamespace[Future](m, "ns"), 3.seconds)
-    assert(r === l.asScala)
+    assert(r === Utils.toSeq(l))
     verify(m).listTableDescriptorsByNamespace("ns")
   }
 
@@ -71,7 +71,7 @@ class AdminSpec extends FlatSpec with MockitoSugar {
     val l = java.util.Arrays.asList(TableName.valueOf("t"))
     when(m.listTableNames(true)).thenReturn(CompletableFuture.completedFuture(l))
     val r = Await.result(admin.listTableNames[Future](m, true), 3.seconds)
-    assert(r === l.asScala)
+    assert(r === Utils.toSeq(l))
     verify(m).listTableNames(true)
   }
 
@@ -81,7 +81,7 @@ class AdminSpec extends FlatSpec with MockitoSugar {
     val l = java.util.Arrays.asList(TableName.valueOf("t"))
     when(m.listTableNames(p, true)).thenReturn(CompletableFuture.completedFuture(l))
     val r = Await.result(admin.listTableNamesByPattern[Future](m, p, true), 3.seconds)
-    assert(r === l.asScala)
+    assert(r === Utils.toSeq(l))
     verify(m).listTableNames(p, true)
   }
 
@@ -250,7 +250,7 @@ class AdminSpec extends FlatSpec with MockitoSugar {
   "listNamespaceDescriptors" should "call listNamespaceDescriptors of AsyncAdmin" in {
     val m  = mock[AsyncAdmin]
     val ds = Seq(NamespaceDescriptor.DEFAULT_NAMESPACE)
-    when(m.listNamespaceDescriptors()).thenReturn(CompletableFuture.completedFuture(ds.asJava))
+    when(m.listNamespaceDescriptors()).thenReturn(CompletableFuture.completedFuture(Utils.toJavaList(ds)))
     val r = Await.result(admin.listNamespaceDescriptors[Future](m), 3.seconds)
     assert(r === ds)
     verify(m).listNamespaceDescriptors()
@@ -260,7 +260,7 @@ class AdminSpec extends FlatSpec with MockitoSugar {
     val m  = mock[AsyncAdmin]
     val sn = ServerName.valueOf("sn,80")
     val ds = Seq(mock[RegionInfo])
-    when(m.getRegions(sn)).thenReturn(CompletableFuture.completedFuture(ds.asJava))
+    when(m.getRegions(sn)).thenReturn(CompletableFuture.completedFuture(Utils.toJavaList(ds)))
     val r = Await.result(admin.getRegions[Future](m, sn), 3.seconds)
     assert(r === ds)
     verify(m).getRegions(sn)
@@ -270,7 +270,7 @@ class AdminSpec extends FlatSpec with MockitoSugar {
     val m  = mock[AsyncAdmin]
     val tn = TableName.valueOf("tn")
     val ds = Seq(mock[RegionInfo])
-    when(m.getRegions(tn)).thenReturn(CompletableFuture.completedFuture(ds.asJava))
+    when(m.getRegions(tn)).thenReturn(CompletableFuture.completedFuture(Utils.toJavaList(ds)))
     val r = Await.result(admin.getRegionsByTableName[Future](m, tn), 3.seconds)
     assert(r === ds)
     verify(m).getRegions(tn)

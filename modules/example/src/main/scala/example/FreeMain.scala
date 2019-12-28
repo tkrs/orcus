@@ -177,7 +177,7 @@ object Work {
 
   implicit class WorkOps(val a: Work) extends AnyVal {
     def key(prefix: String, author: String): Array[Byte] = {
-      val b = StringBuilder.newBuilder
+      val b = new StringBuilder
       val v = b.append(prefix).append(Long.MaxValue - a.releaseDate.toEpochDay).append(author).append(a.name)
       Bytes.toBytes(v.toString())
     }

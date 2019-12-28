@@ -16,9 +16,9 @@ class ResultScannerSpec extends FunSpec with MockitoSugar with Matchers {
 
       when(m.next()).thenReturn(expected)
 
-      val Right(Some(v)) = resultScanner.nextOne[F](m)
+      val v = resultScanner.nextOne[F](m)
 
-      assert(expected === v)
+      assert(v === Right(Some(expected)))
       verify(m).next()
     }
     it("should return empty when ResultScanner.next() returns null") {
@@ -26,9 +26,9 @@ class ResultScannerSpec extends FunSpec with MockitoSugar with Matchers {
 
       when(m.next()).thenReturn(null)
 
-      val Right(v) = resultScanner.nextOne[F](m)
+      val v = resultScanner.nextOne[F](m)
 
-      assert(v.isEmpty)
+      assert(v === Right(None))
       verify(m).next()
     }
   }
@@ -40,9 +40,9 @@ class ResultScannerSpec extends FunSpec with MockitoSugar with Matchers {
 
       when(m.next(10)).thenReturn(expected)
 
-      val Right(vs) = resultScanner.next[F](m, 10)
+      val vs = resultScanner.next[F](m, 10)
 
-      assert(expected.toSeq === vs)
+      assert(vs === Right(expected.toSeq))
       verify(m).next(10)
     }
   }

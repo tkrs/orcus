@@ -26,11 +26,11 @@ class ResultScannerSpec extends FunSpec with MockitoSugar with Matchers {
 
         when(m.next()).thenReturn(r)
 
-        val Right(Some(v)) = ops[ResultScannerOp]
+        val v = ops[ResultScannerOp]
           .nextOne(m)
           .foldMap(interpreter[F, Option[Result]])
 
-        assert(v === r)
+        assert(v === Right(Some(r)))
       }
     }
     describe("next") {
@@ -40,11 +40,11 @@ class ResultScannerSpec extends FunSpec with MockitoSugar with Matchers {
 
         when(m.next(10)).thenReturn(r)
 
-        val Right(v) = ops[ResultScannerOp]
+        val v = ops[ResultScannerOp]
           .next(m, 10)
           .foldMap(interpreter[F, ByteBuffer])
 
-        assert(v === r.toSeq)
+        assert(v === Right(r.toSeq))
       }
     }
   }

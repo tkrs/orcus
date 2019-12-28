@@ -1,24 +1,24 @@
 package orcus
 
-import java.{lang => jl}
 import java.util.concurrent.CompletableFuture
+import java.{lang => jl}
 
 import cats.instances.future._
+import orcus.async.implicits._
+import orcus.async.instances.future._
+import orcus.internal.Utils
 import org.apache.hadoop.conf.Configuration
 import org.apache.hadoop.hbase.TableName
 import org.apache.hadoop.hbase.client._
 import org.apache.hadoop.hbase.util.Bytes
+import org.mockito.ArgumentMatchers._
+import org.mockito.Mockito._
 import org.scalatest.{FunSpec, Matchers}
 import org.scalatestplus.mockito.MockitoSugar
-import org.mockito.Mockito._
-import org.mockito.ArgumentMatchers._
-import orcus.async.implicits._
-import orcus.async.instances.future._
 
-import scala.concurrent.{Await, Future}
 import scala.concurrent.ExecutionContext.Implicits.global
 import scala.concurrent.duration._
-import scala.collection.JavaConverters._
+import scala.concurrent.{Await, Future}
 
 class TableSpec extends FunSpec with MockitoSugar with Matchers {
   describe("getName") {
@@ -102,7 +102,7 @@ class TableSpec extends FunSpec with MockitoSugar with Matchers {
         mock[Result]
       )
 
-      when(m.scanAll(scan)).thenReturn(CompletableFuture.completedFuture(expected.asJava))
+      when(m.scanAll(scan)).thenReturn(CompletableFuture.completedFuture(Utils.toJavaList(expected)))
 
       val v = Await.result(table.scanAll[Future](m, scan), 3.seconds)
       assert(v === expected)
@@ -198,11 +198,11 @@ class TableSpec extends FunSpec with MockitoSugar with Matchers {
       )
 
       when(m.batch[Object](any[java.util.List[Row]]))
-        .thenReturn(returns.map(a => CompletableFuture.completedFuture(a)).asJava)
+        .thenReturn(Utils.toJavaList(returns.map(a => CompletableFuture.completedFuture(a))))
 
       val v = Await.result(table.batch[Future, Seq](m, rows), 3.seconds)
       assert(v === expected)
-      verify(m).batch[Object](rows.asJava)
+      verify(m).batch[Object](Utils.toJavaList(rows))
     }
   }
 
@@ -223,11 +223,11 @@ class TableSpec extends FunSpec with MockitoSugar with Matchers {
       val expected = returns.map(Option.apply)
 
       when(m.batchAll[Result](any[java.util.List[Row]]))
-        .thenReturn(CompletableFuture.completedFuture(returns.asJava))
+        .thenReturn(CompletableFuture.completedFuture(Utils.toJavaList(returns)))
 
       val v = Await.result(table.batchAll[Future, Seq](m, rows), 3.seconds)
       assert(v === expected)
-      verify(m).batchAll[Result](rows.asJava)
+      verify(m).batchAll[Result](Utils.toJavaList(rows))
     }
   }
 }
