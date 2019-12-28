@@ -9,10 +9,8 @@ import scala.concurrent._
 
 trait AsyncSpec { _: TestSuite =>
 
-  def failedFuture[A]: CompletableFuture[A] =
-    CompletableFuture.supplyAsync(new Supplier[A] {
-      def get(): A = throw new Exception
-    })
+  def failedFuture[A](e: Throwable): CompletableFuture[A] =
+    CompletableFuture.failedFuture(e)
 
   def blockedFuture[A]: CompletableFuture[A] =
     CompletableFuture.supplyAsync(new Supplier[A] {

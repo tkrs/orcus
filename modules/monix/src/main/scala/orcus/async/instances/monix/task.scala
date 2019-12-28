@@ -1,3 +1,3 @@
 package orcus.async.instances.monix
 
-object task extends AsynHandlerMonixTaskInstances
+object task extends AsyncHandlerMonixTaskInstances
