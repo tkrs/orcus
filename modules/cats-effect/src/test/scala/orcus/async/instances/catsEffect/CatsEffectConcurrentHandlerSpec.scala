@@ -5,12 +5,13 @@ import java.util.concurrent.CompletableFuture
 import cats.effect.{ContextShift, IO, Timer}
 import orcus.async._
 import orcus.async.implicits._
-import concurrent._
+import orcus.async.instances.catsEffect.concurrent._
 import org.scalatest._
+import org.scalatest.flatspec.AnyFlatSpec
 
 import scala.concurrent._
 
-class CatsEffectConcurrentHandlerSpec extends FlatSpec with AsyncSpec {
+class CatsEffectConcurrentHandlerSpec extends AnyFlatSpec with AsyncSpec {
   import ExecutionContext.Implicits.global
 
   implicit def contextShift: ContextShift[IO] =

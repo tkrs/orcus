@@ -13,14 +13,15 @@ import org.apache.hadoop.hbase.client._
 import org.apache.hadoop.hbase.util.Bytes
 import org.mockito.ArgumentMatchers._
 import org.mockito.Mockito._
-import org.scalatest.{FunSpec, Matchers}
+import org.scalatest.funspec.AnyFunSpec
+import org.scalatest.matchers.should.Matchers
 import org.scalatestplus.mockito.MockitoSugar
 
 import scala.concurrent.ExecutionContext.Implicits.global
 import scala.concurrent.duration._
 import scala.concurrent.{Await, Future}
 
-class TableSpec extends FunSpec with MockitoSugar with Matchers {
+class TableSpec extends AnyFunSpec with MockitoSugar with Matchers {
   describe("getName") {
     it("should return table name") {
       val m = mock[AsyncTable[ScanResultConsumer]]

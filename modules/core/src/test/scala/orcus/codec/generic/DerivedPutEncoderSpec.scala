@@ -4,9 +4,9 @@ import orcus.codec.{PutEncoder, PutFamilyEncoder}
 import orcus.codec.semiauto._
 import org.apache.hadoop.hbase.client.Put
 import org.apache.hadoop.hbase.util.Bytes
-import org.scalatest.FlatSpec
+import org.scalatest.flatspec.AnyFlatSpec
 
-class DerivedPutEncoderSpec extends FlatSpec {
+class DerivedPutEncoderSpec extends AnyFlatSpec {
   case class X(a: A, b: B, c: C, d: D)
 
   object X {

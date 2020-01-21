@@ -5,9 +5,9 @@ import com.google.protobuf.ByteString
 import orcus.bigtable.CRow
 import orcus.bigtable.codec.semiauto._
 import org.apache.hadoop.hbase.util.Bytes
-import org.scalatest.FunSuite
+import org.scalatest.funsuite.AnyFunSuite
 
-class RowDecoderTest extends FunSuite {
+class RowDecoderTest extends AnyFunSuite {
   case class Foo(c1: Bar, c2: Option[Baz])
 
   object Foo {

@@ -7,9 +7,9 @@ import orcus.internal.Utils
 import org.apache.hadoop.hbase.client.Result
 import org.apache.hadoop.hbase.util.Bytes
 import org.apache.hadoop.hbase.{Cell, CellBuilderType, ExtendedCellBuilderFactory}
-import org.scalatest.FlatSpec
+import org.scalatest.flatspec.AnyFlatSpec
 
-class DerivedDecoderSpec extends FlatSpec with CodecSpec {
+class DerivedDecoderSpec extends AnyFlatSpec with CodecSpec {
   case class All(
     a: Option[Int] = None,
     b: Option[Float] = None,

@@ -14,10 +14,11 @@ import org.apache.hadoop.hbase.client.Result
 import org.apache.hadoop.hbase.util.Bytes
 import org.mockito.ArgumentMatchers._
 import org.mockito.Mockito._
-import org.scalatest.{FunSpec, Matchers}
+import org.scalatest.funspec.AnyFunSpec
+import org.scalatest.matchers.should.Matchers
 import org.scalatestplus.mockito.MockitoSugar
 
-class ResultSpec extends FunSpec with MockitoSugar with Matchers {
+class ResultSpec extends AnyFunSpec with MockitoSugar with Matchers {
   type F[A] = Either[Throwable, A]
 
   def interpreter[M[_], A](implicit H: Handler[M]): ResultOp ~> M = H

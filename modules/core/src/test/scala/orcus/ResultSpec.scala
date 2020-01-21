@@ -12,9 +12,11 @@ import org.apache.hadoop.hbase.util.Bytes
 import org.mockito.ArgumentMatchers._
 import org.mockito.Mockito._
 import org.scalatest._
+import org.scalatest.funspec.AnyFunSpec
+import org.scalatest.matchers.should.Matchers
 import org.scalatestplus.mockito.MockitoSugar
 
-class ResultSpec extends FunSpec with MockitoSugar with Matchers {
+class ResultSpec extends AnyFunSpec with MockitoSugar with Matchers {
   type F[A] = Either[Throwable, A]
 
   describe("getRow") {

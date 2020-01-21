@@ -11,14 +11,14 @@ import org.apache.hadoop.hbase.client._
 import org.apache.hadoop.hbase.util.Bytes
 import org.apache.hadoop.hbase.{NamespaceDescriptor, ServerName, TableName}
 import org.mockito.Mockito._
-import org.scalatest.FlatSpec
+import org.scalatest.flatspec.AnyFlatSpec
 import org.scalatestplus.mockito.MockitoSugar
 
 import scala.concurrent.ExecutionContext.Implicits.global
 import scala.concurrent.duration._
 import scala.concurrent.{Await, Future}
 
-class AdminSpec extends FlatSpec with MockitoSugar {
+class AdminSpec extends AnyFlatSpec with MockitoSugar {
   def voidFuture: CompletableFuture[Void] =
     CompletableFuture.runAsync(new Runnable {
       def run(): Unit = ()

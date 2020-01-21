@@ -4,9 +4,9 @@ import java.{util => ju}
 
 import cats.Eval
 import org.apache.hadoop.hbase.util.Bytes
-import org.scalatest.FunSuite
+import org.scalatest.funsuite.AnyFunSuite
 
-class FamilyDecoderSpec extends FunSuite {
+class FamilyDecoderSpec extends AnyFunSuite {
   test("pure") {
     val f = FamilyDecoder.pure(10)
     assert(f(new ju.TreeMap) === Right(10))

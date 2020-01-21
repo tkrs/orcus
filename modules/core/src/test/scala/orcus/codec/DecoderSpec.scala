@@ -6,9 +6,9 @@ import cats.Eval
 import orcus.internal.Utils
 import org.apache.hadoop.hbase.client.Result
 import org.apache.hadoop.hbase.util.Bytes
-import org.scalatest.FlatSpec
+import org.scalatest.flatspec.AnyFlatSpec
 
-class DecoderSpec extends FlatSpec with CodecSpec {
+class DecoderSpec extends AnyFlatSpec with CodecSpec {
   "decodeMapLike" should "decode the nested map" in {
     val cells = Utils.toJavaList(
       Seq(

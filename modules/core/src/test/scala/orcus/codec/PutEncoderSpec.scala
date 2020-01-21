@@ -2,9 +2,9 @@ package orcus.codec
 
 import org.apache.hadoop.hbase.client.Put
 import org.apache.hadoop.hbase.util.Bytes
-import org.scalatest.FlatSpec
+import org.scalatest.flatspec.AnyFlatSpec
 
-class PutEncoderSpec extends FlatSpec {
+class PutEncoderSpec extends AnyFlatSpec {
   case class X(a: A, b: B, c: C, d: D)
   case class A(x: Int)
   case class B(y: String)
