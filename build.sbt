@@ -183,7 +183,7 @@ lazy val bigtable = project
     moduleName := "orcus-bigtable"
   )
   .settings(
-    libraryDependencies ++= Seq(Pkg.catsEffect, Pkg.bigtable).map(_.withSources)
+    libraryDependencies ++= Seq(Pkg.bigtable).map(_.withSources)
   )
   .dependsOn(core)
 
