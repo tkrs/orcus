@@ -5,9 +5,9 @@ import java.{util => ju}
 import orcus.codec.FamilyDecoder
 import orcus.codec.semiauto.derivedFamilyDecoder
 import org.apache.hadoop.hbase.util.Bytes
-import org.scalatest.FlatSpec
+import org.scalatest.flatspec.AnyFlatSpec
 
-class DerivedFamilyDecoderSpec extends FlatSpec {
+class DerivedFamilyDecoderSpec extends AnyFlatSpec {
   case class Foo(a: Int)
 
   object Foo {

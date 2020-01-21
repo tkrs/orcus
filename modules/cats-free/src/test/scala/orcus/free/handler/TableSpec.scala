@@ -26,14 +26,15 @@ import org.apache.hadoop.hbase.client.{
 import org.apache.hadoop.hbase.TableName
 import org.apache.hadoop.hbase.util.Bytes
 import org.mockito.Mockito._
-import org.scalatest.{FunSpec, Matchers}
+import org.scalatest.funspec.AnyFunSpec
 import org.scalatestplus.mockito.MockitoSugar
+import org.scalatest.matchers.should.Matchers
 
 import scala.concurrent.ExecutionContext.Implicits.global
 import scala.concurrent.duration._
 import scala.concurrent.{Await, Future}
 
-class TableSpec extends FunSpec with MockitoSugar with Matchers {
+class TableSpec extends AnyFunSpec with MockitoSugar with Matchers {
   type F[A] = Future[A]
 
   def interpreter[M[_]](implicit H: Handler[M]): Handler[M] = H

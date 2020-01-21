@@ -2,10 +2,11 @@ package orcus.codec
 
 import org.apache.hadoop.hbase.util.Bytes
 import org.scalacheck.{Arbitrary, Prop, Shrink}
-import org.scalatest.{FunSuite, Matchers}
+import org.scalatest.funsuite.AnyFunSuite
+import org.scalatest.matchers.should.Matchers
 import org.scalatestplus.scalacheck.Checkers
 
-class ValueCodecSpec extends FunSuite with Checkers with Matchers {
+class ValueCodecSpec extends AnyFunSuite with Checkers with Matchers {
   private def _roundTrip[A: ValueCodec](a: A): Boolean = {
     val encoded = ValueCodec[A].encode(a)
     val decoded = ValueCodec[A].decode(encoded)

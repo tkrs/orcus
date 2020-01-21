@@ -8,10 +8,11 @@ import orcus.free.handler.resultScanner.Handler
 import orcus.free.{ResultScannerOp, ResultScannerOps}
 import org.apache.hadoop.hbase.client.{Result, ResultScanner}
 import org.mockito.Mockito._
-import org.scalatest.{FunSpec, Matchers}
+import org.scalatest.funspec.AnyFunSpec
+import org.scalatest.matchers.should.Matchers
 import org.scalatestplus.mockito.MockitoSugar
 
-class ResultScannerSpec extends FunSpec with MockitoSugar with Matchers {
+class ResultScannerSpec extends AnyFunSpec with MockitoSugar with Matchers {
   type F[A] = Either[Throwable, A]
 
   def interpreter[M[_], A](implicit H: Handler[M]): ResultScannerOp ~> M = H

@@ -3,14 +3,14 @@ package orcus.async.twitterUtil
 import java.util.concurrent.CompletableFuture
 
 import com.twitter.util.{Await, Future}
-import orcus.async.{AsyncSpec, Par}
 import orcus.async.implicits._
 import orcus.async.instances.twitterUtil.future._
-import org.scalatest._
+import orcus.async.{AsyncSpec, Par}
+import org.scalatest.flatspec.AnyFlatSpec
 
 import scala.concurrent.CancellationException
 
-class TwitterUtilFutureAsyncHandlerSpec extends FlatSpec with AsyncSpec {
+class TwitterUtilFutureAsyncHandlerSpec extends AnyFlatSpec with AsyncSpec {
   it should "convert to a Future" in {
     def run = Par[CompletableFuture, Future].parallel(CompletableFuture.completedFuture(10))
     assert(10 === Await.result(run))

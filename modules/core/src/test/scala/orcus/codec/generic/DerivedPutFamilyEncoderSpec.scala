@@ -4,9 +4,9 @@ import orcus.codec.PutFamilyEncoder
 import orcus.codec.semiauto._
 import org.apache.hadoop.hbase.client.Put
 import org.apache.hadoop.hbase.util.Bytes
-import org.scalatest.FlatSpec
+import org.scalatest.flatspec.AnyFlatSpec
 
-class DerivedPutFamilyEncoderSpec extends FlatSpec {
+class DerivedPutFamilyEncoderSpec extends AnyFlatSpec {
   case class Foo(a: Int, b: String, c: Double)
 
   object Foo {

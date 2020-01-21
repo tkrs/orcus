@@ -2,9 +2,9 @@ package orcus.codec
 
 import org.apache.hadoop.hbase.client.Put
 import org.apache.hadoop.hbase.util.Bytes
-import org.scalatest.FlatSpec
+import org.scalatest.flatspec.AnyFlatSpec
 
-class PutFamilyEncoderSpec extends FlatSpec {
+class PutFamilyEncoderSpec extends AnyFlatSpec {
   it should "encode to Put from family's Map" in {
     val row = Bytes.toBytes("row")
     val cf  = Bytes.toBytes("cf")

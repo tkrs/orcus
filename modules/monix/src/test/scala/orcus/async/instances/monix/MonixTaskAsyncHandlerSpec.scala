@@ -4,16 +4,15 @@ import java.util.concurrent.CompletableFuture
 
 import _root_.monix.eval.Task
 import _root_.monix.execution.Scheduler.Implicits.global
-import orcus.async.{AsyncSpec, Par}
 import orcus.async.implicits._
 import orcus.async.instances.monix.task._
-import org.scalatest._
+import orcus.async.{AsyncSpec, Par}
+import org.scalatest.flatspec.AnyFlatSpec
 
 import scala.concurrent.duration._
 import scala.concurrent.{Await, TimeoutException}
-import org.scalatest.FlatSpec
 
-class MonixTaskAsyncHandlerSpec extends FlatSpec with AsyncSpec {
+class MonixTaskAsyncHandlerSpec extends AnyFlatSpec with AsyncSpec {
   it should "convert to a Task" in {
     def run = Par[CompletableFuture, Task].parallel(CompletableFuture.completedFuture(10)).runToFuture
     assert(10 === Await.result(run, 1.second))
