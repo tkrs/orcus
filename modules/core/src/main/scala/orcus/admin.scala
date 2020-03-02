@@ -151,13 +151,6 @@ object admin {
   ): F[Boolean] =
     M.map(F.parallel(t.isTableAvailable(tableName)))(_.booleanValue)
 
-  def isTableAvailableWithSplitKeys[F[_]](t: AsyncAdmin, tableName: TableName, splitKeys: Array[Array[Byte]])(
-    implicit
-    M: Functor[F],
-    F: Par.Aux[CompletableFuture, F]
-  ): F[Boolean] =
-    M.map(F.parallel(t.isTableAvailable(tableName, splitKeys)))(_.booleanValue)
-
   def addColumnFamily[F[_]](t: AsyncAdmin, tableName: TableName, columnFamilyDescriptor: ColumnFamilyDescriptor)(
     implicit
     M: Applicative[F],
