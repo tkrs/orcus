@@ -32,7 +32,7 @@ libraryDependencies += Seq(
 )
 ```
 
-And, so look at this [example](https://github.com/tkrs/orcus/blob/master/modules/bigtable-example/src/main/scala/example/Main.scala)
+And, so look at this [example](https://github.com/tkrs/orcus/blob/master/modules/example-bigtable/src/main/scala/orcus/example/Main.scala)
 
 LICENSE
 
