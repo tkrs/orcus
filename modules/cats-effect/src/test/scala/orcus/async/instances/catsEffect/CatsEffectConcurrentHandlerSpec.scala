@@ -12,7 +12,7 @@ import org.scalatest.flatspec.AnyFlatSpec
 import scala.concurrent._
 
 class CatsEffectConcurrentHandlerSpec extends AnyFlatSpec with AsyncSpec {
-  import ExecutionContext.Implicits.global
+  import ExecutionContext.global
 
   implicit def contextShift: ContextShift[IO] =
     IO.contextShift(global)
