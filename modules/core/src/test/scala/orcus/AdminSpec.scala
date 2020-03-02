@@ -179,15 +179,6 @@ class AdminSpec extends AnyFlatSpec with MockitoSugar {
     verify(m).isTableAvailable(t)
   }
 
-  "isTableAvailableWithSplitKeys" should "call isTableAvailable of AsyncAdmin" in {
-    val m         = mock[AsyncAdmin]
-    val splitKeys = Array(Bytes.toBytes("t"))
-    val t         = TableName.valueOf("t")
-    when(m.isTableAvailable(t, splitKeys)).thenReturn(jTrueFuture)
-    assert(Await.result(admin.isTableAvailableWithSplitKeys[Future](m, t, splitKeys), 3.seconds))
-    verify(m).isTableAvailable(t, splitKeys)
-  }
-
   "addColumnFamily" should "call addColumnFamily of AsyncAdmin" in {
     val m = mock[AsyncAdmin]
     val t = TableName.valueOf("t")
