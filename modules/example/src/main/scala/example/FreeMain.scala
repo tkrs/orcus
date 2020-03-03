@@ -25,7 +25,6 @@ import org.apache.hadoop.hbase.TableName
 import org.apache.hadoop.hbase.client._
 import org.apache.hadoop.hbase.util.Bytes
 
-import scala.concurrent.ExecutionContext.Implicits.global
 import scala.concurrent.duration._
 
 trait FreeMain extends IOApp with LazyLogging {
