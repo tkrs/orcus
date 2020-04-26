@@ -6,7 +6,6 @@ import cats.effect.{ContextShift, IO, Timer}
 import orcus.async._
 import orcus.async.implicits._
 import orcus.async.instances.catsEffect.concurrent._
-import org.scalatest._
 import org.scalatest.flatspec.AnyFlatSpec
 
 import scala.concurrent._

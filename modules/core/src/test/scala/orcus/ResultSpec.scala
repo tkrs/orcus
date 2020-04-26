@@ -11,7 +11,6 @@ import org.apache.hadoop.hbase.client.Result
 import org.apache.hadoop.hbase.util.Bytes
 import org.mockito.ArgumentMatchers._
 import org.mockito.Mockito._
-import org.scalatest._
 import org.scalatest.funspec.AnyFunSpec
 import org.scalatest.matchers.should.Matchers
 import org.scalatestplus.mockito.MockitoSugar

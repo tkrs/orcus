@@ -2,8 +2,8 @@ import sbt._
 
 object Dependencies {
   val Ver = new {
-    val `scala2.13` = "2.13.1"
-    val `scala2.12` = "2.12.10"
+    val `scala2.13` = "2.13.2"
+    val `scala2.12` = "2.12.11"
 
     val kindProjector = "0.11.0"
 
