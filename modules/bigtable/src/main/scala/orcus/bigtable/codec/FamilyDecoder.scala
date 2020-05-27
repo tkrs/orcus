@@ -14,8 +14,7 @@ object FamilyDecoder extends FamilyDecoder1 {
 }
 
 trait FamilyDecoder1 {
-  implicit def decodeMap[K, V, M[_, _] <: Map[K, V]](
-    implicit
+  implicit def decodeMap[K, V, M[_, _] <: Map[K, V]](implicit
     decodeK: PrimitiveDecoder[K],
     decodeV: PrimitiveDecoder[V],
     factory: Factory[(K, V), M[K, V]]
@@ -43,8 +42,7 @@ trait FamilyDecoder1 {
       loop(family)
     }
 
-  implicit def decodeOptionA[A](
-    implicit
+  implicit def decodeOptionA[A](implicit
     A: FamilyDecoder[A]
   ): FamilyDecoder[Option[A]] =
     family => if (family == null || family.isEmpty) Right(None) else A.apply(family).map(Option.apply)

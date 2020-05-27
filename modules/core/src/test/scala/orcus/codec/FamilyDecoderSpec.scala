@@ -32,7 +32,7 @@ class FamilyDecoderSpec extends AnyFunSuite {
   }
   test("flatmap/map should return Left when its upstream decoder was failed") {
     val expected = Left[Throwable, Int](new Exception)
-    val f        = FamilyDecoder.liftF(expected).flatMap[Int](_ => fail()).map[Int](_ => fail())
+    val f = FamilyDecoder.liftF(expected).flatMap[Int](_ => fail()).map[Int](_ => fail())
 
     assert(f(new ju.TreeMap) === expected)
   }

@@ -31,7 +31,7 @@ class DerivedDecoderSpec extends AnyFlatSpec with CodecSpec {
   }
 
   it should "decode a nested case class" in {
-    val f   = Decoder[Table0]
+    val f = Decoder[Table0]
     val row = Bytes.toBytes("row")
     val cf1 = Bytes.toBytes("cf1")
 

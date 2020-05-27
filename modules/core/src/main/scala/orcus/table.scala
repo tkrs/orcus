@@ -27,77 +27,66 @@ import org.apache.hadoop.hbase.{TableName => HTableName}
 object table {
   type AsyncTableT = AsyncTable[T] forSome { type T <: ScanResultConsumerBase }
 
-  def getName[F[_]](t: AsyncTableT)(
-    implicit
+  def getName[F[_]](t: AsyncTableT)(implicit
     F: Applicative[F]
   ): F[HTableName] =
     F.pure(t.getName)
 
-  def getConfiguration[F[_]](t: AsyncTableT)(
-    implicit
+  def getConfiguration[F[_]](t: AsyncTableT)(implicit
     F: Applicative[F]
   ): F[HConfig] =
     F.pure(t.getConfiguration)
 
-  def exists[F[_]](t: AsyncTableT, get: HGet)(
-    implicit
+  def exists[F[_]](t: AsyncTableT, get: HGet)(implicit
     FE: ApplicativeError[F, Throwable],
     F: Par.Aux[CompletableFuture, F]
   ): F[Boolean] =
     FE.map(F.parallel(t.exists(get)))(_.booleanValue())
 
-  def get[F[_]](t: AsyncTableT, a: HGet)(
-    implicit
+  def get[F[_]](t: AsyncTableT, a: HGet)(implicit
     F: Par.Aux[CompletableFuture, F]
   ): F[HResult] =
     F.parallel(t.get(a))
 
-  def put[F[_]](t: AsyncTableT, a: HPut)(
-    implicit
+  def put[F[_]](t: AsyncTableT, a: HPut)(implicit
     FE: ApplicativeError[F, Throwable],
     F: Par.Aux[CompletableFuture, F]
   ): F[Unit] =
     FE.map(F.parallel(t.put(a)))(_ => ())
 
-  def scanAll[F[_]](t: AsyncTableT, a: HScan)(
-    implicit
+  def scanAll[F[_]](t: AsyncTableT, a: HScan)(implicit
     FE: ApplicativeError[F, Throwable],
     F: Par.Aux[CompletableFuture, F]
   ): F[Seq[HResult]] =
     FE.map(F.parallel(t.scanAll(a)))(Utils.toSeq)
 
-  def getScanner[F[_]](t: AsyncTableT, a: HScan)(
-    implicit
+  def getScanner[F[_]](t: AsyncTableT, a: HScan)(implicit
     FE: ApplicativeError[F, Throwable]
   ): F[HResultScanner] =
     FE.catchNonFatal(t.getScanner(a))
 
-  def delete[F[_]](t: AsyncTableT, a: HDelete)(
-    implicit
+  def delete[F[_]](t: AsyncTableT, a: HDelete)(implicit
     FE: ApplicativeError[F, Throwable],
     F: Par.Aux[CompletableFuture, F]
   ): F[Unit] =
     FE.map(F.parallel(t.delete(a)))(_ => ())
 
-  def append[F[_]](t: AsyncTableT, a: HAppend)(
-    implicit
+  def append[F[_]](t: AsyncTableT, a: HAppend)(implicit
     F: Par.Aux[CompletableFuture, F]
   ): F[HResult] =
     F.parallel(t.append(a))
 
-  def increment[F[_]](t: AsyncTableT, a: HIncrement)(
-    implicit
+  def increment[F[_]](t: AsyncTableT, a: HIncrement)(implicit
     F: Par.Aux[CompletableFuture, F]
   ): F[HResult] =
     F.parallel(t.increment(a))
 
-  def batch[F[_], C[_]](t: AsyncTableT, as: Seq[_ <: HRow])(
-    implicit
+  def batch[F[_], C[_]](t: AsyncTableT, as: Seq[_ <: HRow])(implicit
     apErrorF: ApplicativeError[F, Throwable],
     parF: Par.Aux[CompletableFuture, F],
     factoryC: Factory[BatchResult, C[BatchResult]]
   ): F[C[BatchResult]] = {
-    val itr   = as.iterator
+    val itr = as.iterator
     val itcfo = Utils.toIterator(t.batch[Object](Utils.toJavaList(as)))
     val itfb = itr
       .zip(itcfo.map(parF.parallel.apply))
@@ -126,15 +115,14 @@ object table {
     apErrorF.map(fbb)(_.result)
   }
 
-  def batchAll[F[_], C[_]](t: AsyncTableT, as: Seq[_ <: HRow])(
-    implicit
+  def batchAll[F[_], C[_]](t: AsyncTableT, as: Seq[_ <: HRow])(implicit
     FE: ApplicativeError[F, Throwable],
     F: Par.Aux[CompletableFuture, F],
     factory: Factory[Option[HResult], C[Option[HResult]]]
   ): F[C[Option[HResult]]] =
     FE.map(F.parallel(t.batchAll[Object](Utils.toJavaList(as)))) { xs =>
       val it = xs.iterator
-      val c  = factory.newBuilder
+      val c = factory.newBuilder
       while (it.hasNext) c += (it.next match { case r: HResult => Option(r); case null => None })
       c.result
     }

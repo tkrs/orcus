@@ -11,17 +11,17 @@ object PutEncoder extends PutEncoder1 {
 }
 
 trait PutEncoder1 {
-  implicit def encodeMap[K, V](
-    implicit
+  implicit def encodeMap[K, V](implicit
     K: ValueCodec[K],
     V: PutFamilyEncoder[V]
-  ): PutEncoder[Map[K, V]] = new PutEncoder[Map[K, V]] {
-    def apply(acc: Put, a: Map[K, V]): Put = {
-      a.foreach {
-        case (k, v) =>
-          V(acc, K.encode(k), v)
+  ): PutEncoder[Map[K, V]] =
+    new PutEncoder[Map[K, V]] {
+      def apply(acc: Put, a: Map[K, V]): Put = {
+        a.foreach {
+          case (k, v) =>
+            V(acc, K.encode(k), v)
+        }
+        acc
       }
-      acc
     }
-  }
 }

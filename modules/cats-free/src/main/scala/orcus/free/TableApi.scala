@@ -41,20 +41,19 @@ trait TableApi[F[_]] {
 sealed trait TableOp[A]
 
 object TableOp {
-  final case object GetName                 extends TableOp[TableName]
-  final case object GetConfiguration        extends TableOp[HConfig]
-  final case class Exists(a: HGet)          extends TableOp[Boolean]
-  final case class Get(a: HGet)             extends TableOp[HResult]
-  final case class Put(a: HPut)             extends TableOp[Unit]
-  final case class GetScanner(a: HScan)     extends TableOp[HResultScanner]
-  final case class ScanAll(a: HScan)        extends TableOp[Seq[HResult]]
-  final case class Delete(a: HDelete)       extends TableOp[Unit]
-  final case class Append(a: HAppend)       extends TableOp[HResult]
+  final case object GetName extends TableOp[TableName]
+  final case object GetConfiguration extends TableOp[HConfig]
+  final case class Exists(a: HGet) extends TableOp[Boolean]
+  final case class Get(a: HGet) extends TableOp[HResult]
+  final case class Put(a: HPut) extends TableOp[Unit]
+  final case class GetScanner(a: HScan) extends TableOp[HResultScanner]
+  final case class ScanAll(a: HScan) extends TableOp[Seq[HResult]]
+  final case class Delete(a: HDelete) extends TableOp[Unit]
+  final case class Append(a: HAppend) extends TableOp[HResult]
   final case class Increment(a: HIncrement) extends TableOp[HResult]
 
   final case class Batch(a: Seq[_ <: Row]) extends TableOp[Seq[BatchResult]] {
-    def run[M[_]](t: AsyncTableT)(
-      implicit
+    def run[M[_]](t: AsyncTableT)(implicit
       apErrorM: ApplicativeError[M, Throwable],
       parM: Par.Aux[CompletableFuture, M]
     ): M[Seq[BatchResult]] =

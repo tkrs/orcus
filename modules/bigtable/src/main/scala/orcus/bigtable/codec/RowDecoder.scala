@@ -16,8 +16,7 @@ object RowDecoder extends RowDecoder1 {
 trait RowDecoder1 {
   implicit val decodeRowAsRow: RowDecoder[CRow] = row => Right(row)
 
-  implicit def decodeRowAsMap[V, M[_, _] <: Map[String, V]](
-    implicit
+  implicit def decodeRowAsMap[V, M[_, _] <: Map[String, V]](implicit
     decodeV: FamilyDecoder[V],
     factory: Factory[(String, V), M[String, V]]
   ): RowDecoder[M[String, V]] =
@@ -26,13 +25,12 @@ trait RowDecoder1 {
   implicit def decodeRowAsVWithKey[V](implicit V: RowDecoder[V]): RowDecoder[(String, V)] =
     row => V.apply(row).map(r => row.rowKey -> r)
 
-  private def decodeRow[V, M[_, _] <: Map[String, V]](row: CRow)(
-    implicit
+  private def decodeRow[V, M[_, _] <: Map[String, V]](row: CRow)(implicit
     decodeV: FamilyDecoder[V],
     factory: Factory[(String, V), M[String, V]]
   ): Either[Throwable, M[String, V]] = {
     val builder = factory.newBuilder
-    val it      = row.families.iterator
+    val it = row.families.iterator
 
     @tailrec def loop(): Either[Throwable, M[String, V]] =
       if (!it.hasNext) Right(builder.result())

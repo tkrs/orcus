@@ -1,7 +1,6 @@
 package orcus.async.benchmark
 
 import java.util.concurrent._
-import java.util.function.Supplier
 
 import _root_.monix.eval.Task
 import _root_.monix.execution.Scheduler
@@ -39,21 +38,22 @@ import scala.util.Random
 )
 abstract class AsyncHandlerBenchmark {
   final val Xs: Vector[Int] = Vector.range(1, 50)
-  final val Rnd: Random     = new Random
+  final val Rnd: Random = new Random
 
   @Param(Array("1", "2", "4", "8", "16", "32", "64", "0"))
   var threads: Int = _
 
   var backgroundService: ExecutorService = _
 
-  def daemonThreadFactory: ThreadFactory = new ThreadFactory {
-    def newThread(r: Runnable): Thread = {
-      val t = new Thread(r)
-      t.setDaemon(true)
-      if (t.getPriority != Thread.NORM_PRIORITY) t.setPriority(Thread.NORM_PRIORITY)
-      t
+  def daemonThreadFactory: ThreadFactory =
+    new ThreadFactory {
+      def newThread(r: Runnable): Thread = {
+        val t = new Thread(r)
+        t.setDaemon(true)
+        if (t.getPriority != Thread.NORM_PRIORITY) t.setPriority(Thread.NORM_PRIORITY)
+        t
+      }
     }
-  }
 
   @Setup
   def setup(): Unit =
@@ -63,16 +63,16 @@ abstract class AsyncHandlerBenchmark {
       backgroundService = Executors.newFixedThreadPool(threads, daemonThreadFactory)
 
   @inline final def compute(i: Int): CompletableFuture[Int] =
-    CompletableFuture.supplyAsync(new Supplier[Int] {
-      def get(): Int = Rnd.nextInt(i) / i
-    }, backgroundService)
+    CompletableFuture.supplyAsync(
+      () => Rnd.nextInt(i) / i,
+      backgroundService
+    )
 
   @TearDown
   def tearDown(): Unit = {
     backgroundService.shutdown()
-    if (!backgroundService.awaitTermination(10, TimeUnit.SECONDS)) {
-      val _ = backgroundService.shutdownNow()
-    }
+    if (!backgroundService.awaitTermination(10, TimeUnit.SECONDS))
+      backgroundService.shutdownNow()
   }
 }
 
