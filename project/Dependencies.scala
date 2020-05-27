@@ -8,9 +8,9 @@ object Dependencies {
     val kindProjector = "0.11.0"
 
     val cats = "2.1.1"
-    val monix = "3.1.0"
+    val monix = "3.2.1"
     val twitterUtil = "20.3.0"
-    val catsEffect = "2.0.0"
+    val catsEffect = "2.1.3"
     val shapeless = "2.3.3"
     val scalatest = "3.1.1"
     val scalatestplus = new {
@@ -20,7 +20,7 @@ object Dependencies {
 
     val hbase = "2.2.3"
     val bigtableHBase = "1.14.0"
-    val bigtable = "1.11.0"
+    val bigtable = "1.12.2"
     val logback = "1.2.3"
     val scalaLogging = "3.9.2"
     val scalaJava8Compat = "0.9.0"

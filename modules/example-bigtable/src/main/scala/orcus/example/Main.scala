@@ -29,7 +29,7 @@ object Main extends IOApp {
         .newBuilder()
         .setCredentialsProvider(FixedCredentialsProvider.create(GoogleCredentials.getApplicationDefault))
         .setProjectId(ServiceOptions.getDefaultProjectId)
-        .setInstanceId(sys.env("BIGTABLE_INSTANCE"))
+        .setInstanceId(sys.env.getOrElse("BIGTABLE_INSTANCE", "fake"))
         .setAppProfileId(sys.env.getOrElse("BIGTABLE_APP_PROFILE", "default"))
 
       val stubSettings = builder.stubSettings()
@@ -37,19 +37,37 @@ object Main extends IOApp {
         .readRowsSettings()
         .getRetrySettings
         .toBuilder
-        .setMaxRpcTimeout(org.threeten.bp.Duration.ofSeconds(4L))
+        .setInitialRetryDelay(org.threeten.bp.Duration.ofMillis(5))
+        .setRetryDelayMultiplier(2)
+        .setMaxRetryDelay(org.threeten.bp.Duration.ofMillis(500L))
+        .setInitialRpcTimeout(org.threeten.bp.Duration.ofSeconds(1L))
+        .setRpcTimeoutMultiplier(1.0)
+        .setMaxRpcTimeout(org.threeten.bp.Duration.ofSeconds(3L))
+        .setTotalTimeout(org.threeten.bp.Duration.ofSeconds(5L))
         .build()
       val readRowRetrySettings = stubSettings
         .readRowsSettings()
         .getRetrySettings
         .toBuilder
-        .setMaxRpcTimeout(org.threeten.bp.Duration.ofSeconds(3L))
+        .setInitialRetryDelay(org.threeten.bp.Duration.ofMillis(5))
+        .setRetryDelayMultiplier(2)
+        .setMaxRetryDelay(org.threeten.bp.Duration.ofMillis(500L))
+        .setInitialRpcTimeout(org.threeten.bp.Duration.ofSeconds(1L))
+        .setRpcTimeoutMultiplier(1.0)
+        .setMaxRpcTimeout(org.threeten.bp.Duration.ofSeconds(2L))
+        .setTotalTimeout(org.threeten.bp.Duration.ofSeconds(5L))
         .build()
       val mutateRowRetrySettings = stubSettings
         .readRowsSettings()
         .getRetrySettings
         .toBuilder
-        .setMaxRpcTimeout(org.threeten.bp.Duration.ofSeconds(5L))
+        .setInitialRetryDelay(org.threeten.bp.Duration.ofMillis(5))
+        .setRetryDelayMultiplier(2)
+        .setMaxRetryDelay(org.threeten.bp.Duration.ofMillis(500L))
+        .setInitialRpcTimeout(org.threeten.bp.Duration.ofSeconds(1L))
+        .setRpcTimeoutMultiplier(1.0)
+        .setMaxRpcTimeout(org.threeten.bp.Duration.ofSeconds(1L))
+        .setTotalTimeout(org.threeten.bp.Duration.ofSeconds(5L))
         .build()
       stubSettings.readRowsSettings().setRetrySettings(readRowsRetrySettings)
       stubSettings.readRowSettings().setRetrySettings(readRowRetrySettings)
