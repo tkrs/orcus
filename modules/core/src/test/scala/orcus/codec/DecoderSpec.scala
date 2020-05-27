@@ -18,7 +18,7 @@ class DecoderSpec extends AnyFlatSpec with CodecSpec {
       )
     )
 
-    val f        = Decoder[Map[String, Map[String, String]]]
+    val f = Decoder[Map[String, Map[String, String]]]
     val expected = Right(Map("cf1" -> Map("a" -> "a", "b" -> "", "c" -> "")))
 
     assert(f(Result.create(cells)) === expected)
@@ -35,7 +35,7 @@ class DecoderSpec extends AnyFlatSpec with CodecSpec {
     implicit val decodeE: FamilyDecoder[E] =
       (_: util.NavigableMap[Array[Byte], Array[Byte]]) => Left(expected)
     val cells = Utils.toJavaList(Seq(cell("row", "cf1", "a", Bytes.toBytes("a"))))
-    val f     = Decoder[Map[String, E]]
+    val f = Decoder[Map[String, E]]
 
     assert(f(Result.create(cells)) === Left(expected))
   }
@@ -46,7 +46,7 @@ class DecoderSpec extends AnyFlatSpec with CodecSpec {
     implicit val decodeE: Decoder[E] =
       (_: Result) => Left(expected)
     val cells = Utils.toJavaList(Seq(cell("row", "cf1", "a", Bytes.toBytes("a"))))
-    val f     = Decoder[Option[E]]
+    val f = Decoder[Option[E]]
 
     assert(f(Result.create(cells)) === Left(expected))
   }
@@ -77,7 +77,7 @@ class DecoderSpec extends AnyFlatSpec with CodecSpec {
 
   it should "return Left when its upstream decoder was failed" in {
     val expected = Left[Throwable, Int](new Exception)
-    val f        = Decoder.liftF(expected).flatMap[Int](_ => fail()).map[Int](_ => fail())
+    val f = Decoder.liftF(expected).flatMap[Int](_ => fail()).map[Int](_ => fail())
 
     assert(f(Result.EMPTY_RESULT) === expected)
   }
@@ -88,7 +88,7 @@ class DecoderSpec extends AnyFlatSpec with CodecSpec {
   }
   it should "return Left when its upstream decoder was failed" in {
     val expected = new Exception
-    val f        = Decoder.liftF[Int](Left(expected)).mapF(_ => fail())
+    val f = Decoder.liftF[Int](Left(expected)).mapF(_ => fail())
     assert(f(Result.EMPTY_RESULT) === Left(expected))
   }
 }

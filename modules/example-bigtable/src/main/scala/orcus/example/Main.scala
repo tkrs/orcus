@@ -67,11 +67,11 @@ object Main extends IOApp {
 
   object qualifiers {
     val percentage = ByteString.copyFromUtf8("percentage")
-    val tags       = ByteString.copyFromUtf8("tags")
+    val tags = ByteString.copyFromUtf8("tags")
   }
 
   private[this] val userName = sys.env("USER")
-  private[this] val keySep   = "#"
+  private[this] val keySep = "#"
 
   private[this] val cpuNums = (1 to sys.runtime.availableProcessors()).toList
 
@@ -83,12 +83,12 @@ object Main extends IOApp {
   private def runMutate(dataClient: BigtableDataClient): IO[Unit] = {
     val wrapped = new BigtableDataClientWrapper[IO](dataClient)
 
-    val millis                = System.currentTimeMillis()
-    val micros                = millis * 1000L
+    val millis = System.currentTimeMillis()
+    val micros = millis * 1000L
     val reversedCurrentMillis = Long.MaxValue - millis
     cpuNums.traverse[IO, Unit] { num =>
       val usage = ThreadLocalRandom.current().nextInt(0, 100)
-      val tags  = Seq("app:fake,location=asia")
+      val tags = Seq("app:fake,location=asia")
 
       val rowMutation = RowMutation
         .create(tableId, Seq(userName, num.toString, reversedCurrentMillis.toString).mkString(keySep))
@@ -105,11 +105,11 @@ object Main extends IOApp {
   private def readRows(dataClient: BigtableDataClient): IO[List[(String, CPU)]] = {
     val wrapped = new BigtableDataClientWrapper[IO](dataClient)
 
-    val now    = Instant.now
-    val start  = now.minus(Duration.ofMinutes(3)).toEpochMilli * 1000L
-    val end    = now.toEpochMilli * 1000L
+    val now = Instant.now
+    val start = now.minus(Duration.ofMinutes(3)).toEpochMilli * 1000L
+    val end = now.toEpochMilli * 1000L
     val filter = Filters.FILTERS.timestamp().range().of(start, end)
-    val query  = Query.create(tableId).prefix(userName + keySep).filter(filter)
+    val query = Query.create(tableId).prefix(userName + keySep).filter(filter)
 
     IO.async(wrapped.readRowsAsync[(String, CPU)](_, query))
   }

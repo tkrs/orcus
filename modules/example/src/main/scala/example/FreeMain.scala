@@ -31,7 +31,7 @@ trait FreeMain extends IOApp with LazyLogging {
   import Syntax._
 
   final val tableName: TableName = TableName.valueOf("novelist")
-  final val keyPrefix: String    = "novel"
+  final val keyPrefix: String = "novel"
 
   final val novels = Map(
     "Ryunosuke Akutagawa" -> List(
@@ -58,12 +58,11 @@ trait FreeMain extends IOApp with LazyLogging {
   final def deleteTable(conn: AsyncAdmin): IO[Unit] =
     admin.deleteTable[IO](conn, tableName)
 
-  final def putProgram[F[a]](
-    implicit
+  final def putProgram[F[a]](implicit
     tableOps: TableOps[F]
   ): Free[F, Unit] = {
     def mkPut(author: String, novel: Novel) = {
-      val ts     = System.currentTimeMillis()
+      val ts = System.currentTimeMillis()
       val rowKey = novel.work.key(keyPrefix, author)
 
       PutEncoder[Novel]
@@ -81,8 +80,7 @@ trait FreeMain extends IOApp with LazyLogging {
       .sequence[Free[F, ?], Unit] *> Free.pure(())
   }
 
-  final def scanProgram[F[_]](numRecords: Int)(
-    implicit
+  final def scanProgram[F[_]](numRecords: Int)(implicit
     tableOps: TableOps[F],
     resultScannerOps: ResultScannerOps[F]
   ): Free[F, Seq[Result]] = {
@@ -93,16 +91,14 @@ trait FreeMain extends IOApp with LazyLogging {
     tableOps.getScanner(mkScan) >>= (sc => resultScannerOps.next(sc, numRecords))
   }
 
-  final def resultProgram[F[_]](results: Seq[Result])(
-    implicit
+  final def resultProgram[F[_]](results: Seq[Result])(implicit
     resultOps: ResultOps[F]
   ): Free[F, Vector[Option[Novel]]] =
     results.toVector
       .map(resultOps.to[Option[Novel]])
       .sequence[Free[F, ?], Option[Novel]]
 
-  final def program[F[_]](
-    implicit
+  final def program[F[_]](implicit
     T: TableOps[F],
     R: ResultOps[F],
     RS: ResultScannerOps[F]
@@ -110,30 +106,29 @@ trait FreeMain extends IOApp with LazyLogging {
     val numRecords = 100
 
     for {
-      _  <- putProgram[F]
+      _ <- putProgram[F]
       xs <- scanProgram[F](numRecords)
       ys <- resultProgram(xs)
     } yield ys
   }
 
-  final type Algebra[A]      = EitherK[TableOp, EitherK[ResultOp, ResultScannerOp, ?], A]
+  final type Algebra[A] = EitherK[TableOp, EitherK[ResultOp, ResultScannerOp, ?], A]
   final type TableK[F[_], A] = Kleisli[F, AsyncTableT, A]
 
-  final def interpreter[M[_]](
-    implicit
+  final def interpreter[M[_]](implicit
     tableHandlerM: TableHandler[M],
     resultHandlerM: ResultHandler[M],
     resultScannerHandlerM: ResultScannerHandler[M]
   ): Algebra ~> TableK[M, ?] = {
-    val t: TableOp ~> TableK[M, ?]          = tableHandlerM
-    val r: ResultOp ~> TableK[M, ?]         = resultHandlerM.liftF
+    val t: TableOp ~> TableK[M, ?] = tableHandlerM
+    val r: ResultOp ~> TableK[M, ?] = resultHandlerM.liftF
     val rs: ResultScannerOp ~> TableK[M, ?] = resultScannerHandlerM.liftF
 
     t.or(r.or(rs))
   }
 
   final def runExample(conn: AsyncConnection): IO[ExitCode] = {
-    val i: Algebra ~> TableK[IO, ?]          = interpreter[IO]
+    val i: Algebra ~> TableK[IO, ?] = interpreter[IO]
     val k: TableK[IO, Vector[Option[Novel]]] = program[Algebra].foldMap(i)
 
     for {
@@ -159,7 +154,7 @@ object HBaseMain extends FreeMain {
 
 object BigtableMain extends FreeMain {
   def getConnection: IO[AsyncConnection] = {
-    val projectId  = sys.props.getOrElse("bigtable.project-id", "fake")
+    val projectId = sys.props.getOrElse("bigtable.project-id", "fake")
     val instanceId = sys.props.getOrElse("bigtable.instance-id", "fake")
     IO(new BigtableAsyncConnection(BigtableConfiguration.configure(projectId, instanceId)))
   }
@@ -172,7 +167,7 @@ object Work {
     ValueCodec[Long].imap(_.toEpochDay, LocalDate.ofEpochDay)
 
   implicit val encodeWork: PutFamilyEncoder[Work] = derivedPutFamilyEncoder[Work]
-  implicit val decodeWork: FamilyDecoder[Work]    = derivedFamilyDecoder[Work]
+  implicit val decodeWork: FamilyDecoder[Work] = derivedFamilyDecoder[Work]
 
   implicit class WorkOps(val a: Work) extends AnyVal {
     def key(prefix: String, author: String): Array[Byte] = {
@@ -186,7 +181,7 @@ object Work {
 final case class Novel(work: Work)
 
 object Novel {
-  implicit val decodeNovel: Decoder[Novel]       = derivedDecoder[Novel]
+  implicit val decodeNovel: Decoder[Novel] = derivedDecoder[Novel]
   implicit val encodePutNovel: PutEncoder[Novel] = derivedPutEncoder[Novel]
 }
 

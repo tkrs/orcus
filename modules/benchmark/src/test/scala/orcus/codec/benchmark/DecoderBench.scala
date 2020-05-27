@@ -40,8 +40,8 @@ class DecoderBench {
   @Benchmark
   def decodeSelf(data: Data): Map[String, Columns] = {
     val cf = Bytes.toBytes("cf1")
-    val m  = mutable.Map.empty[String, Columns]
-    val r  = data.genResult
+    val m = mutable.Map.empty[String, Columns]
+    val r = data.genResult
     val c =
       if (data.size == 10) Columns10.fromResult(cf, r)
       else Columns30.fromResult(cf, r)

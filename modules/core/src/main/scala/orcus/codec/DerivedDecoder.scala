@@ -11,8 +11,7 @@ object DerivedDecoder extends DerivedDecoder1
 trait DerivedDecoder1 {
   implicit val decodeHNil: DerivedDecoder[HNil] = _ => Right(HNil)
 
-  implicit def decodeLabelledHCons[K <: Symbol, H, T <: HList](
-    implicit
+  implicit def decodeLabelledHCons[K <: Symbol, H, T <: HList](implicit
     K: Witness.Aux[K],
     H: FamilyDecoder[H],
     T: Lazy[DerivedDecoder[T]]
@@ -29,8 +28,7 @@ trait DerivedDecoder1 {
           Left(e)
       }
 
-  implicit def decodeLabelledGen[H <: HList, A](
-    implicit
+  implicit def decodeLabelledGen[H <: HList, A](implicit
     gen: LabelledGeneric.Aux[A, H],
     A: Lazy[DerivedDecoder[H]]
   ): DerivedDecoder[A] =

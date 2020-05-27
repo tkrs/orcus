@@ -11,42 +11,51 @@ trait Decoder[A] extends Serializable { self =>
 
   def apply(result: Result): Either[Throwable, A]
 
-  def flatMap[B](f: A => Decoder[B]): Decoder[B] = new Decoder[B] {
-    def apply(result: Result): Either[Throwable, B] = self(result) match {
-      case Right(a)    => f(a)(result)
-      case l @ Left(_) => l.asInstanceOf[Either[Throwable, B]]
+  def flatMap[B](f: A => Decoder[B]): Decoder[B] =
+    new Decoder[B] {
+      def apply(result: Result): Either[Throwable, B] =
+        self(result) match {
+          case Right(a)    => f(a)(result)
+          case l @ Left(_) => l.asInstanceOf[Either[Throwable, B]]
+        }
     }
-  }
 
-  def map[B](f: A => B): Decoder[B] = new Decoder[B] {
-    def apply(result: Result): Either[Throwable, B] = self(result) match {
-      case Right(a)    => Right(f(a))
-      case l @ Left(_) => l.asInstanceOf[Either[Throwable, B]]
+  def map[B](f: A => B): Decoder[B] =
+    new Decoder[B] {
+      def apply(result: Result): Either[Throwable, B] =
+        self(result) match {
+          case Right(a)    => Right(f(a))
+          case l @ Left(_) => l.asInstanceOf[Either[Throwable, B]]
+        }
     }
-  }
 
-  def mapF[B](f: A => Either[Throwable, B]): Decoder[B] = new Decoder[B] {
-    def apply(result: Result): Either[Throwable, B] = self(result) match {
-      case Right(a)    => f(a)
-      case l @ Left(_) => l.asInstanceOf[Either[Throwable, B]]
+  def mapF[B](f: A => Either[Throwable, B]): Decoder[B] =
+    new Decoder[B] {
+      def apply(result: Result): Either[Throwable, B] =
+        self(result) match {
+          case Right(a)    => f(a)
+          case l @ Left(_) => l.asInstanceOf[Either[Throwable, B]]
+        }
     }
-  }
 }
 
 object Decoder extends Decoder1 {
   @inline def apply[A](implicit A: Decoder[A]): Decoder[A] = A
 
-  def pure[A](a: A): Decoder[A] = new Decoder[A] {
-    def apply(result: Result): Either[Throwable, A] = Right(a)
-  }
+  def pure[A](a: A): Decoder[A] =
+    new Decoder[A] {
+      def apply(result: Result): Either[Throwable, A] = Right(a)
+    }
 
-  def eval[A](a: Eval[A]): Decoder[A] = new Decoder[A] {
-    def apply(result: Result): Either[Throwable, A] = Right(a.value)
-  }
+  def eval[A](a: Eval[A]): Decoder[A] =
+    new Decoder[A] {
+      def apply(result: Result): Either[Throwable, A] = Right(a.value)
+    }
 
-  def liftF[A](a: Either[Throwable, A]): Decoder[A] = new Decoder[A] {
-    def apply(result: Result): Either[Throwable, A] = a
-  }
+  def liftF[A](a: Either[Throwable, A]): Decoder[A] =
+    new Decoder[A] {
+      def apply(result: Result): Either[Throwable, A] = a
+    }
 }
 
 trait Decoder1 {
@@ -61,8 +70,7 @@ trait Decoder1 {
           }
     }
 
-  implicit def decodeMapLike[M[_, _] <: Map[String, V], V](
-    implicit
+  implicit def decodeMapLike[M[_, _] <: Map[String, V], V](implicit
     K: ValueCodec[String],
     V: FamilyDecoder[V],
     factory: Factory[(String, V), M[String, V]]
@@ -70,7 +78,7 @@ trait Decoder1 {
     new Decoder[M[String, V]] {
       def apply(result: Result): Either[Throwable, M[String, V]] = {
         val builder = factory.newBuilder
-        val map     = result.getMap
+        val map = result.getMap
         if (map == null) Right(builder.result())
         else {
           val keys = map.keySet().iterator()

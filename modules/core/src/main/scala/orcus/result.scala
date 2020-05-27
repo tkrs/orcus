@@ -9,32 +9,27 @@ import org.apache.hadoop.hbase.Cell
 import org.apache.hadoop.hbase.client.Result
 
 object result {
-  def getRow[M[_]](r: Result)(
-    implicit
+  def getRow[M[_]](r: Result)(implicit
     M: Applicative[M]
   ): M[Option[Array[Byte]]] =
     M.pure(Option(r.getRow))
 
-  def rawCells[M[_]](r: Result)(
-    implicit
+  def rawCells[M[_]](r: Result)(implicit
     M: Applicative[M]
   ): M[Seq[Cell]] =
     M.pure(r.rawCells() match { case null => Vector.empty; case xs => xs.toSeq })
 
-  def getColumnCells[M[_]](r: Result, family: Array[Byte], qualifier: Array[Byte])(
-    implicit
+  def getColumnCells[M[_]](r: Result, family: Array[Byte], qualifier: Array[Byte])(implicit
     M: Applicative[M]
   ): M[Seq[Cell]] =
     M.pure(Utils.toSeq(r.getColumnCells(family, qualifier)))
 
-  def getColumnLatestCell[M[_]](r: Result, family: Array[Byte], qualifier: Array[Byte])(
-    implicit
+  def getColumnLatestCell[M[_]](r: Result, family: Array[Byte], qualifier: Array[Byte])(implicit
     M: Applicative[M]
   ): M[Option[Cell]] =
     M.pure(Option(r.getColumnLatestCell(family, qualifier)))
 
-  def get[A, M[_]](r: Result, family: Array[Byte], qualifier: Array[Byte])(
-    implicit
+  def get[A, M[_]](r: Result, family: Array[Byte], qualifier: Array[Byte])(implicit
     A: ValueCodec[A],
     M: MonadError[M, Throwable]
   ): M[Option[A]] =
@@ -47,20 +42,17 @@ object result {
       case _ => M.pure(None)
     }
 
-  def getValue[M[_]](r: Result, family: Array[Byte], qualifier: Array[Byte])(
-    implicit
+  def getValue[M[_]](r: Result, family: Array[Byte], qualifier: Array[Byte])(implicit
     M: Applicative[M]
   ): M[Option[Array[Byte]]] =
     M.pure(Option(r.getValue(family, qualifier)))
 
-  def getValueAsByteBuffer[M[_]](r: Result, family: Array[Byte], qualifier: Array[Byte])(
-    implicit
+  def getValueAsByteBuffer[M[_]](r: Result, family: Array[Byte], qualifier: Array[Byte])(implicit
     M: Applicative[M]
   ): M[Option[ByteBuffer]] =
     M.pure(Option(r.getValueAsByteBuffer(family, qualifier)))
 
-  def getFamily[A, M[_]](r: Result, family: Array[Byte])(
-    implicit
+  def getFamily[A, M[_]](r: Result, family: Array[Byte])(implicit
     A: FamilyDecoder[A],
     ME: ApplicativeError[M, Throwable]
   ): M[A] =
@@ -69,8 +61,7 @@ object result {
       case Left(e)  => ME.raiseError(e)
     }
 
-  def getFamilyMap[M[_]](r: Result, family: Array[Byte])(
-    implicit
+  def getFamilyMap[M[_]](r: Result, family: Array[Byte])(implicit
     ME: Applicative[M]
   ): M[Map[Array[Byte], Array[Byte]]] =
     ME.pure(r.getFamilyMap(family) match {
@@ -78,8 +69,7 @@ object result {
       case xs   => Utils.toMap(xs)
     })
 
-  def to[A, M[_]](r: Result)(
-    implicit
+  def to[A, M[_]](r: Result)(implicit
     A: Decoder[A],
     ME: ApplicativeError[M, Throwable]
   ): M[A] =

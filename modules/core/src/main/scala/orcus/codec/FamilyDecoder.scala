@@ -12,52 +12,57 @@ trait FamilyDecoder[A] { self =>
 
   def apply(map: NMap[Array[Byte], Array[Byte]]): Either[Throwable, A]
 
-  def flatMap[B](f: A => FamilyDecoder[B]): FamilyDecoder[B] = new FamilyDecoder[B] {
-    def apply(map: NMap[Array[Byte], Array[Byte]]): Either[Throwable, B] =
-      self(map) match {
-        case Right(a)    => f(a)(map)
-        case l @ Left(_) => l.asInstanceOf[Either[Throwable, B]]
-      }
-  }
+  def flatMap[B](f: A => FamilyDecoder[B]): FamilyDecoder[B] =
+    new FamilyDecoder[B] {
+      def apply(map: NMap[Array[Byte], Array[Byte]]): Either[Throwable, B] =
+        self(map) match {
+          case Right(a)    => f(a)(map)
+          case l @ Left(_) => l.asInstanceOf[Either[Throwable, B]]
+        }
+    }
 
-  def map[B](f: A => B): FamilyDecoder[B] = new FamilyDecoder[B] {
-    def apply(map: NMap[Array[Byte], Array[Byte]]): Either[Throwable, B] =
-      self(map) match {
-        case Right(a)    => Right(f(a))
-        case l @ Left(_) => l.asInstanceOf[Either[Throwable, B]]
-      }
-  }
+  def map[B](f: A => B): FamilyDecoder[B] =
+    new FamilyDecoder[B] {
+      def apply(map: NMap[Array[Byte], Array[Byte]]): Either[Throwable, B] =
+        self(map) match {
+          case Right(a)    => Right(f(a))
+          case l @ Left(_) => l.asInstanceOf[Either[Throwable, B]]
+        }
+    }
 
-  def mapF[B](f: A => Either[Throwable, B]): FamilyDecoder[B] = new FamilyDecoder[B] {
-    def apply(map: NMap[Array[Byte], Array[Byte]]): Either[Throwable, B] =
-      self(map) match {
-        case Right(a)    => f(a)
-        case l @ Left(_) => l.asInstanceOf[Either[Throwable, B]]
-      }
-  }
+  def mapF[B](f: A => Either[Throwable, B]): FamilyDecoder[B] =
+    new FamilyDecoder[B] {
+      def apply(map: NMap[Array[Byte], Array[Byte]]): Either[Throwable, B] =
+        self(map) match {
+          case Right(a)    => f(a)
+          case l @ Left(_) => l.asInstanceOf[Either[Throwable, B]]
+        }
+    }
 }
 
 object FamilyDecoder extends FamilyDecoder1 {
   @inline def apply[A](implicit A: FamilyDecoder[A]): FamilyDecoder[A] = A
 
-  def pure[A](a: A): FamilyDecoder[A] = new FamilyDecoder[A] {
-    def apply(map: NMap[Array[Byte], Array[Byte]]): Either[Throwable, A] =
-      Right(a)
-  }
+  def pure[A](a: A): FamilyDecoder[A] =
+    new FamilyDecoder[A] {
+      def apply(map: NMap[Array[Byte], Array[Byte]]): Either[Throwable, A] =
+        Right(a)
+    }
 
-  def eval[A](a: Eval[A]): FamilyDecoder[A] = new FamilyDecoder[A] {
-    def apply(map: NMap[Array[Byte], Array[Byte]]): Either[Throwable, A] =
-      Right(a.value)
-  }
+  def eval[A](a: Eval[A]): FamilyDecoder[A] =
+    new FamilyDecoder[A] {
+      def apply(map: NMap[Array[Byte], Array[Byte]]): Either[Throwable, A] =
+        Right(a.value)
+    }
 
-  def liftF[A](a: Either[Throwable, A]): FamilyDecoder[A] = new FamilyDecoder[A] {
-    def apply(map: NMap[Array[Byte], Array[Byte]]): Either[Throwable, A] = a
-  }
+  def liftF[A](a: Either[Throwable, A]): FamilyDecoder[A] =
+    new FamilyDecoder[A] {
+      def apply(map: NMap[Array[Byte], Array[Byte]]): Either[Throwable, A] = a
+    }
 }
 
 trait FamilyDecoder1 {
-  implicit def decodeOption[A](
-    implicit
+  implicit def decodeOption[A](implicit
     A: FamilyDecoder[A]
   ): FamilyDecoder[Option[A]] =
     new FamilyDecoder[Option[A]] {
@@ -71,8 +76,7 @@ trait FamilyDecoder1 {
           }
     }
 
-  implicit def decodeMapLike[M[_, _] <: Map[K, V], K, V](
-    implicit
+  implicit def decodeMapLike[M[_, _] <: Map[K, V], K, V](implicit
     K: ValueCodec[K],
     V: ValueCodec[V],
     factory: Factory[(K, V), M[K, V]]
@@ -89,7 +93,7 @@ trait FamilyDecoder1 {
             if (!entries.hasNext) Right(acc.result())
             else {
               val entry = entries.next()
-              val key   = entry.getKey
+              val key = entry.getKey
               val value = entry.getValue
 
               K.decode(key) match {

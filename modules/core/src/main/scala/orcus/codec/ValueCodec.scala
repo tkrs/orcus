@@ -8,10 +8,11 @@ trait ValueCodec[A] { self =>
   def encode(a: A): Array[Byte]
   def decode(bytes: Array[Byte]): ValueCodec.Result[A]
 
-  final def imap[B](fa: B => A, fb: A => B): ValueCodec[B] = new ValueCodec[B] {
-    def encode(a: B): Array[Byte]                        = self.encode(fa(a))
-    def decode(bytes: Array[Byte]): ValueCodec.Result[B] = self.decode(bytes).map(fb)
-  }
+  final def imap[B](fa: B => A, fb: A => B): ValueCodec[B] =
+    new ValueCodec[B] {
+      def encode(a: B): Array[Byte] = self.encode(fa(a))
+      def decode(bytes: Array[Byte]): ValueCodec.Result[B] = self.decode(bytes).map(fb)
+    }
 }
 
 object ValueCodec {
@@ -20,7 +21,7 @@ object ValueCodec {
   def apply[A](implicit A: ValueCodec[A]): ValueCodec[A] = A
 
   implicit val codecForBytes: ValueCodec[Array[Byte]] = new ValueCodec[Array[Byte]] {
-    def encode(a: Array[Byte]): Array[Byte]             = a
+    def encode(a: Array[Byte]): Array[Byte] = a
     def decode(bytes: Array[Byte]): Result[Array[Byte]] = Right(bytes)
   }
 

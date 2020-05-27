@@ -23,7 +23,7 @@ class ResultSpec extends AnyFunSpec with MockitoSugar with Matchers {
       val m = mock[Result]
 
       val expected = "3"
-      val row      = Bytes.toBytes(expected)
+      val row = Bytes.toBytes(expected)
 
       when(m.getRow).thenReturn(row)
 
@@ -48,7 +48,7 @@ class ResultSpec extends AnyFunSpec with MockitoSugar with Matchers {
 
   describe("rawCells") {
     it("should take the cells from Result.rawCells() and convert it to scala's Seq") {
-      val m     = mock[Result]
+      val m = mock[Result]
       val cells = Iterator.continually(mock[Cell]).take(10).toArray[Cell]
 
       when(m.rawCells()).thenReturn(cells)
@@ -59,7 +59,7 @@ class ResultSpec extends AnyFunSpec with MockitoSugar with Matchers {
       verify(m).rawCells()
     }
     it("should return empty when Result.rawCells() returns null") {
-      val m     = mock[Result]
+      val m = mock[Result]
       val cells = null
 
       when(m.rawCells()).thenReturn(cells)
@@ -73,9 +73,9 @@ class ResultSpec extends AnyFunSpec with MockitoSugar with Matchers {
 
   describe("getColumnCells") {
     it("should take the value from Result.getColumnCells(Array[Byte], Array[Byte]) and convert it to scala's Seq") {
-      val m   = mock[Result]
+      val m = mock[Result]
       val cfn = Bytes.toBytes("1")
-      val cn  = Bytes.toBytes("2")
+      val cn = Bytes.toBytes("2")
 
       val cells = Iterator.continually(mock[Cell]).take(10).toList
 
@@ -90,9 +90,9 @@ class ResultSpec extends AnyFunSpec with MockitoSugar with Matchers {
 
   describe("getColumnLatestCell") {
     it("should take the value from Result.getColumnLatestCell(Array[Byte], Array[Byte])") {
-      val m   = mock[Result]
+      val m = mock[Result]
       val cfn = Bytes.toBytes("1")
-      val cn  = Bytes.toBytes("2")
+      val cn = Bytes.toBytes("2")
 
       val cell = mock[Cell]
 
@@ -104,9 +104,9 @@ class ResultSpec extends AnyFunSpec with MockitoSugar with Matchers {
       verify(m).getColumnLatestCell(cfn, cn)
     }
     it("should return empty when Result.getColumnLatestCell(Array[Byte], Array[Byte]) returns null") {
-      val m   = mock[Result]
+      val m = mock[Result]
       val cfn = Bytes.toBytes("1")
-      val cn  = Bytes.toBytes("2")
+      val cn = Bytes.toBytes("2")
 
       when(m.getColumnLatestCell(cfn, cn)).thenReturn(null)
 
@@ -119,12 +119,12 @@ class ResultSpec extends AnyFunSpec with MockitoSugar with Matchers {
 
   describe("get") {
     it("should take the value from Result.getValue(Array[Byte], Array[Byte]) and convert it to arbitrary types") {
-      val m   = mock[Result]
+      val m = mock[Result]
       val cfn = Bytes.toBytes("1")
-      val cn  = Bytes.toBytes("2")
+      val cn = Bytes.toBytes("2")
 
       val expected = Double.MaxValue
-      val value    = Bytes.toBytes(expected)
+      val value = Bytes.toBytes(expected)
 
       when(m.getValue(cfn, cn)).thenReturn(value)
 
@@ -136,12 +136,12 @@ class ResultSpec extends AnyFunSpec with MockitoSugar with Matchers {
 
   describe("getValue") {
     it("should take the value from Result.getValue(Array[Byte], Array[Byte]) as-is") {
-      val m   = mock[Result]
+      val m = mock[Result]
       val cfn = Bytes.toBytes("1")
-      val cn  = Bytes.toBytes("2")
+      val cn = Bytes.toBytes("2")
 
       val expected = "3"
-      val value    = Bytes.toBytes(expected)
+      val value = Bytes.toBytes(expected)
 
       when(m.getValue(cfn, cn)).thenReturn(value)
 
@@ -153,9 +153,9 @@ class ResultSpec extends AnyFunSpec with MockitoSugar with Matchers {
       verify(m).getValue(cfn, cn)
     }
     it("should return empty when Result.getValue(Array[Byte], Array[Byte]) returns null") {
-      val m   = mock[Result]
+      val m = mock[Result]
       val cfn = Bytes.toBytes("1")
-      val cn  = Bytes.toBytes("2")
+      val cn = Bytes.toBytes("2")
 
       when(m.getValue(cfn, cn)).thenReturn(null)
 
@@ -168,12 +168,12 @@ class ResultSpec extends AnyFunSpec with MockitoSugar with Matchers {
 
   describe("getValueAsByteBuffer") {
     it("should take the value from Result.getValueAsByteBuffer(Array[Byte], Array[Byte])") {
-      val m   = mock[Result]
+      val m = mock[Result]
       val cfn = Bytes.toBytes("1")
-      val cn  = Bytes.toBytes("2")
+      val cn = Bytes.toBytes("2")
 
       val expected = "3"
-      val value    = ByteBuffer.wrap(Bytes.toBytes(expected))
+      val value = ByteBuffer.wrap(Bytes.toBytes(expected))
 
       when(m.getValueAsByteBuffer(cfn, cn)).thenReturn(value)
 
@@ -185,9 +185,9 @@ class ResultSpec extends AnyFunSpec with MockitoSugar with Matchers {
       verify(m).getValueAsByteBuffer(cfn, cn)
     }
     it("should return empty when Result.getValueAsByteBuffer(Array[Byte], Array[Byte]) return null") {
-      val m   = mock[Result]
+      val m = mock[Result]
       val cfn = Bytes.toBytes("1")
-      val cn  = Bytes.toBytes("2")
+      val cn = Bytes.toBytes("2")
 
       when(m.getValueAsByteBuffer(cfn, cn)).thenReturn(null)
 
@@ -200,7 +200,7 @@ class ResultSpec extends AnyFunSpec with MockitoSugar with Matchers {
 
   describe("getFamilyMap") {
     it("should take the map from Result.getFamilyMap(Array[Byte]) and convert it to scala's Map") {
-      val m   = mock[Result]
+      val m = mock[Result]
       val cfn = Bytes.toBytes("1")
 
       val map = mock[util.NavigableMap[Array[Byte], Array[Byte]]]
@@ -213,7 +213,7 @@ class ResultSpec extends AnyFunSpec with MockitoSugar with Matchers {
       verify(m).getFamilyMap(cfn)
     }
     it("should return empty when Result.getFamilyMap(Array[Byte]) returns null") {
-      val m   = mock[Result]
+      val m = mock[Result]
       val cfn = Bytes.toBytes("1")
 
       when(m.getFamilyMap(cfn)).thenReturn(null)
@@ -229,7 +229,7 @@ class ResultSpec extends AnyFunSpec with MockitoSugar with Matchers {
     it("should convert to arbitrary type obtained from getFamilyMap") {
       final case class Foo(x: Int, y: String, z: Boolean)
 
-      val m   = mock[Result]
+      val m = mock[Result]
       val cfn = Bytes.toBytes("1")
 
       val map = new util.TreeMap[Array[Byte], Array[Byte]](Bytes.BYTES_COMPARATOR)
@@ -246,7 +246,7 @@ class ResultSpec extends AnyFunSpec with MockitoSugar with Matchers {
       assert(v === Right(Some(foo)))
     }
     it("should convert to typed Map obtained from getFamilyMap") {
-      val m   = mock[Result]
+      val m = mock[Result]
       val cfn = Bytes.toBytes("1")
 
       val map = new util.TreeMap[Array[Byte], Array[Byte]](Bytes.BYTES_COMPARATOR)
@@ -265,7 +265,7 @@ class ResultSpec extends AnyFunSpec with MockitoSugar with Matchers {
     it("should return empty when getFamilyMap returns null") {
       final case class Foo(x: Int, y: String, z: Boolean)
 
-      val m   = mock[Result]
+      val m = mock[Result]
       val cfn = Bytes.toBytes("1")
 
       when(m.getFamilyMap(cfn)).thenReturn(null)
@@ -284,9 +284,9 @@ class ResultSpec extends AnyFunSpec with MockitoSugar with Matchers {
 
       val m = mock[Result]
 
-      val map  = new util.TreeMap[Array[Byte], Array[Byte]](Bytes.BYTES_COMPARATOR)
+      val map = new util.TreeMap[Array[Byte], Array[Byte]](Bytes.BYTES_COMPARATOR)
       val quux = Quux(a = -1)
-      val bar  = Bar(x = Int.MinValue, y = "Johann Carl Friedrich Gauss", z = true)
+      val bar = Bar(x = Int.MinValue, y = "Johann Carl Friedrich Gauss", z = true)
 
       map.put(Bytes.toBytes("x"), Bytes.toBytes(bar.x))
       map.put(Bytes.toBytes("y"), Bytes.toBytes(bar.y))

@@ -30,7 +30,7 @@ class ResultSpec extends AnyFunSpec with MockitoSugar with Matchers {
       it("should take the row successfully") {
         val m = mock[Result]
 
-        val row  = "1"
+        val row = "1"
         val _row = Bytes.toBytes(row)
         when(m.getRow).thenReturn(_row)
 
@@ -61,10 +61,10 @@ class ResultSpec extends AnyFunSpec with MockitoSugar with Matchers {
       it("should take the cells successfully") {
         val m = mock[Result]
 
-        val family     = "1"
-        val qualifier  = "2"
-        val cells      = Iterator.continually(mock[Cell]).take(10).toSeq
-        val _family    = Bytes.toBytes(family)
+        val family = "1"
+        val qualifier = "2"
+        val cells = Iterator.continually(mock[Cell]).take(10).toSeq
+        val _family = Bytes.toBytes(family)
         val _qualifier = Bytes.toBytes(qualifier)
 
         when(m.getColumnCells(_family, _qualifier)).thenReturn(Utils.toJavaList(cells))
@@ -80,10 +80,10 @@ class ResultSpec extends AnyFunSpec with MockitoSugar with Matchers {
       it("should take the cell successfully") {
         val m = mock[Result]
 
-        val family     = "1"
-        val qualifier  = "2"
-        val cell       = mock[Cell]
-        val _family    = Bytes.toBytes(family)
+        val family = "1"
+        val qualifier = "2"
+        val cell = mock[Cell]
+        val _family = Bytes.toBytes(family)
         val _qualifier = Bytes.toBytes(qualifier)
 
         when(m.getColumnLatestCell(_family, _qualifier)).thenReturn(cell)
@@ -99,12 +99,12 @@ class ResultSpec extends AnyFunSpec with MockitoSugar with Matchers {
       it("should take the value successfully") {
         val m = mock[Result]
 
-        val family     = "1"
-        val qualifier  = "2"
-        val value      = "3"
-        val _family    = Bytes.toBytes(family)
+        val family = "1"
+        val qualifier = "2"
+        val value = "3"
+        val _family = Bytes.toBytes(family)
         val _qualifier = Bytes.toBytes(qualifier)
-        val _value     = Bytes.toBytes(value)
+        val _value = Bytes.toBytes(value)
 
         when(m.getValue(_family, _qualifier)).thenReturn(_value)
 
@@ -119,12 +119,12 @@ class ResultSpec extends AnyFunSpec with MockitoSugar with Matchers {
       it("should take the value successfully") {
         val m = mock[Result]
 
-        val family     = "1"
-        val qualifier  = "2"
-        val value      = "3"
-        val _family    = Bytes.toBytes(family)
+        val family = "1"
+        val qualifier = "2"
+        val value = "3"
+        val _family = Bytes.toBytes(family)
         val _qualifier = Bytes.toBytes(qualifier)
-        val _value     = Bytes.toBytes(value)
+        val _value = Bytes.toBytes(value)
 
         when(m.getValue(_family, _qualifier)).thenReturn(_value)
 
@@ -140,12 +140,12 @@ class ResultSpec extends AnyFunSpec with MockitoSugar with Matchers {
       it("should take the value successfully") {
         val m = mock[Result]
 
-        val family     = "1"
-        val qualifier  = "2"
-        val value      = "3"
-        val _family    = Bytes.toBytes(family)
+        val family = "1"
+        val qualifier = "2"
+        val value = "3"
+        val _family = Bytes.toBytes(family)
         val _qualifier = Bytes.toBytes(qualifier)
-        val _value     = ByteBuffer.wrap(Bytes.toBytes(value))
+        val _value = ByteBuffer.wrap(Bytes.toBytes(value))
 
         when(m.getValueAsByteBuffer(_family, _qualifier)).thenReturn(_value)
 
@@ -161,8 +161,8 @@ class ResultSpec extends AnyFunSpec with MockitoSugar with Matchers {
       it("should take the map successfully") {
         val m = mock[Result]
 
-        val family  = "1"
-        val value   = new util.TreeMap[Array[Byte], Array[Byte]]
+        val family = "1"
+        val value = new util.TreeMap[Array[Byte], Array[Byte]]
         val _family = Bytes.toBytes(family)
 
         when(m.getFamilyMap(_family)).thenReturn(value)
@@ -179,8 +179,8 @@ class ResultSpec extends AnyFunSpec with MockitoSugar with Matchers {
         case class Foo(x: Option[Int], y: Option[Long])
         val m = mock[Result]
 
-        val family  = "1"
-        val value   = new util.TreeMap[Array[Byte], Array[Byte]](Bytes.BYTES_COMPARATOR)
+        val family = "1"
+        val value = new util.TreeMap[Array[Byte], Array[Byte]](Bytes.BYTES_COMPARATOR)
         val _family = Bytes.toBytes(family)
 
         value.put(Bytes.toBytes("x"), Bytes.toBytes(1: Int))
