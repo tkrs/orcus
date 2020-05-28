@@ -133,7 +133,7 @@ object States {
 
     def row: Array[Byte] = Bytes.toBytes("row")
     def cf1: Array[Byte] = Bytes.toBytes("cf1")
-    def newPut: Put = new Put(row)
+    def newPut: Put      = new Put(row)
 
     def cell(q: String, v: Array[Byte]): Cell =
       ExtendedCellBuilderFactory

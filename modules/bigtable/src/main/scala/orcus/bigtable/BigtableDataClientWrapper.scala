@@ -99,7 +99,7 @@ object BigtableDataClientAdapter {
       query,
       new ResponseObserver[Row] {
         private[this] var controller: StreamController = _
-        private[this] val acc = List.newBuilder[A]
+        private[this] val acc                          = List.newBuilder[A]
 
         def onStart(controller: StreamController): Unit =
           this.controller = controller
@@ -159,9 +159,9 @@ object BigtableDataClientAdapter {
   def close(client: BigtableDataClient): Unit = client.close()
 
   private def decode(row: Row): CRow = {
-    val acc = Map.newBuilder[String, List[RowCell]]
+    val acc   = Map.newBuilder[String, List[RowCell]]
     val cells = row.getCells
-    val size = cells.size()
+    val size  = cells.size()
 
     @tailrec def loop2(
       currentFamily: String,
@@ -178,7 +178,7 @@ object BigtableDataClientAdapter {
     @tailrec def loop(i: Int): Map[String, List[RowCell]] =
       if (i >= size) acc.result()
       else {
-        val family = cells.get(i).getFamily
+        val family   = cells.get(i).getFamily
         val (ii, xs) = loop2(family, i, List.newBuilder)
         acc += family -> xs
         loop(ii)

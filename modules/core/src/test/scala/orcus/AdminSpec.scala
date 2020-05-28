@@ -31,7 +31,7 @@ class AdminSpec extends AnyFlatSpec with MockitoSugar {
     CompletableFuture.completedFuture(java.lang.Boolean.FALSE)
 
   "tableExists" should "call tableExists of AsyncAdmin" in {
-    val m = mock[AsyncAdmin]
+    val m  = mock[AsyncAdmin]
     val tn = TableName.valueOf("t")
     when(m.tableExists(tn)).thenReturn(jTrueFuture)
     assert(Await.result(admin.tableExists[Future](m, tn), 3.seconds))
@@ -104,18 +104,18 @@ class AdminSpec extends AnyFlatSpec with MockitoSugar {
   }
 
   "createTableWithKeyRange" should "call createTable of AsyncAdmin" in {
-    val m = mock[AsyncAdmin]
-    val t = TableDescriptorBuilder.NAMESPACE_TABLEDESC
+    val m        = mock[AsyncAdmin]
+    val t        = TableDescriptorBuilder.NAMESPACE_TABLEDESC
     val startKey = Bytes.toBytes("s")
-    val endKey = Bytes.toBytes("e")
+    val endKey   = Bytes.toBytes("e")
     when(m.createTable(t, startKey, endKey, 10)).thenReturn(voidFuture)
     Await.result(admin.createTableWithKeyRange[Future](m, t, startKey, endKey, 10), 3.seconds)
     verify(m).createTable(t, startKey, endKey, 10)
   }
 
   "createTableWithSplitKeys" should "call createTable of AsyncAdmin" in {
-    val m = mock[AsyncAdmin]
-    val t = TableDescriptorBuilder.NAMESPACE_TABLEDESC
+    val m         = mock[AsyncAdmin]
+    val t         = TableDescriptorBuilder.NAMESPACE_TABLEDESC
     val splitKeys = Array(Bytes.toBytes("e"))
     when(m.createTable(t, splitKeys)).thenReturn(voidFuture)
     Await.result(admin.createTableWithSplitKeys[Future](m, t, splitKeys), 3.seconds)
@@ -123,8 +123,8 @@ class AdminSpec extends AnyFlatSpec with MockitoSugar {
   }
 
   "modifyTable" should "call modifyTable of AsyncAdmin" in {
-    val m = mock[AsyncAdmin]
-    val t = TableDescriptorBuilder.NAMESPACE_TABLEDESC
+    val m         = mock[AsyncAdmin]
+    val t         = TableDescriptorBuilder.NAMESPACE_TABLEDESC
     val splitKeys = Array(Bytes.toBytes("e"))
     when(m.createTable(t, splitKeys)).thenReturn(voidFuture)
     Await.result(admin.createTableWithSplitKeys[Future](m, t, splitKeys), 3.seconds)
@@ -239,7 +239,7 @@ class AdminSpec extends AnyFlatSpec with MockitoSugar {
   }
 
   "listNamespaceDescriptors" should "call listNamespaceDescriptors of AsyncAdmin" in {
-    val m = mock[AsyncAdmin]
+    val m  = mock[AsyncAdmin]
     val ds = Seq(NamespaceDescriptor.DEFAULT_NAMESPACE)
     when(m.listNamespaceDescriptors()).thenReturn(CompletableFuture.completedFuture(Utils.toJavaList(ds)))
     val r = Await.result(admin.listNamespaceDescriptors[Future](m), 3.seconds)
@@ -248,7 +248,7 @@ class AdminSpec extends AnyFlatSpec with MockitoSugar {
   }
 
   "getRegions" should "call getRegions of AsyncAdmin" in {
-    val m = mock[AsyncAdmin]
+    val m  = mock[AsyncAdmin]
     val sn = ServerName.valueOf("sn,80")
     val ds = Seq(mock[RegionInfo])
     when(m.getRegions(sn)).thenReturn(CompletableFuture.completedFuture(Utils.toJavaList(ds)))
@@ -258,7 +258,7 @@ class AdminSpec extends AnyFlatSpec with MockitoSugar {
   }
 
   "getRegionsByTableName" should "call getRegions of AsyncAdmin" in {
-    val m = mock[AsyncAdmin]
+    val m  = mock[AsyncAdmin]
     val tn = TableName.valueOf("tn")
     val ds = Seq(mock[RegionInfo])
     when(m.getRegions(tn)).thenReturn(CompletableFuture.completedFuture(Utils.toJavaList(ds)))
@@ -268,7 +268,7 @@ class AdminSpec extends AnyFlatSpec with MockitoSugar {
   }
 
   "flush" should "call flush of AsyncAdmin" in {
-    val m = mock[AsyncAdmin]
+    val m  = mock[AsyncAdmin]
     val tn = TableName.valueOf("tn")
     when(m.flush(tn)).thenReturn(voidFuture)
     Await.result(admin.flush[Future](m, tn), 3.seconds)
@@ -276,7 +276,7 @@ class AdminSpec extends AnyFlatSpec with MockitoSugar {
   }
 
   "flushRegion" should "call flushRegion of AsyncAdmin" in {
-    val m = mock[AsyncAdmin]
+    val m  = mock[AsyncAdmin]
     val rn = Bytes.toBytes("n")
     when(m.flushRegion(rn)).thenReturn(voidFuture)
     Await.result(admin.flushRegion[Future](m, rn), 3.seconds)
@@ -284,7 +284,7 @@ class AdminSpec extends AnyFlatSpec with MockitoSugar {
   }
 
   "flushRegionServer" should "call flushRegionServer of AsyncAdmin" in {
-    val m = mock[AsyncAdmin]
+    val m  = mock[AsyncAdmin]
     val sn = ServerName.valueOf("sn,80")
     when(m.flushRegionServer(sn)).thenReturn(voidFuture)
     Await.result(admin.flushRegionServer[Future](m, sn), 3.seconds)
@@ -292,7 +292,7 @@ class AdminSpec extends AnyFlatSpec with MockitoSugar {
   }
 
   "compact" should "call compact of AsyncAdmin" in {
-    val m = mock[AsyncAdmin]
+    val m  = mock[AsyncAdmin]
     val tn = TableName.valueOf("tn")
     when(m.compact(tn)).thenReturn(voidFuture)
     Await.result(admin.compact[Future](m, tn), 3.seconds)
@@ -300,7 +300,7 @@ class AdminSpec extends AnyFlatSpec with MockitoSugar {
   }
 
   "compactColumn" should "call compact of AsyncAdmin" in {
-    val m = mock[AsyncAdmin]
+    val m  = mock[AsyncAdmin]
     val tn = TableName.valueOf("tn")
     val cn = Bytes.toBytes("cn")
     when(m.compact(tn, cn)).thenReturn(voidFuture)
@@ -309,7 +309,7 @@ class AdminSpec extends AnyFlatSpec with MockitoSugar {
   }
 
   "compactColumnWithType" should "call compact of AsyncAdmin" in {
-    val m = mock[AsyncAdmin]
+    val m  = mock[AsyncAdmin]
     val tn = TableName.valueOf("tn")
     val cn = Bytes.toBytes("cn")
     val ct = CompactType.MOB
@@ -319,7 +319,7 @@ class AdminSpec extends AnyFlatSpec with MockitoSugar {
   }
 
   "compactRegion" should "call compactRegion of AsyncAdmin" in {
-    val m = mock[AsyncAdmin]
+    val m  = mock[AsyncAdmin]
     val rn = Bytes.toBytes("rn")
     when(m.compactRegion(rn)).thenReturn(voidFuture)
     Await.result(admin.compactRegion[Future](m, rn), 3.seconds)
@@ -327,8 +327,8 @@ class AdminSpec extends AnyFlatSpec with MockitoSugar {
   }
 
   "compactFamilyRegion" should "call compactRegion of AsyncAdmin" in {
-    val m = mock[AsyncAdmin]
-    val rn = Bytes.toBytes("rn")
+    val m   = mock[AsyncAdmin]
+    val rn  = Bytes.toBytes("rn")
     val cfn = Bytes.toBytes("fn")
     when(m.compactRegion(rn, cfn)).thenReturn(voidFuture)
     Await.result(admin.compactFamilyRegion[Future](m, rn, cfn), 3.seconds)
@@ -336,7 +336,7 @@ class AdminSpec extends AnyFlatSpec with MockitoSugar {
   }
 
   "majorCompact" should "call majorCompact of AsyncAdmin" in {
-    val m = mock[AsyncAdmin]
+    val m  = mock[AsyncAdmin]
     val tn = TableName.valueOf("tn")
     when(m.majorCompact(tn, CompactType.NORMAL)).thenReturn(voidFuture)
     Await.result(admin.majorCompact[Future](m, tn), 3.seconds)
@@ -344,8 +344,8 @@ class AdminSpec extends AnyFlatSpec with MockitoSugar {
   }
 
   "majorCompactFamily" should "call majorCompact of AsyncAdmin" in {
-    val m = mock[AsyncAdmin]
-    val tn = TableName.valueOf("tn")
+    val m   = mock[AsyncAdmin]
+    val tn  = TableName.valueOf("tn")
     val cfn = Bytes.toBytes("cfn")
     when(m.majorCompact(tn, cfn, CompactType.NORMAL)).thenReturn(voidFuture)
     Await.result(admin.majorCompactFamily[Future](m, tn, cfn), 3.seconds)
@@ -353,7 +353,7 @@ class AdminSpec extends AnyFlatSpec with MockitoSugar {
   }
 
   "majorCompactRegion" should "call majorCompactRegion of AsyncAdmin" in {
-    val m = mock[AsyncAdmin]
+    val m  = mock[AsyncAdmin]
     val rn = Bytes.toBytes("rn")
     when(m.majorCompactRegion(rn)).thenReturn(voidFuture)
     Await.result(admin.majorCompactRegion[Future](m, rn), 3.seconds)
@@ -361,8 +361,8 @@ class AdminSpec extends AnyFlatSpec with MockitoSugar {
   }
 
   "majorCompactFamilyRegion" should "call majorCompactRegion of AsyncAdmin" in {
-    val m = mock[AsyncAdmin]
-    val rn = Bytes.toBytes("rn")
+    val m   = mock[AsyncAdmin]
+    val rn  = Bytes.toBytes("rn")
     val cfn = Bytes.toBytes("cfn")
     when(m.majorCompactRegion(rn, cfn)).thenReturn(voidFuture)
     Await.result(admin.majorCompactFamilyRegion[Future](m, rn, cfn), 3.seconds)
@@ -370,7 +370,7 @@ class AdminSpec extends AnyFlatSpec with MockitoSugar {
   }
 
   "compactRegionServer" should "call compactRegionServer of AsyncAdmin" in {
-    val m = mock[AsyncAdmin]
+    val m  = mock[AsyncAdmin]
     val sn = ServerName.valueOf("aaa,100")
     when(m.compactRegionServer(sn)).thenReturn(voidFuture)
     Await.result(admin.compactRegionServer[Future](m, sn), 3.seconds)
@@ -378,7 +378,7 @@ class AdminSpec extends AnyFlatSpec with MockitoSugar {
   }
 
   "majorCompactRegionServer" should "call majorCompactRegionServer of AsyncAdmin" in {
-    val m = mock[AsyncAdmin]
+    val m  = mock[AsyncAdmin]
     val sn = ServerName.valueOf("aaa,100")
     when(m.majorCompactRegionServer(sn)).thenReturn(voidFuture)
     Await.result(admin.majorCompactRegionServer[Future](m, sn), 3.seconds)

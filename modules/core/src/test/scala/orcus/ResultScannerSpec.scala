@@ -12,7 +12,7 @@ class ResultScannerSpec extends AnyFunSpec with MockitoSugar with Matchers {
 
   describe("nextOne") {
     it("should take the result from ResultScanner.next() as-is") {
-      val m = mock[ResultScanner]
+      val m        = mock[ResultScanner]
       val expected = mock[Result]
 
       when(m.next()).thenReturn(expected)
@@ -36,7 +36,7 @@ class ResultScannerSpec extends AnyFunSpec with MockitoSugar with Matchers {
 
   describe("next") {
     it("should take the results from ResultScanner.next(Int) and convert it to scala's Seq") {
-      val m = mock[ResultScanner]
+      val m        = mock[ResultScanner]
       val expected = Iterator.continually(mock[Result]).take(10).toArray[Result]
 
       when(m.next(10)).thenReturn(expected)

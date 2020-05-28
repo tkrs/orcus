@@ -86,7 +86,7 @@ object table {
     parF: Par.Aux[CompletableFuture, F],
     factoryC: Factory[BatchResult, C[BatchResult]]
   ): F[C[BatchResult]] = {
-    val itr = as.iterator
+    val itr   = as.iterator
     val itcfo = Utils.toIterator(t.batch[Object](Utils.toJavaList(as)))
     val itfb = itr
       .zip(itcfo.map(parF.parallel.apply))
@@ -122,7 +122,7 @@ object table {
   ): F[C[Option[HResult]]] =
     FE.map(F.parallel(t.batchAll[Object](Utils.toJavaList(as)))) { xs =>
       val it = xs.iterator
-      val c = factory.newBuilder
+      val c  = factory.newBuilder
       while (it.hasNext) c += (it.next match { case r: HResult => Option(r); case null => None })
       c.result
     }

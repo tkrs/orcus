@@ -30,7 +30,7 @@ trait RowDecoder1 {
     factory: Factory[(String, V), M[String, V]]
   ): Either[Throwable, M[String, V]] = {
     val builder = factory.newBuilder
-    val it = row.families.iterator
+    val it      = row.families.iterator
 
     @tailrec def loop(): Either[Throwable, M[String, V]] =
       if (!it.hasNext) Right(builder.result())
