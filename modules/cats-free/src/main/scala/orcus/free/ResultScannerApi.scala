@@ -14,7 +14,7 @@ trait ResultScannerApi[F[_]] {
 sealed trait ResultScannerOp[A]
 
 object ResultScannerOp {
-  final case class NextOne(resultScanner: ResultScanner) extends ResultScannerOp[Option[Result]]
+  final case class NextOne(resultScanner: ResultScanner)      extends ResultScannerOp[Option[Result]]
   final case class Next(resultScanner: ResultScanner, i: Int) extends ResultScannerOp[Seq[Result]]
 }
 

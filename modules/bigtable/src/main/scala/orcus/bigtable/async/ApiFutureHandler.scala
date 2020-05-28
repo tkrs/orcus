@@ -20,7 +20,7 @@ trait ApiFutureHandler {
               f,
               new ApiFutureCallback[A] {
                 def onFailure(t: Throwable): Unit = cb(t.asLeft)
-                def onSuccess(a: A): Unit = cb(a.asRight)
+                def onSuccess(a: A): Unit         = cb(a.asRight)
               },
               MoreExecutors.directExecutor()
             ),

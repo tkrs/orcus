@@ -78,7 +78,7 @@ trait Decoder1 {
     new Decoder[M[String, V]] {
       def apply(result: Result): Either[Throwable, M[String, V]] = {
         val builder = factory.newBuilder
-        val map = result.getMap
+        val map     = result.getMap
         if (map == null) Right(builder.result())
         else {
           val keys = map.keySet().iterator()

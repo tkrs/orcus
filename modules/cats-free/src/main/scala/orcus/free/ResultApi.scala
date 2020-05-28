@@ -36,7 +36,7 @@ trait ResultApi[F[_]] {
 sealed trait ResultOp[A]
 
 object ResultOp {
-  final case class GetRow(result: Result) extends ResultOp[Option[Array[Byte]]]
+  final case class GetRow(result: Result)   extends ResultOp[Option[Array[Byte]]]
   final case class RawCells(result: Result) extends ResultOp[Seq[Cell]]
 
   final case class GetColumnCells(result: Result, family: Array[Byte], qualifier: Array[Byte])

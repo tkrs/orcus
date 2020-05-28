@@ -39,9 +39,9 @@ class DerivedPutEncoderSpec extends AnyFlatSpec {
 
   it should "encode to Put from case class" in {
     val row = Bytes.toBytes("row")
-    val ts = Long.MaxValue
-    val x = X(A(1), B("2"), C(3), D(None))
-    val p = PutEncoder[X].apply(new Put(row), x)
+    val ts  = Long.MaxValue
+    val x   = X(A(1), B("2"), C(3), D(None))
+    val p   = PutEncoder[X].apply(new Put(row), x)
 
     assert(p.has(Bytes.toBytes("a"), Bytes.toBytes("x"), ts, Bytes.toBytes(1)))
     assert(p.has(Bytes.toBytes("b"), Bytes.toBytes("y"), ts, Bytes.toBytes("2")))

@@ -93,7 +93,7 @@ trait FamilyDecoder1 {
             if (!entries.hasNext) Right(acc.result())
             else {
               val entry = entries.next()
-              val key = entry.getKey
+              val key   = entry.getKey
               val value = entry.getValue
 
               K.decode(key) match {

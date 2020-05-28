@@ -38,7 +38,7 @@ import scala.util.Random
 )
 abstract class AsyncHandlerBenchmark {
   final val Xs: Vector[Int] = Vector.range(1, 50)
-  final val Rnd: Random = new Random
+  final val Rnd: Random     = new Random
 
   @Param(Array("1", "2", "4", "8", "16", "32", "64", "0"))
   var threads: Int = _

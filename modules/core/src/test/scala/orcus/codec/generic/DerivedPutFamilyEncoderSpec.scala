@@ -15,10 +15,10 @@ class DerivedPutFamilyEncoderSpec extends AnyFlatSpec {
 
   it should "encode to Put from case class" in {
     val row = Bytes.toBytes("row")
-    val cf = Bytes.toBytes("cf")
-    val ts = 1L
-    val a = Foo(1, "2", 3.0)
-    val p = PutFamilyEncoder[Foo].apply(new Put(row, ts), cf, a)
+    val cf  = Bytes.toBytes("cf")
+    val ts  = 1L
+    val a   = Foo(1, "2", 3.0)
+    val p   = PutFamilyEncoder[Foo].apply(new Put(row, ts), cf, a)
 
     assert(p.has(cf, Bytes.toBytes("a"), ts, Bytes.toBytes(1)))
     assert(p.has(cf, Bytes.toBytes("b"), ts, Bytes.toBytes("2")))
