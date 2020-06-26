@@ -46,7 +46,7 @@ object Main extends IOApp {
         .setTotalTimeout(org.threeten.bp.Duration.ofSeconds(5L))
         .build()
       val readRowRetrySettings = stubSettings
-        .readRowsSettings()
+        .readRowSettings()
         .getRetrySettings
         .toBuilder
         .setInitialRetryDelay(org.threeten.bp.Duration.ofMillis(5))
@@ -58,7 +58,7 @@ object Main extends IOApp {
         .setTotalTimeout(org.threeten.bp.Duration.ofSeconds(5L))
         .build()
       val mutateRowRetrySettings = stubSettings
-        .readRowsSettings()
+        .mutateRowSettings()
         .getRetrySettings
         .toBuilder
         .setInitialRetryDelay(org.threeten.bp.Duration.ofMillis(5))
