@@ -24,7 +24,7 @@ trait ApiFutureHandler {
               },
               MoreExecutors.directExecutor()
             ),
-          f.cancel(false)
+          f.cancel(true)
         )
     }
 }
