@@ -1,9 +1,11 @@
 package orcus.bigtable
 
+import cats.Monad
+import cats.MonadError
 import cats.data.Kleisli
-import cats.{Monad, MonadError}
 import com.google.api.core.ApiFuture
-import com.google.api.gax.rpc.{ResponseObserver, StreamController}
+import com.google.api.gax.rpc.ResponseObserver
+import com.google.api.gax.rpc.StreamController
 import com.google.cloud.bigtable.data.v2.BigtableDataClient
 import com.google.cloud.bigtable.data.v2.models._
 import orcus.async.AsyncHandler
@@ -14,12 +16,12 @@ import orcus.internal.Utils
 import scala.annotation.tailrec
 import scala.collection.mutable
 
-class BigtableDataClientWrapper[F[_]](client: BigtableDataClient)(implicit
+final class DataClient[F[_]](client: BigtableDataClient)(implicit
   F: MonadError[F, Throwable],
   asyncH: AsyncHandler[F],
   parF: Par.Aux[ApiFuture, F]
 ) {
-  private[this] val adapter = BigtableDataClientAdapter
+  private[this] val adapter = DataClientAdapter
 
   def readRowAsync(query: Query): F[Option[CRow]] =
     adapter.readRowAsync(client, query)
@@ -46,12 +48,12 @@ class BigtableDataClientWrapper[F[_]](client: BigtableDataClient)(implicit
     adapter.close(client)
 }
 
-class BigtableDataClientWrapperK[F[_]](implicit
+final class DataClientK[F[_]](implicit
   F: MonadError[F, Throwable],
   asyncH: AsyncHandler[F],
   parF: Par.Aux[ApiFuture, F]
 ) {
-  private[this] val adapter = BigtableDataClientAdapter
+  private[this] val adapter = DataClientAdapter
 
   def readRowAsync(query: Query): Kleisli[F, BigtableDataClient, Option[CRow]] =
     Kleisli(adapter.readRowAsync(_, query))
@@ -78,7 +80,7 @@ class BigtableDataClientWrapperK[F[_]](implicit
     Kleisli(c => F.pure(adapter.close(c)))
 }
 
-object BigtableDataClientAdapter {
+object DataClientAdapter {
   import cats.implicits._
 
   def readRowAsync[F[_], A: RowDecoder](client: BigtableDataClient, query: Query)(implicit
