@@ -11,5 +11,5 @@ trait Par[F[_]] {
 object Par {
   type Aux[F[_], G0[_]] = Par[F] { type G[α] = G0[α] }
 
-  @inline def apply[F[_], G[_]](implicit F: Par.Aux[F, G]): Par.Aux[F, G] = F
+  @inline def apply[F[_], G[_]](implicit F: Aux[F, G]): Aux[F, G] = F
 }

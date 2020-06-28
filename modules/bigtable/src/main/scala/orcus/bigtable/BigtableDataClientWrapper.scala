@@ -6,6 +6,7 @@ import com.google.api.core.ApiFuture
 import com.google.api.gax.rpc.{ResponseObserver, StreamController}
 import com.google.cloud.bigtable.data.v2.BigtableDataClient
 import com.google.cloud.bigtable.data.v2.models._
+import orcus.async.AsyncHandler
 import orcus.async.Par
 import orcus.bigtable.codec.RowDecoder
 import orcus.internal.Utils
@@ -15,15 +16,16 @@ import scala.collection.mutable
 
 class BigtableDataClientWrapper[F[_]](client: BigtableDataClient)(implicit
   F: MonadError[F, Throwable],
+  asyncH: AsyncHandler[F],
   parF: Par.Aux[ApiFuture, F]
 ) {
   private[this] val adapter = BigtableDataClientAdapter
 
-  def readRowAsync[A: RowDecoder](query: Query): F[Option[A]] =
+  def readRowAsync(query: Query): F[Option[CRow]] =
     adapter.readRowAsync(client, query)
 
-  def readRowsAsync[A: RowDecoder](cb: Either[Throwable, List[A]] => Unit, query: Query): Unit =
-    adapter.readRowsAsync(client, cb, query)
+  def readRowsAsync(query: Query): F[Vector[CRow]] =
+    adapter.readRowsAsync(client, query)
 
   def sampleRowKeysAsync(tableId: String): F[List[KeyOffset]] =
     adapter.sampleRowKeysAsync(client, tableId)
@@ -37,27 +39,25 @@ class BigtableDataClientWrapper[F[_]](client: BigtableDataClient)(implicit
   def checkAndMutateRowAsync(mutation: ConditionalRowMutation): F[Boolean] =
     adapter.checkAndMutateRowAsync(client, mutation)
 
-  def readModifyWriteRowAsync[A: RowDecoder](mutation: ReadModifyWriteRow): F[Option[A]] =
+  def readModifyWriteRowAsync(mutation: ReadModifyWriteRow): F[Option[CRow]] =
     adapter.readModifyWriteRowAsync(client, mutation)
 
   def close(): Unit =
     adapter.close(client)
 }
 
-class BigtableDataClientWrapperK[F[_]]()(implicit
+class BigtableDataClientWrapperK[F[_]](implicit
   F: MonadError[F, Throwable],
+  asyncH: AsyncHandler[F],
   parF: Par.Aux[ApiFuture, F]
 ) {
   private[this] val adapter = BigtableDataClientAdapter
 
-  def readRowAsync[A: RowDecoder](query: Query): Kleisli[F, BigtableDataClient, Option[A]] =
+  def readRowAsync(query: Query): Kleisli[F, BigtableDataClient, Option[CRow]] =
     Kleisli(adapter.readRowAsync(_, query))
 
-  def readRowsAsync[A: RowDecoder](
-    cb: Either[Throwable, List[A]] => Unit,
-    query: Query
-  ): Kleisli[F, BigtableDataClient, Unit] =
-    Kleisli(c => F.pure(adapter.readRowsAsync(c, cb, query)))
+  def readRowsAsync(query: Query): Kleisli[F, BigtableDataClient, Vector[CRow]] =
+    Kleisli(adapter.readRowsAsync(_, query))
 
   def sampleRowKeysAsync(tableId: String): Kleisli[F, BigtableDataClient, List[KeyOffset]] =
     Kleisli(adapter.sampleRowKeysAsync(_, tableId))
@@ -71,7 +71,7 @@ class BigtableDataClientWrapperK[F[_]]()(implicit
   def checkAndMutateRowAsync(mutation: ConditionalRowMutation): Kleisli[F, BigtableDataClient, Boolean] =
     Kleisli(adapter.checkAndMutateRowAsync(_, mutation))
 
-  def readModifyWriteRowAsync[A: RowDecoder](mutation: ReadModifyWriteRow): Kleisli[F, BigtableDataClient, Option[A]] =
+  def readModifyWriteRowAsync(mutation: ReadModifyWriteRow): Kleisli[F, BigtableDataClient, Option[CRow]] =
     Kleisli(adapter.readModifyWriteRowAsync(_, mutation))
 
   def close(): Kleisli[F, BigtableDataClient, Unit] =
@@ -81,52 +81,37 @@ class BigtableDataClientWrapperK[F[_]]()(implicit
 object BigtableDataClientAdapter {
   import cats.implicits._
 
-  def readRowAsync[F[_], A: RowDecoder](
-    client: BigtableDataClient,
-    query: Query
-  )(implicit F: MonadError[F, Throwable], parF: Par.Aux[ApiFuture, F]): F[Option[A]] =
+  def readRowAsync[F[_], A: RowDecoder](client: BigtableDataClient, query: Query)(implicit
+    F: MonadError[F, Throwable],
+    parF: Par.Aux[ApiFuture, F]
+  ): F[Option[A]] =
     F.flatMap(parF.parallel(client.readRowCallable.futureCall(query))) {
       case null => F.pure(none)
       case row  => F.fromEither(RowDecoder[A].apply(decode(row))).map(Option.apply)
     }
 
-  def readRowsAsync[A: RowDecoder](
-    client: BigtableDataClient,
-    cb: Either[Throwable, List[A]] => Unit,
-    query: Query
-  ): Unit =
-    client.readRowsAsync(
-      query,
-      new ResponseObserver[Row] {
-        private[this] var controller: StreamController = _
-        private[this] val acc                          = List.newBuilder[A]
+  def readRowsAsync[F[_]](client: BigtableDataClient, query: Query)(implicit F: AsyncHandler[F]): F[Vector[CRow]] =
+    F.handle[Vector[CRow]](
+      cb =>
+        client.readRowsAsync(
+          query,
+          new ResponseObserver[Row] {
+            private[this] var controller: StreamController = _
+            private[this] val acc                          = Vector.newBuilder[CRow]
 
-        def onStart(controller: StreamController): Unit =
-          this.controller = controller
-
-        def onResponse(response: Row): Unit =
-          RowDecoder[A].apply(decode(response)) match {
-            case Right(v) =>
-              acc += v
-            case Left(e) =>
-              controller.cancel()
-              cb(e.asLeft)
+            def onStart(controller: StreamController): Unit = this.controller = controller
+            def onResponse(response: Row): Unit             = acc += decode(response)
+            def onError(e: Throwable): Unit                 = cb(e.asLeft)
+            def onComplete(): Unit                          = cb(acc.result().asRight)
           }
-
-        def onError(e: Throwable): Unit =
-          cb(e.asLeft)
-
-        def onComplete(): Unit = {
-          val xs = acc.result()
-          cb(xs.asRight)
-        }
-      }
+        ),
+      ()
     )
 
-  def sampleRowKeysAsync[F[_]](
-    client: BigtableDataClient,
-    tableId: String
-  )(implicit F: Monad[F], parF: Par.Aux[ApiFuture, F]): F[List[KeyOffset]] =
+  def sampleRowKeysAsync[F[_]](client: BigtableDataClient, tableId: String)(implicit
+    F: Monad[F],
+    parF: Par.Aux[ApiFuture, F]
+  ): F[List[KeyOffset]] =
     parF.parallel(client.sampleRowKeysAsync(tableId)).map(Utils.toList)
 
   def mutateRowAsync[F[_]](client: BigtableDataClient, rowMutation: RowMutation)(implicit
@@ -147,12 +132,12 @@ object BigtableDataClientAdapter {
   ): F[Boolean] =
     parF.parallel(client.checkAndMutateRowAsync(mutation)).map(Boolean.unbox)
 
-  def readModifyWriteRowAsync[F[_], A: RowDecoder](client: BigtableDataClient, mutation: ReadModifyWriteRow)(implicit
+  def readModifyWriteRowAsync[F[_]](client: BigtableDataClient, mutation: ReadModifyWriteRow)(implicit
     F: MonadError[F, Throwable],
     parF: Par.Aux[ApiFuture, F]
-  ): F[Option[A]] =
+  ): F[Option[CRow]] =
     F.flatMap(parF.parallel(client.readModifyWriteRowAsync(mutation)).map(Option.apply)) {
-      case Some(row) => F.fromEither(RowDecoder[A].apply(decode(row))).map(Option.apply)
+      case Some(row) => F.pure(Option(decode(row)))
       case _         => F.pure(none)
     }
 
@@ -171,7 +156,7 @@ object BigtableDataClientAdapter {
       if (i >= size) i -> b.result()
       else {
         val cell = cells.get(i)
-        if (cell.getFamily != currentFamily) i -> b.result()
+        if (currentFamily != cell.getFamily) i -> b.result()
         else loop2(currentFamily, i + 1, b += cell)
       }
 

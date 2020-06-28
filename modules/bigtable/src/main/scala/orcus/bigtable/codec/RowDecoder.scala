@@ -13,7 +13,7 @@ object RowDecoder extends RowDecoder1 {
   @inline def apply[A](implicit A: RowDecoder[A]): RowDecoder[A] = A
 }
 
-trait RowDecoder1 {
+private[bigtable] trait RowDecoder1 {
   implicit val decodeRowAsRow: RowDecoder[CRow] = row => Right(row)
 
   implicit def decodeRowAsMap[V, M[_, _] <: Map[String, V]](implicit
@@ -37,10 +37,8 @@ trait RowDecoder1 {
       else {
         val (k, v) = it.next()
         decodeV.apply(v) match {
-          case Right(v) =>
-            builder += k -> v
-            loop()
-          case l => l.asInstanceOf[Either[Throwable, M[String, V]]]
+          case Right(v) => builder += k -> v; loop()
+          case l        => l.asInstanceOf[Either[Throwable, M[String, V]]]
         }
       }
 

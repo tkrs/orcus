@@ -1,26 +1,37 @@
 package orcus.example
 
-import java.time.{Duration, Instant}
+import java.time.Duration
+import java.time.Instant
 import java.util.concurrent.ThreadLocalRandom
 
-import cats.effect.{ExitCode, IO, IOApp}
+import cats.effect.ContextShift
+import cats.effect.ExitCode
+import cats.effect.IO
+import cats.effect.IOApp
 import cats.implicits._
 import com.google.api.gax.core.FixedCredentialsProvider
 import com.google.auth.oauth2.GoogleCredentials
 import com.google.cloud.ServiceOptions
-import com.google.cloud.bigtable.data.v2.models.{Filters, Query, RowMutation}
-import com.google.cloud.bigtable.data.v2.{BigtableDataClient, BigtableDataSettings}
+import com.google.cloud.bigtable.data.v2.BigtableDataClient
+import com.google.cloud.bigtable.data.v2.BigtableDataSettings
+import com.google.cloud.bigtable.data.v2.models.Filters
+import com.google.cloud.bigtable.data.v2.models.Query
+import com.google.cloud.bigtable.data.v2.models.RowMutation
+import com.google.common.primitives.Ints
 import com.google.protobuf.ByteString
-import orcus.async.instances.catsEffect.effect._
+import com.typesafe.scalalogging.LazyLogging
+import orcus.async.instances.catsEffect.concurrent._
 import orcus.bigtable.BigtableDataClientWrapper
+import orcus.bigtable.CRow
 import orcus.bigtable.async.implicits._
+import orcus.bigtable.codec.FamilyDecoder
+import orcus.bigtable.codec.PrimitiveDecoder
+import orcus.bigtable.codec.RowDecoder
 import orcus.bigtable.codec.semiauto._
-import orcus.bigtable.codec.{FamilyDecoder, PrimitiveDecoder, RowDecoder}
-import org.apache.hadoop.hbase.util.Bytes
 
 import scala.util.control.NonFatal
 
-object Main extends IOApp {
+object Main extends IOApp with LazyLogging {
   private[this] val dataSettings = {
     if (sys.env.contains("BIGTABLE_EMULATOR_HOST"))
       BigtableDataSettings.newBuilder().setProjectId("fake").setInstanceId("fake").build()
@@ -95,8 +106,7 @@ object Main extends IOApp {
 
   override def run(args: List[String]): IO[ExitCode] =
     IO(BigtableDataClient.create(dataSettings))
-      .bracket(r => runMutate(r) >> runRead(r))(r => IO(r.close())) >>
-      IO(ExitCode.Success)
+      .bracket(r => runMutate(r) >> runRead(r))(r => IO(r.close())) >> IO(ExitCode.Success)
 
   private def runMutate(dataClient: BigtableDataClient): IO[Unit] = {
     val wrapped = new BigtableDataClientWrapper[IO](dataClient)
@@ -105,22 +115,26 @@ object Main extends IOApp {
     val micros                = millis * 1000L
     val reversedCurrentMillis = Long.MaxValue - millis
     cpuNums.traverse[IO, Unit] { num =>
+      logger.info(s"runMutate: $num")
       val usage = ThreadLocalRandom.current().nextInt(0, 100)
       val tags  = Seq("app:fake,location=asia")
 
       val rowMutation = RowMutation
         .create(tableId, Seq(userName, num.toString, reversedCurrentMillis.toString).mkString(keySep))
-        .setCell(family.metric, qualifiers.percentage, micros, ByteString.copyFrom(Bytes.toBytes(usage)))
-        .setCell(family.metric, qualifiers.tags, micros, ByteString.copyFrom(Bytes.toBytes(tags.mkString(","))))
+        .setCell(family.metric, qualifiers.percentage, micros, ByteString.copyFrom(Ints.toByteArray(usage)))
+        .setCell(family.metric, qualifiers.tags, micros, ByteString.copyFromUtf8(tags.mkString(",")))
 
       wrapped.mutateRowAsync(rowMutation)
     } >> IO.unit
   }
 
   private def runRead(dataClient: BigtableDataClient): IO[Unit] =
-    readRows(dataClient).map(_.map(_.toString)).map(_.foreach(println(_)))
+    readRows(dataClient)
+      .map(_.map(_.toString))
+      .map(_.foreach(v => logger.info(s"runRead: $v")))
 
-  private def readRows(dataClient: BigtableDataClient): IO[List[(String, CPU)]] = {
+  private def readRows(dataClient: BigtableDataClient): IO[Vector[(String, CPU)]] = {
+    logger.info("readRows start")
     val wrapped = new BigtableDataClientWrapper[IO](dataClient)
 
     val now    = Instant.now
@@ -129,7 +143,9 @@ object Main extends IOApp {
     val filter = Filters.FILTERS.timestamp().range().of(start, end)
     val query  = Query.create(tableId).prefix(userName + keySep).filter(filter)
 
-    IO.async(wrapped.readRowsAsync[(String, CPU)](_, query))
+    ((wrapped.readRowsAsync(query) <* ContextShift[IO].shift) >>=
+      (rows => IO.fromEither(CRow.decodeRows[(String, CPU)](rows))))
+      .flatTap(a => IO(logger.info(s"readRows: ${a.toString}")))
   }
 }
 
@@ -144,7 +160,7 @@ final case class Metric(percentage: Int, tags: List[String])
 object Metric {
   implicit val decodeTags: PrimitiveDecoder[List[String]] = bs =>
     try if (bs == null) Right(Nil)
-    else Right(Bytes.toString(bs.toByteArray).split(",").toList.map(_.trim))
+    else Right(bs.toStringUtf8.split(",").toList.map(_.trim))
     catch {
       case NonFatal(e) => Left(e)
     }

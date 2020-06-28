@@ -13,7 +13,7 @@ object PrimitiveDecoder extends PrimitiveDecoder1 {
   @inline def apply[A](implicit A: PrimitiveDecoder[A]): PrimitiveDecoder[A] = A
 }
 
-trait PrimitiveDecoder1 {
+private[bigtable] trait PrimitiveDecoder1 {
   implicit val decodeString: PrimitiveDecoder[String] = bs =>
     try Right(bs.toStringUtf8)
     catch {
