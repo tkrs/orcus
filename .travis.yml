@@ -7,7 +7,7 @@ matrix:
     scala: 2.12.11
     env: COV=false
   - jdk: openjdk11
-    scala: 2.13.2
+    scala: 2.13.3
     env: COV=true
 cache:
   directories:
