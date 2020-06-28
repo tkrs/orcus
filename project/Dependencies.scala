@@ -1,52 +1,50 @@
 import sbt._
 
 object Dependencies {
-  val Ver = new {
-    val `scala2.13` = "2.13.2"
+  val V = new {
+    val `scala2.13` = "2.13.3"
     val `scala2.12` = "2.12.11"
 
     val kindProjector = "0.11.0"
 
     val cats        = "2.1.1"
-    val monix       = "3.2.1"
+    val monix       = "3.2.2"
     val twitterUtil = "20.3.0"
     val catsEffect  = "2.1.3"
     val shapeless   = "2.3.3"
-    val scalatest   = "3.1.1"
+    val scalatest   = "3.2.0"
     val scalatestplus = new {
-      val scalacheck = "3.1.1.1"
-      val mockito    = "3.1.1.0"
+      val scalacheck = "3.2.0.0"
+      val mockito    = "3.2.0.0"
     }
 
     val hbase            = "2.2.3"
-    val bigtableHBase    = "1.14.0"
+    val bigtableHBase    = "1.14.1"
     val bigtable         = "1.13.0"
     val logback          = "1.2.3"
     val scalaLogging     = "3.9.2"
     val scalaJava8Compat = "0.9.0"
   }
 
-  val Pkg = new {
-    lazy val kindProjector = ("org.typelevel" %% "kind-projector" % Ver.kindProjector).cross(CrossVersion.full)
+  lazy val KindProjector = ("org.typelevel" %% "kind-projector" % V.kindProjector).cross(CrossVersion.full)
 
-    lazy val catsCore       = "org.typelevel"              %% "cats-core"             % Ver.cats
-    lazy val catsFree       = "org.typelevel"              %% "cats-free"             % Ver.cats
-    lazy val catsEffect     = "org.typelevel"              %% "cats-effect"           % Ver.catsEffect
-    lazy val monixEval      = "io.monix"                   %% "monix-eval"            % Ver.monix
-    lazy val twitterUtil    = "com.twitter"                %% "util-core"             % Ver.twitterUtil
-    lazy val catbirdUtil    = "io.catbird"                 %% "catbird-util"          % Ver.twitterUtil
-    lazy val shapeless      = "com.chuusai"                %% "shapeless"             % Ver.shapeless
-    lazy val java8Compat    = "org.scala-lang.modules"     %% "scala-java8-compat"    % Ver.scalaJava8Compat
-    lazy val hbase          = "org.apache.hbase"            % "hbase-client"          % Ver.hbase
-    lazy val bigtableHBase  = "com.google.cloud.bigtable"   % "bigtable-hbase-2.x"    % Ver.bigtableHBase
-    lazy val bigtable       = "com.google.cloud"            % "google-cloud-bigtable" % Ver.bigtable
-    lazy val logbackClassic = "ch.qos.logback"              % "logback-classic"       % Ver.logback
-    lazy val logging        = "com.typesafe.scala-logging" %% "scala-logging"         % Ver.scalaLogging
+  lazy val CatsCore       = "org.typelevel"              %% "cats-core"             % V.cats
+  lazy val CatsFree       = "org.typelevel"              %% "cats-free"             % V.cats
+  lazy val CatsEffect     = "org.typelevel"              %% "cats-effect"           % V.catsEffect
+  lazy val MonixEval      = "io.monix"                   %% "monix-eval"            % V.monix
+  lazy val TwitterUtil    = "com.twitter"                %% "util-core"             % V.twitterUtil
+  lazy val CatbirdUtil    = "io.catbird"                 %% "catbird-util"          % V.twitterUtil
+  lazy val Shapeless      = "com.chuusai"                %% "shapeless"             % V.shapeless
+  lazy val Java8Compat    = "org.scala-lang.modules"     %% "scala-java8-compat"    % V.scalaJava8Compat
+  lazy val Hbase          = "org.apache.hbase"            % "hbase-client"          % V.hbase
+  lazy val BigtableHBase  = "com.google.cloud.bigtable"   % "bigtable-hbase-2.x"    % V.bigtableHBase
+  lazy val Bigtable       = "com.google.cloud"            % "google-cloud-bigtable" % V.bigtable
+  lazy val LogbackClassic = "ch.qos.logback"              % "logback-classic"       % V.logback
+  lazy val Logging        = "com.typesafe.scala-logging" %% "scala-logging"         % V.scalaLogging
 
-    lazy val scalatest  = "org.scalatest"     %% "scalatest"       % Ver.scalatest
-    lazy val scalacheck = "org.scalatestplus" %% "scalacheck-1-14" % Ver.scalatestplus.scalacheck
-    lazy val mockito    = "org.scalatestplus" %% "mockito-3-2"     % Ver.scalatestplus.mockito
+  lazy val Scalatest  = "org.scalatest"     %% "scalatest"       % V.scalatest
+  lazy val Scalacheck = "org.scalatestplus" %% "scalacheck-1-14" % V.scalatestplus.scalacheck
+  lazy val Mockito    = "org.scalatestplus" %% "mockito-3-3"     % V.scalatestplus.mockito
 
-    lazy val forTest = Seq(scalatest, scalacheck, mockito).map(_ % Test)
-  }
+  lazy val TestDeps = Seq(Scalatest, Scalacheck, Mockito).map(_ % Test)
 }
