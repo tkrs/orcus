@@ -1,18 +1,18 @@
 import Dependencies._
 
 ThisBuild / organization := "com.github.tkrs"
-ThisBuild / scalaVersion := Ver.`scala2.13`
+ThisBuild / scalaVersion := V.`scala2.13`
 ThisBuild / crossScalaVersions := Seq(
-  Ver.`scala2.13`,
-  Ver.`scala2.12`
+  V.`scala2.13`,
+  V.`scala2.12`
 )
 ThisBuild / resolvers ++= Seq(
   Resolver.sonatypeRepo("releases"),
   Resolver.sonatypeRepo("snapshots")
 )
-ThisBuild / libraryDependencies ++= Pkg.forTest ++ Seq(
-  Pkg.hbase % Provided,
-  compilerPlugin(Pkg.kindProjector)
+ThisBuild / libraryDependencies ++= TestDeps ++ Seq(
+  Hbase % Provided,
+  compilerPlugin(KindProjector)
 )
 ThisBuild / scalacOptions ++= compilerOptions ++ warnCompilerOptions ++ {
   CrossVersion.partialVersion(scalaVersion.value) match {
@@ -115,9 +115,9 @@ lazy val core = project
     libraryDependencies ++= Seq
       .concat(
         Seq(
-          Pkg.catsCore,
-          Pkg.shapeless,
-          Pkg.java8Compat
+          CatsCore,
+          Shapeless,
+          Java8Compat
         )
       )
       .map(_.withSources)
@@ -132,7 +132,7 @@ lazy val monix = project
     moduleName := "orcus-monix"
   )
   .settings(
-    libraryDependencies += Pkg.monixEval.withSources
+    libraryDependencies += MonixEval.withSources
   )
   .dependsOn(core % "compile->compile;test->test")
 
@@ -145,7 +145,7 @@ lazy val `twitter-util` = project
     moduleName := "orcus-twitter-util"
   )
   .settings(
-    libraryDependencies += Pkg.twitterUtil.withSources
+    libraryDependencies += TwitterUtil.withSources
   )
   .dependsOn(core % "compile->compile;test->test")
 
@@ -157,7 +157,7 @@ lazy val `cats-effect` = project
     moduleName := "orcus-cats-effect"
   )
   .settings(
-    libraryDependencies += Pkg.catsEffect.withSources
+    libraryDependencies += CatsEffect.withSources
   )
   .dependsOn(core % "compile->compile;test->test")
 
@@ -170,7 +170,7 @@ lazy val `cats-free` = project
     moduleName := "orcus-cats-free"
   )
   .settings(
-    libraryDependencies += Pkg.catsFree.withSources
+    libraryDependencies += CatsFree.withSources
   )
   .dependsOn(core)
 
@@ -183,7 +183,7 @@ lazy val bigtable = project
     moduleName := "orcus-bigtable"
   )
   .settings(
-    libraryDependencies ++= Seq(Pkg.bigtable).map(_.withSources)
+    libraryDependencies += Bigtable.withSources
   )
   .dependsOn(core)
 
@@ -198,9 +198,9 @@ lazy val example = project
   )
   .settings(
     libraryDependencies ++= Seq(
-      Pkg.bigtableHBase,
-      Pkg.logging,
-      Pkg.logbackClassic
+      BigtableHBase,
+      Logging,
+      LogbackClassic
     ).map(_.withSources)
   )
   .settings(
@@ -223,9 +223,9 @@ lazy val `example-bigtable` = project
   )
   .settings(
     libraryDependencies ++= Seq(
-      Pkg.hbase,
-      Pkg.logging,
-      Pkg.logbackClassic
+      Hbase,
+      Logging,
+      LogbackClassic
     ).map(_.withSources)
   )
   .settings(
@@ -247,9 +247,9 @@ lazy val benchmark = (project in file("modules/benchmark"))
   )
   .settings(
     libraryDependencies ++= Seq(
-      Pkg.java8Compat,
-      Pkg.hbase,
-      Pkg.catbirdUtil
+      Java8Compat,
+      Hbase,
+      CatbirdUtil
     )
   )
   .enablePlugins(JmhPlugin)
