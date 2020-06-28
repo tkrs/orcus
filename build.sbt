@@ -34,9 +34,9 @@ lazy val compilerOptions = Seq(
 )
 
 lazy val warnCompilerOptions = Seq(
-  "-Xlint",
+  // "-Xlint",
   "-Xcheckinit",
-  "-Xfatal-warnings",
+  // "-Xfatal-warnings",
   "-Ywarn-unused:_",
   "-Ywarn-extra-implicit",
   "-Ywarn-dead-code",
