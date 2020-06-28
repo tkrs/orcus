@@ -21,8 +21,8 @@ import com.google.common.primitives.Ints
 import com.google.protobuf.ByteString
 import com.typesafe.scalalogging.LazyLogging
 import orcus.async.instances.catsEffect.concurrent._
-import orcus.bigtable.BigtableDataClientWrapper
 import orcus.bigtable.CRow
+import orcus.bigtable.DataClient
 import orcus.bigtable.async.implicits._
 import orcus.bigtable.codec.FamilyDecoder
 import orcus.bigtable.codec.PrimitiveDecoder
@@ -109,7 +109,7 @@ object Main extends IOApp with LazyLogging {
       .bracket(r => runMutate(r) >> runRead(r))(r => IO(r.close())) >> IO(ExitCode.Success)
 
   private def runMutate(dataClient: BigtableDataClient): IO[Unit] = {
-    val wrapped = new BigtableDataClientWrapper[IO](dataClient)
+    val wrapped = new DataClient[IO](dataClient)
 
     val millis                = System.currentTimeMillis()
     val micros                = millis * 1000L
@@ -135,7 +135,7 @@ object Main extends IOApp with LazyLogging {
 
   private def readRows(dataClient: BigtableDataClient): IO[Vector[(String, CPU)]] = {
     logger.info("readRows start")
-    val wrapped = new BigtableDataClientWrapper[IO](dataClient)
+    val wrapped = new DataClient[IO](dataClient)
 
     val now    = Instant.now
     val start  = now.minus(Duration.ofMinutes(3)).toEpochMilli * 1000L
