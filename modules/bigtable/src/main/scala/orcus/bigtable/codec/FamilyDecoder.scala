@@ -13,37 +13,34 @@ object FamilyDecoder extends FamilyDecoder1 {
   @inline def apply[A](implicit A: FamilyDecoder[A]): FamilyDecoder[A] = A
 }
 
-trait FamilyDecoder1 {
+private[bigtable] trait FamilyDecoder1 {
   implicit def decodeMap[K, V, M[_, _] <: Map[K, V]](implicit
     decodeK: PrimitiveDecoder[K],
     decodeV: PrimitiveDecoder[V],
     factory: Factory[(K, V), M[K, V]]
-  ): FamilyDecoder[M[K, V]] =
-    family => {
-      val builder = factory.newBuilder
+  ): FamilyDecoder[M[K, V]] = { family =>
+    val builder = factory.newBuilder
 
-      @tailrec def loop(cells: List[RowCell]): Either[Throwable, M[K, V]] =
-        cells match {
-          case h :: t =>
-            decodeK.apply(h.getQualifier) match {
-              case Right(q) =>
-                decodeV.apply(h.getValue) match {
-                  case Right(v) =>
-                    builder += q -> v
-                    loop(t)
-                  case l => l.asInstanceOf[Either[Throwable, M[K, V]]]
-                }
-              case l => l.asInstanceOf[Either[Throwable, M[K, V]]]
-            }
-          case _ =>
-            Right(builder.result())
-        }
+    @tailrec def loop(cells: List[RowCell]): Either[Throwable, M[K, V]] =
+      cells match {
+        case h :: t =>
+          decodeK(h.getQualifier) match {
+            case Right(q) =>
+              decodeV(h.getValue) match {
+                case Right(v) => builder += q -> v; loop(t)
+                case l        => l.asInstanceOf[Either[Throwable, M[K, V]]]
+              }
+            case l => l.asInstanceOf[Either[Throwable, M[K, V]]]
+          }
+        case _ =>
+          Right(builder.result())
+      }
 
-      loop(family)
-    }
+    loop(family)
+  }
 
-  implicit def decodeOptionA[A](implicit
-    A: FamilyDecoder[A]
-  ): FamilyDecoder[Option[A]] =
-    family => if (family == null || family.isEmpty) Right(None) else A.apply(family).map(Option.apply)
+  implicit def decodeOptionA[A](implicit decodeA: FamilyDecoder[A]): FamilyDecoder[Option[A]] =
+    family =>
+      if (family == null || family.isEmpty) Right(None)
+      else decodeA(family).map(Option.apply)
 }

@@ -7,7 +7,8 @@ trait DerivedFamilyDecoder[A] extends FamilyDecoder[A]
 
 object DerivedFamilyDecoder extends DerivedFamilyDecoder1
 
-trait DerivedFamilyDecoder1 {
+private[bigtable] trait DerivedFamilyDecoder1 {
+
   implicit val familyDecodeHNil: DerivedFamilyDecoder[HNil] = _ => Right(HNil)
 
   implicit def familyDecodeLabelledHCons[K <: Symbol, H, T <: HList](implicit
