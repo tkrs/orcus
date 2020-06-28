@@ -18,7 +18,7 @@ class RowDecoderTest extends AnyFunSuite {
   object Bar {
     implicit val decode: FamilyDecoder[Bar] = derivedFamilyDecoder[Bar]
   }
-  case class Baz(d: Long, e: Boolean, f: Float, g: BigDecimal)
+  case class Baz(d: Long, e: Boolean, f: Float)
 
   object Baz {
     implicit val decode: FamilyDecoder[Baz] = derivedFamilyDecoder[Baz]
@@ -73,13 +73,6 @@ class RowDecoderTest extends AnyFunSuite {
             ts,
             java.util.List.of(),
             ByteString.copyFrom(Bytes.toBytes(10.555f))
-          ),
-          RowCell.create(
-            "c2",
-            ByteString.copyFromUtf8("g"),
-            ts,
-            java.util.List.of(),
-            ByteString.copyFrom(Bytes.toBytes(BigDecimal(89783692).bigDecimal))
           )
         )
       )
@@ -87,7 +80,7 @@ class RowDecoderTest extends AnyFunSuite {
 
     val expected = Foo(
       Bar(10, "string", Some(10.999)),
-      Some(Baz(101L, true, 10.555f, BigDecimal(89783692)))
+      Some(Baz(101L, true, 10.555f))
     )
 
     assert(RowDecoder[Foo].apply(row) === Right(expected))

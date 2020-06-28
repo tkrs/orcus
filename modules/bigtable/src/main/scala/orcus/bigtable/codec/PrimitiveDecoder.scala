@@ -1,7 +1,9 @@
 package orcus.bigtable.codec
 
+import com.google.common.primitives.Ints
+import com.google.common.primitives.Longs
+import com.google.common.primitives.Shorts
 import com.google.protobuf.ByteString
-import org.apache.hadoop.hbase.util.Bytes
 
 import scala.util.control.NonFatal
 
@@ -20,56 +22,50 @@ private[bigtable] trait PrimitiveDecoder1 {
       case NonFatal(e) => Left(e)
     }
 
-  implicit val decodeBoolean: PrimitiveDecoder[Boolean] = bs =>
-    try Right(Bytes.toBoolean(bs.toByteArray))
-    catch {
-      case NonFatal(e) => Left(e)
-    }
-
   implicit val decodeByteString: PrimitiveDecoder[ByteString] = bs =>
     try Right(bs)
     catch {
       case NonFatal(e) => Left(e)
     }
 
-  implicit val decodeShort: PrimitiveDecoder[Short] = bs =>
-    try Right(Bytes.toShort(bs.toByteArray))
-    catch {
-      case NonFatal(e) => Left(e)
-    }
-
-  implicit val decodeInt: PrimitiveDecoder[Int] = bs =>
-    try Right(Bytes.toInt(bs.toByteArray))
-    catch {
-      case NonFatal(e) => Left(e)
-    }
-
   implicit val decodeLong: PrimitiveDecoder[Long] = bs =>
-    try Right(Bytes.toLong(bs.toByteArray))
-    catch {
-      case NonFatal(e) => Left(e)
-    }
-
-  implicit val decodeFloat: PrimitiveDecoder[Float] = bs =>
-    try Right(Bytes.toFloat(bs.toByteArray))
-    catch {
-      case NonFatal(e) => Left(e)
-    }
-
-  implicit val decodeDouble: PrimitiveDecoder[Double] = bs =>
-    try Right(Bytes.toDouble(bs.toByteArray))
-    catch {
-      case NonFatal(e) => Left(e)
-    }
-
-  implicit val decodeBigDecimal: PrimitiveDecoder[BigDecimal] = bs =>
-    try Right(Bytes.toBigDecimal(bs.toByteArray))
+    try Right(Longs.fromByteArray(bs.toByteArray))
     catch {
       case NonFatal(e) => Left(e)
     }
 
   implicit val decodeBytes: PrimitiveDecoder[Array[Byte]] = bs =>
     try Right(bs.toByteArray)
+    catch {
+      case NonFatal(e) => Left(e)
+    }
+
+  implicit val decodeBooleanAsHBase: PrimitiveDecoder[Boolean] = bs =>
+    try Right(bs.byteAt(0) != 0.toByte)
+    catch {
+      case NonFatal(e) => Left(e)
+    }
+
+  implicit val decodeShortAsHBase: PrimitiveDecoder[Short] = bs =>
+    try Right(Shorts.fromByteArray(bs.toByteArray))
+    catch {
+      case NonFatal(e) => Left(e)
+    }
+
+  implicit val decodeIntAsHBase: PrimitiveDecoder[Int] = bs =>
+    try Right(Ints.fromByteArray(bs.toByteArray))
+    catch {
+      case NonFatal(e) => Left(e)
+    }
+
+  implicit val decodeFloatAsHBase: PrimitiveDecoder[Float] = bs =>
+    try Right(java.lang.Float.intBitsToFloat(Ints.fromByteArray(bs.toByteArray)))
+    catch {
+      case NonFatal(e) => Left(e)
+    }
+
+  implicit val decodeDoubleAsHBase: PrimitiveDecoder[Double] = bs =>
+    try Right(java.lang.Double.longBitsToDouble(Longs.fromByteArray(bs.toByteArray)))
     catch {
       case NonFatal(e) => Left(e)
     }
