@@ -72,7 +72,7 @@ private[bigtable] trait PrimitiveDecoder1 {
 
   implicit def decodeOptionA[A](implicit A: PrimitiveDecoder[A]): PrimitiveDecoder[Option[A]] =
     bs =>
-      try if (bs == null) Right(None) else A.apply(bs).map(Option.apply)
+      try if (bs == null || bs.isEmpty()) Right(None) else A.apply(bs).map(Option.apply)
       catch {
         case NonFatal(e) => Left(e)
       }
