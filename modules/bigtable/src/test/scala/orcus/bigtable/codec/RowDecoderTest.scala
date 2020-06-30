@@ -8,7 +8,7 @@ import org.apache.hadoop.hbase.util.Bytes
 import org.scalatest.funsuite.AnyFunSuite
 
 class RowDecoderTest extends AnyFunSuite {
-  case class Foo(c1: Bar, c2: Option[Baz])
+  case class Foo(c1: Bar, c2: Option[Baz], c3: Option[Baz] = None)
 
   object Foo {
     implicit val decode: RowDecoder[Foo] = derivedRowDecoder[Foo]
@@ -18,7 +18,7 @@ class RowDecoderTest extends AnyFunSuite {
   object Bar {
     implicit val decode: FamilyDecoder[Bar] = derivedFamilyDecoder[Bar]
   }
-  case class Baz(d: Long, e: Boolean, f: Float)
+  case class Baz(d: Long, e: Boolean, f: Float, g: Option[Int] = None, h: Option[Long] = None)
 
   object Baz {
     implicit val decode: FamilyDecoder[Baz] = derivedFamilyDecoder[Baz]
@@ -106,11 +106,41 @@ class RowDecoderTest extends AnyFunSuite {
             java.util.List.of(),
             ByteString.copyFrom(Bytes.toBytes("string"))
           )
+        ),
+        "c3" -> List(
+          RowCell.create(
+            "c3",
+            ByteString.copyFromUtf8("d"),
+            ts,
+            java.util.List.of(),
+            ByteString.copyFrom(Bytes.toBytes(101L))
+          ),
+          RowCell.create(
+            "c3",
+            ByteString.copyFromUtf8("e"),
+            ts,
+            java.util.List.of(),
+            ByteString.copyFrom(Bytes.toBytes(true))
+          ),
+          RowCell.create(
+            "c3",
+            ByteString.copyFromUtf8("f"),
+            ts,
+            java.util.List.of(),
+            ByteString.copyFrom(Bytes.toBytes(10.555f))
+          ),
+          RowCell.create(
+            "c3",
+            ByteString.copyFromUtf8("h"),
+            ts,
+            java.util.List.of(),
+            ByteString.EMPTY
+          )
         )
       )
     )
 
-    val expected = Foo(Bar(10, "string", None), None)
+    val expected = Foo(Bar(10, "string", None), None, Some(Baz(101L, true, 10.555f, None, None)))
 
     assert(RowDecoder[Foo].apply(row) === Right(expected))
   }
