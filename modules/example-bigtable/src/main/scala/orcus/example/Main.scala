@@ -114,7 +114,7 @@ object Main extends IOApp with LazyLogging {
     val millis                = System.currentTimeMillis()
     val micros                = millis * 1000L
     val reversedCurrentMillis = Long.MaxValue - millis
-    cpuNums.traverse[IO, Unit] { num =>
+    val traverse = cpuNums.traverse[IO, Unit] { num =>
       logger.info(s"runMutate: $num")
       val usage = ThreadLocalRandom.current().nextInt(0, 100)
       val tags  = Seq("app:fake,location=asia")
@@ -125,7 +125,8 @@ object Main extends IOApp with LazyLogging {
         .setCell(family.metric, qualifiers.tags, micros, ByteString.copyFromUtf8(tags.mkString(",")))
 
       wrapped.mutateRowAsync(rowMutation)
-    } >> IO.unit
+    }
+    (traverse <* ContextShift[IO].shift) >> IO.unit
   }
 
   private def runRead(dataClient: BigtableDataClient): IO[Unit] =
