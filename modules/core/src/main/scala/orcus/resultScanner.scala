@@ -1,7 +1,8 @@
 package orcus
 
 import cats.ApplicativeError
-import org.apache.hadoop.hbase.client.{Result, ResultScanner}
+import org.apache.hadoop.hbase.client.Result
+import org.apache.hadoop.hbase.client.ResultScanner
 
 object resultScanner {
   def nextOne[F[_]](resultScanner: ResultScanner)(implicit

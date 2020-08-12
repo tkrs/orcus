@@ -2,9 +2,12 @@ package orcus.bigtable.async
 
 import cats.syntax.either._
 import cats.~>
-import com.google.api.core.{ApiFuture, ApiFutureCallback, ApiFutures}
+import com.google.api.core.ApiFuture
+import com.google.api.core.ApiFutureCallback
+import com.google.api.core.ApiFutures
 import com.google.common.util.concurrent.MoreExecutors
-import orcus.async.{AsyncHandler, Par}
+import orcus.async.AsyncHandler
+import orcus.async.Par
 
 trait ApiFutureHandler {
 

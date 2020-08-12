@@ -2,7 +2,8 @@ package orcus.free
 
 import cats.InjectK
 import cats.free.Free
-import org.apache.hadoop.hbase.client.{Result, ResultScanner}
+import org.apache.hadoop.hbase.client.Result
+import org.apache.hadoop.hbase.client.ResultScanner
 
 trait ResultScannerApi[F[_]] {
   type ResultScannerF[A] = Free[F, A]

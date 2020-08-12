@@ -1,7 +1,8 @@
 package orcus.free.handler
 
-import cats.{~>, ApplicativeError}
+import cats.ApplicativeError
 import cats.data.Kleisli
+import cats.~>
 import orcus.async._
 import orcus.async.implicits._
 import orcus.free.TableOp

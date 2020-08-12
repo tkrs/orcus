@@ -1,6 +1,7 @@
 package orcus.async.instances.twitterUtil
 
-import com.twitter.util.{Future, Promise}
+import com.twitter.util.Future
+import com.twitter.util.Promise
 import orcus.async.AsyncHandler
 
 private[twitterUtil] trait AsyncHandlerTwitterFutureInstances {

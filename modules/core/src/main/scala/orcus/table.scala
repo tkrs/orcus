@@ -2,26 +2,25 @@ package orcus
 
 import java.util.concurrent.CompletableFuture
 
+import cats.Applicative
+import cats.ApplicativeError
 import cats.data.Kleisli
-import cats.{Applicative, ApplicativeError}
 import orcus.async.Par
 import orcus.internal.ScalaVersionSpecifics._
 import orcus.internal.Utils
 import org.apache.hadoop.conf.{Configuration => HConfig}
-import org.apache.hadoop.hbase.client.{
-  AsyncTable,
-  RowMutations,
-  ScanResultConsumerBase,
-  Append => HAppend,
-  Delete => HDelete,
-  Get => HGet,
-  Increment => HIncrement,
-  Put => HPut,
-  Result => HResult,
-  ResultScanner => HResultScanner,
-  Row => HRow,
-  Scan => HScan
-}
+import org.apache.hadoop.hbase.client.AsyncTable
+import org.apache.hadoop.hbase.client.RowMutations
+import org.apache.hadoop.hbase.client.ScanResultConsumerBase
+import org.apache.hadoop.hbase.client.{Append => HAppend}
+import org.apache.hadoop.hbase.client.{Delete => HDelete}
+import org.apache.hadoop.hbase.client.{Get => HGet}
+import org.apache.hadoop.hbase.client.{Increment => HIncrement}
+import org.apache.hadoop.hbase.client.{Put => HPut}
+import org.apache.hadoop.hbase.client.{Result => HResult}
+import org.apache.hadoop.hbase.client.{ResultScanner => HResultScanner}
+import org.apache.hadoop.hbase.client.{Row => HRow}
+import org.apache.hadoop.hbase.client.{Scan => HScan}
 import org.apache.hadoop.hbase.{TableName => HTableName}
 
 object table {

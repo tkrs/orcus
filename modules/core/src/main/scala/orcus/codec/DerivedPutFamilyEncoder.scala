@@ -1,8 +1,13 @@
 package orcus.codec
 
 import org.apache.hadoop.hbase.util.Bytes
+import shapeless.::
+import shapeless.HList
+import shapeless.HNil
+import shapeless.LabelledGeneric
+import shapeless.Lazy
+import shapeless.Witness
 import shapeless.labelled.FieldType
-import shapeless.{::, HList, HNil, LabelledGeneric, Lazy, Witness}
 
 trait DerivedPutFamilyEncoder[A] extends PutFamilyEncoder[A]
 

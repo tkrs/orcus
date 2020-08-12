@@ -4,20 +4,15 @@ package orcus
 import java.util.concurrent.CompletableFuture
 import java.util.regex.Pattern
 
+import cats.Applicative
+import cats.Functor
 import cats.syntax.apply._
-import cats.{Applicative, Functor}
 import orcus.async.Par
 import orcus.internal.Utils
-//import com.google.protobuf.RpcChannel
+import org.apache.hadoop.hbase.NamespaceDescriptor
+import org.apache.hadoop.hbase.ServerName
+import org.apache.hadoop.hbase.TableName
 import org.apache.hadoop.hbase.client._
-import org.apache.hadoop.hbase.{
-//  CacheEvictionStats,
-//  ClusterMetrics,
-  NamespaceDescriptor,
-//  RegionMetrics,
-  ServerName,
-  TableName
-}
 //import org.apache.hadoop.hbase.ClusterMetrics.{Option => CMOption}
 //import org.apache.hadoop.hbase.client.replication.TableCFs
 //import org.apache.hadoop.hbase.client.security.SecurityCapability
