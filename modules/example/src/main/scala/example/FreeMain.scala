@@ -3,8 +3,11 @@ package example
 import java.time.LocalDate
 import java.util.concurrent.CompletableFuture
 
-import cats.data.{EitherK, Kleisli}
-import cats.effect.{ExitCode, IO, IOApp}
+import cats.data.EitherK
+import cats.data.Kleisli
+import cats.effect.ExitCode
+import cats.effect.IO
+import cats.effect.IOApp
 import cats.free.Free
 import cats.implicits._
 import cats.~>

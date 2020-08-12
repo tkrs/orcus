@@ -5,7 +5,8 @@ object Dependencies {
     val `scala2.13` = "2.13.3"
     val `scala2.12` = "2.12.12"
 
-    val kindProjector = "0.11.0"
+    val kindProjector   = "0.11.0"
+    val organizeImports = "0.4.0"
 
     val cats        = "2.1.1"
     val monix       = "3.2.2"
@@ -26,7 +27,8 @@ object Dependencies {
     val scalaJava8Compat = "0.9.0"
   }
 
-  lazy val KindProjector = ("org.typelevel" %% "kind-projector" % V.kindProjector).cross(CrossVersion.full)
+  lazy val KindProjector   = ("org.typelevel"       %% "kind-projector"   % V.kindProjector).cross(CrossVersion.full)
+  lazy val OrganizeImports = "com.github.liancheng" %% "organize-imports" % V.organizeImports
 
   lazy val CatsCore       = "org.typelevel"              %% "cats-core"             % V.cats
   lazy val CatsFree       = "org.typelevel"              %% "cats-free"             % V.cats

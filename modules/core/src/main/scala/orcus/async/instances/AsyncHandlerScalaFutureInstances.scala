@@ -2,7 +2,8 @@ package orcus.async.instances
 
 import orcus.async.AsyncHandler
 
-import scala.concurrent.{Future, Promise}
+import scala.concurrent.Future
+import scala.concurrent.Promise
 
 private[instances] trait AsyncHandlerScalaFutureInstances {
   implicit val handleScalaFuture: AsyncHandler[Future] =

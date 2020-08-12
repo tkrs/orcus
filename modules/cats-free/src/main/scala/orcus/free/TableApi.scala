@@ -2,24 +2,23 @@ package orcus.free
 
 import java.util.concurrent.CompletableFuture
 
-import cats.{ApplicativeError, InjectK}
+import cats.ApplicativeError
+import cats.InjectK
 import cats.free.Free
 import orcus.BatchResult
 import orcus.async.Par
 import orcus.table.AsyncTableT
 import org.apache.hadoop.conf.{Configuration => HConfig}
 import org.apache.hadoop.hbase.TableName
-import org.apache.hadoop.hbase.client.{
-  Row,
-  Append => HAppend,
-  Delete => HDelete,
-  Get => HGet,
-  Increment => HIncrement,
-  Put => HPut,
-  Result => HResult,
-  ResultScanner => HResultScanner,
-  Scan => HScan
-}
+import org.apache.hadoop.hbase.client.Row
+import org.apache.hadoop.hbase.client.{Append => HAppend}
+import org.apache.hadoop.hbase.client.{Delete => HDelete}
+import org.apache.hadoop.hbase.client.{Get => HGet}
+import org.apache.hadoop.hbase.client.{Increment => HIncrement}
+import org.apache.hadoop.hbase.client.{Put => HPut}
+import org.apache.hadoop.hbase.client.{Result => HResult}
+import org.apache.hadoop.hbase.client.{ResultScanner => HResultScanner}
+import org.apache.hadoop.hbase.client.{Scan => HScan}
 
 trait TableApi[F[_]] {
   type TableF[A] = Free[F, A]

@@ -1,8 +1,14 @@
 package orcus.codec
 
 import org.apache.hadoop.hbase.util.Bytes
-import shapeless.{::, HList, HNil, LabelledGeneric, Lazy, Witness}
-import shapeless.labelled.{field, FieldType}
+import shapeless.::
+import shapeless.HList
+import shapeless.HNil
+import shapeless.LabelledGeneric
+import shapeless.Lazy
+import shapeless.Witness
+import shapeless.labelled.FieldType
+import shapeless.labelled.field
 
 trait DerivedFamilyDecoder[A] extends FamilyDecoder[A]
 

@@ -5,7 +5,9 @@ import java.nio.ByteBuffer
 import cats.InjectK
 import cats.MonadError
 import cats.free.Free
-import orcus.codec.{Decoder, FamilyDecoder, ValueCodec}
+import orcus.codec.Decoder
+import orcus.codec.FamilyDecoder
+import orcus.codec.ValueCodec
 import org.apache.hadoop.hbase.Cell
 import org.apache.hadoop.hbase.client.Result
 

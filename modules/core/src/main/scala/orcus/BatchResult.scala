@@ -1,6 +1,7 @@
 package orcus
 
-import org.apache.hadoop.hbase.client.{Row, Result => HResult}
+import org.apache.hadoop.hbase.client.Row
+import org.apache.hadoop.hbase.client.{Result => HResult}
 
 sealed trait BatchResult
 

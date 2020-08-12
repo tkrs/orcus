@@ -2,8 +2,12 @@ package orcus
 
 import java.nio.ByteBuffer
 
-import cats.{Applicative, ApplicativeError, MonadError}
-import orcus.codec.{Decoder, FamilyDecoder, ValueCodec}
+import cats.Applicative
+import cats.ApplicativeError
+import cats.MonadError
+import orcus.codec.Decoder
+import orcus.codec.FamilyDecoder
+import orcus.codec.ValueCodec
 import orcus.internal.Utils
 import org.apache.hadoop.hbase.Cell
 import org.apache.hadoop.hbase.client.Result
