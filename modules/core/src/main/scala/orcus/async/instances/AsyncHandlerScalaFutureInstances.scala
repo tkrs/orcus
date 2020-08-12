@@ -9,7 +9,7 @@ private[instances] trait AsyncHandlerScalaFutureInstances {
   implicit val handleScalaFuture: AsyncHandler[Future] =
     new AsyncHandler[Future] {
       def handle[A](callback: AsyncHandler.Callback[A], cancel: => Unit): Future[A] = {
-        val p = Promise[A]
+        val p = Promise[A]()
 
         callback {
           case Right(v) =>
