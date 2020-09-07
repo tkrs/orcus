@@ -8,7 +8,7 @@ private[twitterUtil] trait AsyncHandlerTwitterFutureInstances {
   implicit val handleTwitterUtilFuture: AsyncHandler[Future] =
     new AsyncHandler[Future] {
       def handle[A](callback: AsyncHandler.Callback[A], cancel: => Unit): Future[A] = {
-        val p = Promise[A]
+        val p = Promise[A]()
 
         p.setInterruptHandler {
           case e: Throwable =>
