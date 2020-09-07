@@ -13,10 +13,10 @@ object Dependencies {
     val twitterUtil = "20.3.0"
     val catsEffect  = "2.1.4"
     val shapeless   = "2.3.3"
-    val scalatest   = "3.2.0"
+    val scalatest   = "3.2.2"
     val scalatestplus = new {
-      val scalacheck = "3.2.0.0"
-      val mockito    = "3.2.0.0"
+      val scalacheck = "3.2.2.0"
+      val mockito    = "3.2.2.0"
     }
 
     val hbase            = "2.2.3"
@@ -46,7 +46,7 @@ object Dependencies {
 
   lazy val Scalatest  = "org.scalatest"     %% "scalatest"       % V.scalatest
   lazy val Scalacheck = "org.scalatestplus" %% "scalacheck-1-14" % V.scalatestplus.scalacheck
-  lazy val Mockito    = "org.scalatestplus" %% "mockito-3-3"     % V.scalatestplus.mockito
+  lazy val Mockito    = "org.scalatestplus" %% "mockito-3-4"     % V.scalatestplus.mockito
 
   lazy val TestDeps = Seq(Scalatest, Scalacheck, Mockito).map(_ % Test)
 }
