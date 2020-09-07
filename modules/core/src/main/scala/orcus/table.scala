@@ -111,7 +111,7 @@ object table {
     val fbb = itfb.foldLeft(apErrorF.pure(factoryC.newBuilder)) {
       case (acc, fb) => apErrorF.map2(fb, acc)((a, b) => b += a)
     }
-    apErrorF.map(fbb)(_.result)
+    apErrorF.map(fbb)(_.result())
   }
 
   def batchAll[F[_], C[_]](t: AsyncTableT, as: Seq[_ <: HRow])(implicit
@@ -123,7 +123,7 @@ object table {
       val it = xs.iterator
       val c  = factory.newBuilder
       while (it.hasNext) c += (it.next match { case r: HResult => Option(r); case null => None })
-      c.result
+      c.result()
     }
 
   def kleisli[F[_], A](f: AsyncTableT => F[A]): Kleisli[F, AsyncTableT, A] =
