@@ -89,27 +89,25 @@ object table {
     val itcfo = Utils.toIterator(t.batch[Object](Utils.toJavaList(as)))
     val itfb = itr
       .zip(itcfo.map(parF.parallel.apply))
-      .map {
-        case (a, fo) =>
-          apErrorF.recoverWith(apErrorF.map[Object, BatchResult](fo) {
-            case r: HResult =>
-              BatchResult.Mutate(Some(r))
-            case null =>
-              a match {
-                case _: HGet | _: HAppend | _: HIncrement | _: RowMutations =>
-                  BatchResult.Mutate(None)
-                case _ => // Delete or Put
-                  BatchResult.VoidMutate
-              }
-            case other =>
-              BatchResult.Error(new Exception(s"Unexpected class is returned: ${other.getClass.getSimpleName}"), a)
-          }) {
-            case t: Throwable =>
-              apErrorF.pure(BatchResult.Error(t, a))
-          }
+      .map { case (a, fo) =>
+        apErrorF.recoverWith(apErrorF.map[Object, BatchResult](fo) {
+          case r: HResult =>
+            BatchResult.Mutate(Some(r))
+          case null =>
+            a match {
+              case _: HGet | _: HAppend | _: HIncrement | _: RowMutations =>
+                BatchResult.Mutate(None)
+              case _ => // Delete or Put
+                BatchResult.VoidMutate
+            }
+          case other =>
+            BatchResult.Error(new Exception(s"Unexpected class is returned: ${other.getClass.getSimpleName}"), a)
+        }) { case t: Throwable =>
+          apErrorF.pure(BatchResult.Error(t, a))
+        }
       }
-    val fbb = itfb.foldLeft(apErrorF.pure(factoryC.newBuilder)) {
-      case (acc, fb) => apErrorF.map2(fb, acc)((a, b) => b += a)
+    val fbb = itfb.foldLeft(apErrorF.pure(factoryC.newBuilder)) { case (acc, fb) =>
+      apErrorF.map2(fb, acc)((a, b) => b += a)
     }
     apErrorF.map(fbb)(_.result())
   }
