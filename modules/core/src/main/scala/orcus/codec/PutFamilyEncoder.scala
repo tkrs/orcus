@@ -17,9 +17,8 @@ trait PutFamilyEncoder1 {
   ): PutFamilyEncoder[Map[K, V]] =
     new PutFamilyEncoder[Map[K, V]] {
       def apply(acc: Put, cf: Array[Byte], a: Map[K, V]): Put = {
-        a.foreach {
-          case (k, v) =>
-            acc.addColumn(cf, H.encode(k), V.encode(v))
+        a.foreach { case (k, v) =>
+          acc.addColumn(cf, H.encode(k), V.encode(v))
         }
         acc
       }
