@@ -19,7 +19,7 @@ object Dependencies {
       val mockito    = "3.2.2.0"
     }
 
-    val hbase            = "2.2.3"
+    val hbase            = "2.2.6"
     val bigtableHBase    = "1.15.0"
     val bigtable         = "1.15.0"
     val logback          = "1.2.3"
