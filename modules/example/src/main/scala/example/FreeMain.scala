@@ -9,7 +9,7 @@ import cats.effect.ExitCode
 import cats.effect.IO
 import cats.effect.IOApp
 import cats.free.Free
-import cats.implicits._
+import cats.syntax.all._
 import cats.~>
 import com.google.cloud.bigtable.hbase.BigtableConfiguration
 import com.typesafe.scalalogging.LazyLogging

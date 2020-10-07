@@ -81,7 +81,7 @@ final class DataClientK[F[_]](implicit
 }
 
 object DataClientAdapter {
-  import cats.implicits._
+  import cats.syntax.all._
 
   def readRowAsync[F[_], A: RowDecoder](client: BigtableDataClient, query: Query)(implicit
     F: MonadError[F, Throwable],

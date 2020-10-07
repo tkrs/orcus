@@ -2,8 +2,6 @@ package orcus.free.handler
 
 import java.util.concurrent.CompletableFuture
 import java.{lang => jl}
-
-import cats.instances.future._
 import orcus.BatchResult
 import orcus.async.instances.future._
 import orcus.free.handler.table.Handler
