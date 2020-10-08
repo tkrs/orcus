@@ -1,7 +1,4 @@
 package orcus.bigtable
-
-import cats.instances.either._
-import cats.instances.vector._
 import cats.syntax.traverse._
 import com.google.cloud.bigtable.data.v2.models.RowCell
 import orcus.bigtable.codec.RowDecoder
