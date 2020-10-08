@@ -2,8 +2,6 @@ package orcus.free.handler
 
 import java.nio.ByteBuffer
 import java.util
-
-import cats.instances.either._
 import cats.~>
 import orcus.codec.auto._
 import orcus.free.handler.result.Handler
