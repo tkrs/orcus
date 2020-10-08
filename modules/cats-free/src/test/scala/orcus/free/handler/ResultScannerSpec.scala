@@ -1,8 +1,6 @@
 package orcus.free.handler
 
 import java.nio.ByteBuffer
-
-import cats.instances.either._
 import cats.~>
 import orcus.free.handler.resultScanner.Handler
 import orcus.free.{ResultScannerOp, ResultScannerOps}
