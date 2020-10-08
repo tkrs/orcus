@@ -6,12 +6,12 @@ object Dependencies {
     val `scala2.12` = "2.12.12"
 
     val kindProjector   = "0.11.0"
-    val organizeImports = "0.4.0"
+    val organizeImports = "0.4.2"
 
-    val cats        = "2.1.1"
+    val cats        = "2.2.0"
     val monix       = "3.2.2"
     val twitterUtil = "20.6.0"
-    val catsEffect  = "2.1.4"
+    val catsEffect  = "2.2.0"
     val shapeless   = "2.3.3"
     val scalatest   = "3.2.2"
     val scalatestplus = new {
@@ -19,12 +19,12 @@ object Dependencies {
       val mockito    = "3.2.2.0"
     }
 
-    val hbase            = "2.2.3"
-    val bigtableHBase    = "1.15.0"
-    val bigtable         = "1.15.0"
+    val hbase            = "2.2.6"
+    val bigtableHBase    = "1.16.0"
+    val bigtable         = "1.16.0"
     val logback          = "1.2.3"
     val scalaLogging     = "3.9.2"
-    val scalaJava8Compat = "0.9.0"
+    val scalaJava8Compat = "0.9.1"
   }
 
   lazy val KindProjector   = ("org.typelevel"       %% "kind-projector"   % V.kindProjector).cross(CrossVersion.full)

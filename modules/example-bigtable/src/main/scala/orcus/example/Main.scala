@@ -8,7 +8,7 @@ import cats.effect.ContextShift
 import cats.effect.ExitCode
 import cats.effect.IO
 import cats.effect.IOApp
-import cats.implicits._
+import cats.syntax.all._
 import com.google.api.gax.core.FixedCredentialsProvider
 import com.google.auth.oauth2.GoogleCredentials
 import com.google.cloud.ServiceOptions
