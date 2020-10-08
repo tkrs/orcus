@@ -6,7 +6,7 @@ object Dependencies {
     val `scala2.12` = "2.12.12"
 
     val kindProjector   = "0.11.0"
-    val organizeImports = "0.4.0"
+    val organizeImports = "0.4.2"
 
     val cats        = "2.1.1"
     val monix       = "3.2.2"
@@ -19,9 +19,9 @@ object Dependencies {
       val mockito    = "3.2.2.0"
     }
 
-    val hbase            = "2.2.3"
-    val bigtableHBase    = "1.15.0"
-    val bigtable         = "1.15.0"
+    val hbase            = "2.2.6"
+    val bigtableHBase    = "1.16.0"
+    val bigtable         = "1.16.0"
     val logback          = "1.2.3"
     val scalaLogging     = "3.9.2"
     val scalaJava8Compat = "0.9.1"
