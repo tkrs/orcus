@@ -11,7 +11,6 @@ import cats.effect.IOApp
 import cats.free.Free
 import cats.syntax.all._
 import cats.~>
-import com.google.cloud.bigtable.hbase.BigtableConfiguration
 import com.typesafe.scalalogging.LazyLogging
 import orcus.admin
 import orcus.async._
@@ -150,17 +149,9 @@ trait FreeMain extends IOApp with LazyLogging {
   def getConnection: IO[AsyncConnection]
 }
 
-object HBaseMain extends FreeMain {
+object Main extends FreeMain {
   def getConnection: IO[AsyncConnection] =
     Par[CompletableFuture, IO].parallel(ConnectionFactory.createAsyncConnection())
-}
-
-object BigtableMain extends FreeMain {
-  def getConnection: IO[AsyncConnection] = {
-    val projectId  = sys.props.getOrElse("bigtable.project-id", "fake")
-    val instanceId = sys.props.getOrElse("bigtable.instance-id", "fake")
-    IO(new BigtableAsyncConnection(BigtableConfiguration.configure(projectId, instanceId)))
-  }
 }
 
 final case class Work(name: String, releaseDate: LocalDate)
