@@ -109,7 +109,7 @@ object Main extends IOApp with LazyLogging {
       .bracket(r => runMutate(r) >> runRead(r))(r => IO(r.close())) >> IO(ExitCode.Success)
 
   private def runMutate(dataClient: BigtableDataClient): IO[Unit] = {
-    val wrapped = new DataClient[IO](dataClient)
+    val wrapped = DataClient[IO](dataClient)
 
     val millis                = System.currentTimeMillis()
     val micros                = millis * 1000L
@@ -136,7 +136,7 @@ object Main extends IOApp with LazyLogging {
 
   private def readRows(dataClient: BigtableDataClient): IO[Vector[(String, CPU)]] = {
     logger.info("readRows start")
-    val wrapped = new DataClient[IO](dataClient)
+    val wrapped = DataClient[IO](dataClient)
 
     val now    = Instant.now
     val start  = now.minus(Duration.ofMinutes(3)).toEpochMilli * 1000L

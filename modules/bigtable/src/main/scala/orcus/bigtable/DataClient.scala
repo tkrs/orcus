@@ -2,7 +2,6 @@ package orcus.bigtable
 
 import cats.Monad
 import cats.MonadError
-import cats.data.Kleisli
 import com.google.api.core.ApiFuture
 import com.google.api.gax.rpc.ResponseObserver
 import com.google.api.gax.rpc.StreamController
@@ -16,11 +15,38 @@ import orcus.internal.Utils
 import scala.annotation.tailrec
 import scala.collection.mutable
 
-final class DataClient[F[_]](client: BigtableDataClient)(implicit
+trait DataClient[F[_]] {
+
+  def readRowAsync(query: Query): F[Option[CRow]]
+
+  def readRowsAsync(query: Query): F[Vector[CRow]]
+
+  def sampleRowKeysAsync(tableId: String): F[List[KeyOffset]]
+
+  def mutateRowAsync(mutation: RowMutation): F[Unit]
+
+  def bulkMutateRowsAsync(mutation: BulkMutation): F[Unit]
+
+  def checkAndMutateRowAsync(mutation: ConditionalRowMutation): F[Boolean]
+
+  def readModifyWriteRowAsync(mutation: ReadModifyWriteRow): F[Option[CRow]]
+
+  def close(): Unit
+}
+
+object DataClient {
+  def apply[F[_]](client: BigtableDataClient)(implicit
+    F: MonadError[F, Throwable],
+    asyncH: AsyncHandler[F],
+    parF: Par.Aux[ApiFuture, F]
+  ): DataClient[F] = new DefaultDataClient[F](client)
+}
+
+final class DefaultDataClient[F[_]](client: BigtableDataClient)(implicit
   F: MonadError[F, Throwable],
   asyncH: AsyncHandler[F],
   parF: Par.Aux[ApiFuture, F]
-) {
+) extends DataClient[F] {
   private[this] val adapter = DataClientAdapter
 
   def readRowAsync(query: Query): F[Option[CRow]] =
@@ -46,38 +72,6 @@ final class DataClient[F[_]](client: BigtableDataClient)(implicit
 
   def close(): Unit =
     adapter.close(client)
-}
-
-final class DataClientK[F[_]](implicit
-  F: MonadError[F, Throwable],
-  asyncH: AsyncHandler[F],
-  parF: Par.Aux[ApiFuture, F]
-) {
-  private[this] val adapter = DataClientAdapter
-
-  def readRowAsync(query: Query): Kleisli[F, BigtableDataClient, Option[CRow]] =
-    Kleisli(adapter.readRowAsync(_, query))
-
-  def readRowsAsync(query: Query): Kleisli[F, BigtableDataClient, Vector[CRow]] =
-    Kleisli(adapter.readRowsAsync(_, query))
-
-  def sampleRowKeysAsync(tableId: String): Kleisli[F, BigtableDataClient, List[KeyOffset]] =
-    Kleisli(adapter.sampleRowKeysAsync(_, tableId))
-
-  def mutateRowAsync(mutation: RowMutation): Kleisli[F, BigtableDataClient, Unit] =
-    Kleisli(adapter.mutateRowAsync(_, mutation))
-
-  def bulkMutateRowsAsync(mutation: BulkMutation): Kleisli[F, BigtableDataClient, Unit] =
-    Kleisli(adapter.bulkMutateRowsAsync(_, mutation))
-
-  def checkAndMutateRowAsync(mutation: ConditionalRowMutation): Kleisli[F, BigtableDataClient, Boolean] =
-    Kleisli(adapter.checkAndMutateRowAsync(_, mutation))
-
-  def readModifyWriteRowAsync(mutation: ReadModifyWriteRow): Kleisli[F, BigtableDataClient, Option[CRow]] =
-    Kleisli(adapter.readModifyWriteRowAsync(_, mutation))
-
-  def close(): Kleisli[F, BigtableDataClient, Unit] =
-    Kleisli(c => F.pure(adapter.close(c)))
 }
 
 object DataClientAdapter {
