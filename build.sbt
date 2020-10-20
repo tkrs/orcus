@@ -201,7 +201,6 @@ lazy val example = project
   )
   .settings(
     libraryDependencies ++= Seq(
-      BigtableHBase,
       Logging,
       LogbackClassic
     ).map(_.withSources)

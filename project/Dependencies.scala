@@ -6,7 +6,7 @@ object Dependencies {
     val `scala2.12` = "2.12.12"
 
     val kindProjector   = "0.11.0"
-    val organizeImports = "0.4.2"
+    val organizeImports = "0.4.3"
 
     val cats        = "2.2.0"
     val monix       = "3.2.2"
@@ -19,9 +19,8 @@ object Dependencies {
       val mockito    = "3.2.2.0"
     }
 
-    val hbase            = "2.2.6"
-    val bigtableHBase    = "1.16.0"
-    val bigtable         = "1.16.0"
+    val hbase            = "2.3.2"
+    val bigtable         = "1.16.2"
     val logback          = "1.2.3"
     val scalaLogging     = "3.9.2"
     val scalaJava8Compat = "0.9.1"
@@ -39,7 +38,6 @@ object Dependencies {
   lazy val Shapeless      = "com.chuusai"                %% "shapeless"             % V.shapeless
   lazy val Java8Compat    = "org.scala-lang.modules"     %% "scala-java8-compat"    % V.scalaJava8Compat
   lazy val Hbase          = "org.apache.hbase"            % "hbase-client"          % V.hbase
-  lazy val BigtableHBase  = "com.google.cloud.bigtable"   % "bigtable-hbase-2.x"    % V.bigtableHBase
   lazy val Bigtable       = "com.google.cloud"            % "google-cloud-bigtable" % V.bigtable
   lazy val LogbackClassic = "ch.qos.logback"              % "logback-classic"       % V.logback
   lazy val Logging        = "com.typesafe.scala-logging" %% "scala-logging"         % V.scalaLogging
