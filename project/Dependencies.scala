@@ -9,7 +9,7 @@ object Dependencies {
     val organizeImports = "0.4.3"
 
     val cats        = "2.2.0"
-    val monix       = "3.2.2"
+    val monix       = "3.3.0"
     val twitterUtil = "20.10.0"
     val catsEffect  = "2.2.0"
     val shapeless   = "2.3.3"
