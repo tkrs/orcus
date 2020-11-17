@@ -1,12 +1,16 @@
 package orcus.codec.generic
 
 import cats.syntax.option._
+import orcus.codec.CodecSpec
+import orcus.codec.Decoder
+import orcus.codec.FamilyDecoder
 import orcus.codec.semiauto._
-import orcus.codec.{CodecSpec, Decoder, FamilyDecoder}
 import orcus.internal.Utils
+import org.apache.hadoop.hbase.Cell
+import org.apache.hadoop.hbase.CellBuilderType
+import org.apache.hadoop.hbase.ExtendedCellBuilderFactory
 import org.apache.hadoop.hbase.client.Result
 import org.apache.hadoop.hbase.util.Bytes
-import org.apache.hadoop.hbase.{Cell, CellBuilderType, ExtendedCellBuilderFactory}
 import org.scalatest.flatspec.AnyFlatSpec
 
 class DerivedDecoderSpec extends AnyFlatSpec with CodecSpec {

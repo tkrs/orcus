@@ -1,7 +1,9 @@
 package orcus.codec
 
+import org.apache.hadoop.hbase.Cell
+import org.apache.hadoop.hbase.CellBuilderType
+import org.apache.hadoop.hbase.ExtendedCellBuilderFactory
 import org.apache.hadoop.hbase.util.Bytes
-import org.apache.hadoop.hbase.{Cell, CellBuilderType, ExtendedCellBuilderFactory}
 
 trait CodecSpec {
   def cell(row: String, cf: String, q: String, v: Array[Byte]): Cell =

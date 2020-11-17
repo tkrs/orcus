@@ -2,10 +2,12 @@ package orcus.async.twitterUtil
 
 import java.util.concurrent.CompletableFuture
 
-import com.twitter.util.{Await, Future}
+import com.twitter.util.Await
+import com.twitter.util.Future
+import orcus.async.AsyncSpec
+import orcus.async.Par
 import orcus.async.implicits._
 import orcus.async.instances.twitterUtil.future._
-import orcus.async.{AsyncSpec, Par}
 import org.scalatest.flatspec.AnyFlatSpec
 
 import scala.concurrent.CancellationException

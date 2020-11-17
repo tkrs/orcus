@@ -1,7 +1,9 @@
 package orcus.codec
 
 import org.apache.hadoop.hbase.util.Bytes
-import org.scalacheck.{Arbitrary, Prop, Shrink}
+import org.scalacheck.Arbitrary
+import org.scalacheck.Prop
+import org.scalacheck.Shrink
 import org.scalatest.funsuite.AnyFunSuite
 import org.scalatest.matchers.should.Matchers
 import org.scalatestplus.scalacheck.Checkers

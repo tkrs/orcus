@@ -1,7 +1,8 @@
 package orcus
 
 import cats.instances.either._
-import org.apache.hadoop.hbase.client.{Result, ResultScanner}
+import org.apache.hadoop.hbase.client.Result
+import org.apache.hadoop.hbase.client.ResultScanner
 import org.mockito.Mockito._
 import org.scalatest.funspec.AnyFunSpec
 import org.scalatest.matchers.should.Matchers

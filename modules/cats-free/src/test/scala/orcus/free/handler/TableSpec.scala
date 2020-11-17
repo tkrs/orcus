@@ -2,35 +2,36 @@ package orcus.free.handler
 
 import java.util.concurrent.CompletableFuture
 import java.{lang => jl}
+
 import orcus.BatchResult
 import orcus.async.instances.future._
+import orcus.free.TableOp
+import orcus.free.TableOps
 import orcus.free.handler.table.Handler
-import orcus.free.{TableOp, TableOps}
 import orcus.internal.Utils
 import org.apache.hadoop.conf.Configuration
-import org.apache.hadoop.hbase.client.{
-  AsyncTable,
-  Result,
-  ResultScanner,
-  RowMutations,
-  ScanResultConsumer,
-  Append => HAppend,
-  Delete => HDelete,
-  Get => HGet,
-  Increment => HIncrement,
-  Put => HPut,
-  Scan => HScan
-}
 import org.apache.hadoop.hbase.TableName
+import org.apache.hadoop.hbase.client.AsyncTable
+import org.apache.hadoop.hbase.client.Result
+import org.apache.hadoop.hbase.client.ResultScanner
+import org.apache.hadoop.hbase.client.RowMutations
+import org.apache.hadoop.hbase.client.ScanResultConsumer
+import org.apache.hadoop.hbase.client.{Append => HAppend}
+import org.apache.hadoop.hbase.client.{Delete => HDelete}
+import org.apache.hadoop.hbase.client.{Get => HGet}
+import org.apache.hadoop.hbase.client.{Increment => HIncrement}
+import org.apache.hadoop.hbase.client.{Put => HPut}
+import org.apache.hadoop.hbase.client.{Scan => HScan}
 import org.apache.hadoop.hbase.util.Bytes
 import org.mockito.Mockito._
 import org.scalatest.funspec.AnyFunSpec
-import org.scalatestplus.mockito.MockitoSugar
 import org.scalatest.matchers.should.Matchers
+import org.scalatestplus.mockito.MockitoSugar
 
+import scala.concurrent.Await
 import scala.concurrent.ExecutionContext.Implicits.global
+import scala.concurrent.Future
 import scala.concurrent.duration._
-import scala.concurrent.{Await, Future}
 
 class TableSpec extends AnyFunSpec with MockitoSugar with Matchers {
   type F[A] = Future[A]

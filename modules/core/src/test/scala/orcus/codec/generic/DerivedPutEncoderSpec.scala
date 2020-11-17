@@ -1,6 +1,7 @@
 package orcus.codec.generic
 
-import orcus.codec.{PutEncoder, PutFamilyEncoder}
+import orcus.codec.PutEncoder
+import orcus.codec.PutFamilyEncoder
 import orcus.codec.semiauto._
 import org.apache.hadoop.hbase.client.Put
 import org.apache.hadoop.hbase.util.Bytes
