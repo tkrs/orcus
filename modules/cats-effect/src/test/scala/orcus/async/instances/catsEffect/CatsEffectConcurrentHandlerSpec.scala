@@ -2,7 +2,9 @@ package orcus.async.instances.catsEffect
 
 import java.util.concurrent.CompletableFuture
 
-import cats.effect.{ContextShift, IO, Timer}
+import cats.effect.ContextShift
+import cats.effect.IO
+import cats.effect.Timer
 import orcus.async._
 import orcus.async.implicits._
 import orcus.async.instances.catsEffect.concurrent._

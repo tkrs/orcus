@@ -5,14 +5,18 @@ import java.util.concurrent._
 import _root_.monix.eval.Task
 import _root_.monix.execution.Scheduler
 import cats.Traverse
-import cats.effect.{ContextShift, IO}
+import cats.effect.ContextShift
+import cats.effect.IO
 import cats.instances.vector._
-import com.twitter.util.{Await => TAwait, Future => TFuture}
+import com.twitter.util.{Await => TAwait}
+import com.twitter.util.{Future => TFuture}
 import orcus.async._
 import orcus.async.implicits._
 import org.openjdk.jmh.annotations._
 
-import scala.concurrent.{ExecutionContext, Await => SAwait, Future => SFuture}
+import scala.concurrent.ExecutionContext
+import scala.concurrent.{Await => SAwait}
+import scala.concurrent.{Future => SFuture}
 import scala.util.Random
 
 @State(Scope.Benchmark)

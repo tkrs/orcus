@@ -2,13 +2,15 @@ package orcus.async.future
 
 import java.util.concurrent.CompletableFuture
 
+import orcus.async.AsyncSpec
+import orcus.async.Par
 import orcus.async.implicits._
 import orcus.async.instances.future._
-import orcus.async.{AsyncSpec, Par}
 import org.scalatest.flatspec.AnyFlatSpec
 
+import scala.concurrent.Await
+import scala.concurrent.Future
 import scala.concurrent.duration._
-import scala.concurrent.{Await, Future}
 
 class ScalaFutureAsyncHandlerSpec extends AnyFlatSpec with AsyncSpec {
   it should "convert to a Future" in {

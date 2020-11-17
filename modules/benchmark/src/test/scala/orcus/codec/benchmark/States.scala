@@ -2,12 +2,16 @@ package orcus.codec.benchmark
 
 import java.{util => ju}
 
+import orcus.codec.Decoder
+import orcus.codec.PutEncoder
 import orcus.codec.auto._
-import orcus.codec.{Decoder, PutEncoder}
 import orcus.internal.Utils
-import org.apache.hadoop.hbase.client.{Put, Result}
+import org.apache.hadoop.hbase.Cell
+import org.apache.hadoop.hbase.CellBuilderType
+import org.apache.hadoop.hbase.ExtendedCellBuilderFactory
+import org.apache.hadoop.hbase.client.Put
+import org.apache.hadoop.hbase.client.Result
 import org.apache.hadoop.hbase.util.Bytes
-import org.apache.hadoop.hbase.{Cell, CellBuilderType, ExtendedCellBuilderFactory}
 import org.openjdk.jmh.annotations._
 
 object States {

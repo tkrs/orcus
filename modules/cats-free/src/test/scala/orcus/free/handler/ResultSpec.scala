@@ -2,10 +2,12 @@ package orcus.free.handler
 
 import java.nio.ByteBuffer
 import java.util
+
 import cats.~>
 import orcus.codec.auto._
+import orcus.free.ResultOp
+import orcus.free.ResultOps
 import orcus.free.handler.result.Handler
-import orcus.free.{ResultOp, ResultOps}
 import orcus.internal.Utils
 import org.apache.hadoop.hbase.Cell
 import org.apache.hadoop.hbase.client.Result

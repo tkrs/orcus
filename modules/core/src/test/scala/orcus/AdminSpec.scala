@@ -7,16 +7,19 @@ import cats.instances.future._
 import orcus.async.implicits._
 import orcus.async.instances.future._
 import orcus.internal.Utils
+import org.apache.hadoop.hbase.NamespaceDescriptor
+import org.apache.hadoop.hbase.ServerName
+import org.apache.hadoop.hbase.TableName
 import org.apache.hadoop.hbase.client._
 import org.apache.hadoop.hbase.util.Bytes
-import org.apache.hadoop.hbase.{NamespaceDescriptor, ServerName, TableName}
 import org.mockito.Mockito._
 import org.scalatest.flatspec.AnyFlatSpec
 import org.scalatestplus.mockito.MockitoSugar
 
+import scala.concurrent.Await
 import scala.concurrent.ExecutionContext.Implicits.global
+import scala.concurrent.Future
 import scala.concurrent.duration._
-import scala.concurrent.{Await, Future}
 
 class AdminSpec extends AnyFlatSpec with MockitoSugar {
   def voidFuture: CompletableFuture[Void] =

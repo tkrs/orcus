@@ -1,10 +1,13 @@
 package orcus.free.handler
 
 import java.nio.ByteBuffer
+
 import cats.~>
+import orcus.free.ResultScannerOp
+import orcus.free.ResultScannerOps
 import orcus.free.handler.resultScanner.Handler
-import orcus.free.{ResultScannerOp, ResultScannerOps}
-import org.apache.hadoop.hbase.client.{Result, ResultScanner}
+import org.apache.hadoop.hbase.client.Result
+import org.apache.hadoop.hbase.client.ResultScanner
 import org.mockito.Mockito._
 import org.scalatest.funspec.AnyFunSpec
 import org.scalatest.matchers.should.Matchers
