@@ -25,18 +25,21 @@ object result {
               getColumnCells[M](result, family, qualifier)
             case GetColumnLatestCell(result, family, qualifier) =>
               getColumnLatestCell[M](result, family, qualifier)
-            case g @ Get(_, _, _) =>
-              g.run[M]
+            case Get(result, family, qualifier, codec) =>
+              implicit val _codec = codec
+              get(result, family, qualifier)
             case GetValue(result, family, qualifier) =>
               getValue[M](result, family, qualifier)
             case GetValueAsByteBuffer(result, family, qualifier) =>
               getValueAsByteBuffer(result, family, qualifier)
-            case g @ GetFamily(_, _) =>
-              g.run[M]
+            case GetFamily(result, family, codec) =>
+              implicit val _codec = codec
+              getFamily[A, M](result, family)
             case GetFamilyMap(result, family) =>
               getFamilyMap[M](result, family)
-            case t @ To(_) =>
-              t.run[M]
+            case To(result, decoder) =>
+              implicit val _decoder = decoder
+              to(result)
           }
       }
   }

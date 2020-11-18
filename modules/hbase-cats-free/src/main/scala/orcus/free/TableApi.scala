@@ -1,13 +1,8 @@
 package orcus.free
 
-import java.util.concurrent.CompletableFuture
-
-import cats.ApplicativeError
 import cats.InjectK
 import cats.free.Free
 import orcus.BatchResult
-import orcus.async.Par
-import orcus.table.AsyncTableT
 import org.apache.hadoop.conf.{Configuration => HConfig}
 import org.apache.hadoop.hbase.TableName
 import org.apache.hadoop.hbase.client.Row
@@ -50,14 +45,7 @@ object TableOp {
   final case class Delete(a: HDelete)       extends TableOp[Unit]
   final case class Append(a: HAppend)       extends TableOp[HResult]
   final case class Increment(a: HIncrement) extends TableOp[HResult]
-
-  final case class Batch(a: Seq[_ <: Row]) extends TableOp[Seq[BatchResult]] {
-    def run[M[_]](t: AsyncTableT)(implicit
-      apErrorM: ApplicativeError[M, Throwable],
-      parM: Par.Aux[CompletableFuture, M]
-    ): M[Seq[BatchResult]] =
-      orcus.table.batch[M, Seq](t, a)
-  }
+  final case class Batch(a: Seq[_ <: Row])  extends TableOp[Seq[BatchResult]]
 }
 
 abstract private[free] class TableOps0[M[_]](implicit inj: InjectK[TableOp, M]) extends TableApi[M] {
