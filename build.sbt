@@ -2,27 +2,35 @@ import Dependencies._
 
 lazy val orcus = project
   .in(file("."))
-  .settings(publishSettings)
-  .settings(noPublishSettings)
+  .settings(publish / skip := true)
   .settings(
-    ThisBuild / organization := "com.github.tkrs",
-    ThisBuild / scalaVersion := V.`scala2.13`,
-    ThisBuild / crossScalaVersions := Seq(V.`scala2.13`, V.`scala2.12`),
-    ThisBuild / libraryDependencies ++= TestDeps ++ Seq(compilerPlugin(KindProjector)),
-    ThisBuild / scalacOptions ++= compilerOptions ++ warnCompilerOptions ++ {
-      CrossVersion.partialVersion(scalaVersion.value) match {
-        case Some((2, n)) if n >= 13 => Nil
-        case _                       => obsoletedOptions
-      }
-    },
+    inThisBuild(
+      Seq(
+        organization := "com.github.tkrs",
+        homepage := Some(url("https://github.com/tkrs/orcus")),
+        licenses := Seq("MIT License" -> url("http://www.opensource.org/licenses/mit-license.php")),
+        developers := List(
+          Developer(
+            "tkrs",
+            "Takeru Sato",
+            "type.in.type@gmail.com",
+            url("https://github.com/tkrs")
+          )
+        ),
+        scalaVersion := V.`scala2.13`,
+        crossScalaVersions := Seq(V.`scala2.13`, V.`scala2.12`),
+        fork := true,
+        scalafmtOnCompile := true,
+        scalafixOnCompile := true,
+        scalafixDependencies += OrganizeImports,
+        semanticdbEnabled := true,
+        semanticdbVersion := scalafixSemanticdb.revision
+      )
+    )
+  )
+  .settings(
     Compile / console / scalacOptions --= warnCompilerOptions,
-    Compile / console / scalacOptions += "-Yrepl-class-based",
-    ThisBuild / fork := true,
-    ThisBuild / scalafmtOnCompile := true,
-    ThisBuild / scalafixOnCompile := true,
-    ThisBuild / scalafixDependencies += OrganizeImports,
-    ThisBuild / semanticdbEnabled := true,
-    ThisBuild / semanticdbVersion := scalafixSemanticdb.revision
+    Compile / console / scalacOptions += "-Yrepl-class-based"
   )
   .aggregate(core,
              hbase,
@@ -49,7 +57,7 @@ lazy val orcus = project
 
 lazy val core = project
   .in(file("modules/core"))
-  .settings(publishSettings)
+  .settings(sharedSettings)
   .settings(crossVersionSharedSources)
   .settings(
     description := "orcus core",
@@ -69,7 +77,7 @@ lazy val core = project
 
 lazy val hbase = project
   .in(file("modules/hbase"))
-  .settings(publishSettings)
+  .settings(sharedSettings)
   .settings(crossVersionSharedSources)
   .settings(
     description := "orcus hbase",
@@ -80,7 +88,7 @@ lazy val hbase = project
 
 lazy val monix = project
   .in(file("modules/monix"))
-  .settings(publishSettings)
+  .settings(sharedSettings)
   .settings(crossVersionSharedSources)
   .settings(
     description := "orcus monix",
@@ -93,7 +101,7 @@ lazy val monix = project
 
 lazy val `twitter-util` = project
   .in(file("modules/twitter-util"))
-  .settings(publishSettings)
+  .settings(sharedSettings)
   .settings(crossVersionSharedSources)
   .settings(
     description := "orcus twitter-util",
@@ -106,7 +114,7 @@ lazy val `twitter-util` = project
 
 lazy val `cats-effect` = project
   .in(file("modules/cats-effect"))
-  .settings(publishSettings)
+  .settings(sharedSettings)
   .settings(
     description := "orcus cats-effect",
     moduleName := "orcus-cats-effect"
@@ -118,7 +126,7 @@ lazy val `cats-effect` = project
 
 lazy val `hbase-cats-free` = project
   .in(file("modules/hbase-cats-free"))
-  .settings(publishSettings)
+  .settings(sharedSettings)
   .settings(crossVersionSharedSources)
   .settings(
     description := "orcus cats-free",
@@ -131,7 +139,7 @@ lazy val `hbase-cats-free` = project
 
 lazy val bigtable = project
   .in(file("modules/bigtable"))
-  .settings(publishSettings)
+  .settings(sharedSettings)
   .settings(crossVersionSharedSources)
   .settings(
     description := "orcus bigtable",
@@ -144,8 +152,8 @@ lazy val bigtable = project
 
 lazy val `hbase-example` = project
   .in(file("modules/hbase-example"))
-  .settings(publishSettings)
-  .settings(noPublishSettings)
+  .settings(sharedSettings)
+  .settings(publish / skip := true)
   .settings(crossVersionSharedSources)
   .settings(
     description := "orcus example",
@@ -169,8 +177,8 @@ lazy val `hbase-example` = project
 
 lazy val `bigtable-example` = project
   .in(file("modules/bigtable-example"))
-  .settings(publishSettings)
-  .settings(noPublishSettings)
+  .settings(sharedSettings)
+  .settings(publish / skip := true)
   .settings(crossVersionSharedSources)
   .settings(
     description := "orcus bigtable-example",
@@ -192,8 +200,8 @@ lazy val `bigtable-example` = project
   .dependsOn(bigtable, `cats-effect`)
 
 lazy val benchmark = (project in file("modules/benchmark"))
-  .settings(publishSettings)
-  .settings(noPublishSettings)
+  .settings(publish / skip := true)
+  .settings(sharedSettings)
   .settings(crossVersionSharedSources)
   .settings(
     description := "orcus benchmark",
@@ -238,39 +246,14 @@ lazy val warnCompilerOptions = Seq(
 
 lazy val obsoletedOptions = Seq("-Xfuture", "-Ypartial-unification", "-Yno-adapted-args", "-Ywarn-inaccessible")
 
-lazy val publishSettings = Seq(
-  releaseCrossBuild := true,
-  releasePublishArtifactsAction := PgpKeys.publishSigned.value,
-  homepage := Some(url("https://github.com/tkrs/orcus")),
-  licenses := Seq("MIT License" -> url("http://www.opensource.org/licenses/mit-license.php")),
-  publishMavenStyle := true,
-  Test / publishArtifact := false,
-  pomIncludeRepository := (_ => false),
-  publishTo := {
-    val nexus = "https://oss.sonatype.org/"
-    if (isSnapshot.value)
-      Some("snapshots".at(nexus + "content/repositories/snapshots"))
-    else
-      Some("releases".at(nexus + "service/local/staging/deploy/maven2"))
+lazy val sharedSettings = Seq(
+  scalacOptions ++= compilerOptions ++ warnCompilerOptions ++ {
+    CrossVersion.partialVersion(scalaVersion.value) match {
+      case Some((2, n)) if n >= 13 => Nil
+      case _                       => obsoletedOptions
+    }
   },
-  scmInfo := Some(
-    ScmInfo(
-      url("https://github.com/tkrs/orcus"),
-      "scm:git:git@github.com:tkrs/orcus.git"
-    )
-  ),
-  pomExtra :=
-    <developers>
-      <developer>
-        <id>tkrs</id>
-        <name>Takeru Sato</name>
-        <url>https://github.com/tkrs</url>
-      </developer>
-    </developers>
-)
-
-lazy val noPublishSettings = Seq(
-  publish / skip := true
+  libraryDependencies ++= TestDeps ++ Seq(compilerPlugin(KindProjector))
 )
 
 lazy val crossVersionSharedSources: Seq[Setting[_]] =
