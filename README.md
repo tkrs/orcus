@@ -11,12 +11,9 @@ orcus is a library to interact with HBase/Bigtable built atop [HBase Java Client
 
 ### HBase
 
-Firstly, this library depends on "provided" HBase client on your project. Thus, you must to add an HBase client to your `build.sbt` in addition to `orcus-hbase`. For example:
-
-```
+```scala
 libraryDependencies += Seq(
-  "com.github.tkrs" %% "orcus-hbase" % "x.y.z",
-  "org.apache.hbase" % "hbase-client" % "a.b.c"
+  "com.github.tkrs" %% "orcus-hbase" % "x.y.z"
 )
 ```
 
@@ -24,7 +21,7 @@ And, so look at this [example](https://github.com/tkrs/orcus/blob/master/modules
 
 ### Bigtable
 
-```
+```scala
 libraryDependencies += Seq(
   "com.github.tkrs" %% "orcus-bigtable" % "x.y.z"
 )

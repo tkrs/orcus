@@ -8,8 +8,7 @@ lazy val orcus = project
     ThisBuild / organization := "com.github.tkrs",
     ThisBuild / scalaVersion := V.`scala2.13`,
     ThisBuild / crossScalaVersions := Seq(V.`scala2.13`, V.`scala2.12`),
-    ThisBuild / resolvers ++= Seq(Resolver.sonatypeRepo("releases"), Resolver.sonatypeRepo("snapshots")),
-    ThisBuild / libraryDependencies ++= TestDeps ++ Seq(Hbase % Provided, compilerPlugin(KindProjector)),
+    ThisBuild / libraryDependencies ++= TestDeps ++ Seq(compilerPlugin(KindProjector)),
     ThisBuild / scalacOptions ++= compilerOptions ++ warnCompilerOptions ++ {
       CrossVersion.partialVersion(scalaVersion.value) match {
         case Some((2, n)) if n >= 13 => Nil
@@ -75,9 +74,7 @@ lazy val hbase = project
   .settings(
     description := "orcus hbase",
     moduleName := "orcus-hbase",
-    libraryDependencies ++= Seq(
-      Hbase.withSources() % Provided
-    )
+    libraryDependencies += Hbase.withSources()
   )
   .dependsOn(core)
 
@@ -156,6 +153,7 @@ lazy val `hbase-example` = project
   )
   .settings(
     libraryDependencies ++= Seq(
+      Hbase,
       Logging,
       LogbackClassic
     ).map(_.withSources)

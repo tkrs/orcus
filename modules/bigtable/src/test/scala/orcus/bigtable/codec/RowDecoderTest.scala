@@ -1,10 +1,12 @@
 package orcus.bigtable.codec
 
 import com.google.cloud.bigtable.data.v2.models.RowCell
+import com.google.common.primitives.Ints
+import com.google.common.primitives.Longs
+import com.google.common.primitives.Shorts
 import com.google.protobuf.ByteString
 import orcus.bigtable.CRow
 import orcus.bigtable.codec.semiauto._
-import org.apache.hadoop.hbase.util.Bytes
 import org.scalatest.funsuite.AnyFunSuite
 
 class RowDecoderTest extends AnyFunSuite {
@@ -32,47 +34,47 @@ class RowDecoderTest extends AnyFunSuite {
         "c1" -> List(
           RowCell.create(
             "c1",
-            ByteString.copyFromUtf8("a"),
+            "a".asBytes,
             ts,
             java.util.List.of(),
-            ByteString.copyFrom(Bytes.toBytes(10))
+            10.asBytes
           ),
           RowCell.create(
             "c1",
-            ByteString.copyFromUtf8("b"),
+            "b".asBytes,
             ts,
             java.util.List.of(),
-            ByteString.copyFrom(Bytes.toBytes("string"))
+            "string".asBytes
           ),
           RowCell.create(
             "c1",
-            ByteString.copyFromUtf8("c"),
+            "c".asBytes,
             ts,
             java.util.List.of(),
-            ByteString.copyFrom(Bytes.toBytes(10.999))
+            10.999.asBytes
           )
         ),
         "c2" -> List(
           RowCell.create(
             "c2",
-            ByteString.copyFromUtf8("d"),
+            "d".asBytes,
             ts,
             java.util.List.of(),
-            ByteString.copyFrom(Bytes.toBytes(101L))
+            101L.asBytes
           ),
           RowCell.create(
             "c2",
-            ByteString.copyFromUtf8("e"),
+            "e".asBytes,
             ts,
             java.util.List.of(),
-            ByteString.copyFrom(Bytes.toBytes(true))
+            true.asBytes
           ),
           RowCell.create(
             "c2",
-            ByteString.copyFromUtf8("f"),
+            "f".asBytes,
             ts,
             java.util.List.of(),
-            ByteString.copyFrom(Bytes.toBytes(10.555f))
+            10.555f.asBytes
           )
         )
       )
@@ -97,41 +99,41 @@ class RowDecoderTest extends AnyFunSuite {
             ByteString.copyFromUtf8("a"),
             ts,
             java.util.List.of(),
-            ByteString.copyFrom(Bytes.toBytes(10))
+            10.asBytes
           ),
           RowCell.create(
             "c1",
-            ByteString.copyFromUtf8("b"),
+            "b".asBytes,
             ts,
             java.util.List.of(),
-            ByteString.copyFrom(Bytes.toBytes("string"))
+            "string".asBytes
           )
         ),
         "c3" -> List(
           RowCell.create(
             "c3",
-            ByteString.copyFromUtf8("d"),
+            "d".asBytes,
             ts,
             java.util.List.of(),
-            ByteString.copyFrom(Bytes.toBytes(101L))
+            101L.asBytes
           ),
           RowCell.create(
             "c3",
-            ByteString.copyFromUtf8("e"),
+            "e".asBytes,
             ts,
             java.util.List.of(),
-            ByteString.copyFrom(Bytes.toBytes(true))
+            true.asBytes
           ),
           RowCell.create(
             "c3",
-            ByteString.copyFromUtf8("f"),
+            "f".asBytes,
             ts,
             java.util.List.of(),
-            ByteString.copyFrom(Bytes.toBytes(10.555f))
+            10.555f.asBytes
           ),
           RowCell.create(
             "c3",
-            ByteString.copyFromUtf8("h"),
+            "h".asBytes,
             ts,
             java.util.List.of(),
             ByteString.EMPTY
@@ -153,26 +155,26 @@ class RowDecoderTest extends AnyFunSuite {
         "c1" -> List(
           RowCell.create(
             "c1",
-            ByteString.copyFrom(Bytes.toBytes(10)),
+            10.asBytes,
             ts,
             java.util.List.of(),
-            ByteString.copyFrom(Bytes.toBytes(100.toShort))
+            100.toShort.asBytes
           ),
           RowCell.create(
             "c1",
-            ByteString.copyFrom(Bytes.toBytes(11)),
+            11.asBytes,
             ts,
             java.util.List.of(),
-            ByteString.copyFrom(Bytes.toBytes(110.toShort))
+            110.toShort.asBytes
           )
         ),
         "c2" -> List(
           RowCell.create(
             "c1",
-            ByteString.copyFrom(Bytes.toBytes(12)),
+            12.asBytes,
             ts,
             java.util.List.of(),
-            ByteString.copyFrom(Bytes.toBytes(120.toShort))
+            120.toShort.asBytes
           )
         )
       )
@@ -189,5 +191,27 @@ class RowDecoderTest extends AnyFunSuite {
     )
 
     assert(RowDecoder[Map[String, Map[Int, Short]]].apply(row) === Right(expected))
+  }
+
+  implicit class BooleanOps(private val v: Boolean) {
+    def asBytes: ByteString = ByteString.copyFrom(Array(if (v) -1 else 0).map(_.toByte))
+  }
+  implicit class ShortOps(private val v: Short) {
+    def asBytes: ByteString = ByteString.copyFrom(Shorts.toByteArray(v))
+  }
+  implicit class IntOps(private val v: Int) {
+    def asBytes: ByteString = ByteString.copyFrom(Ints.toByteArray(v))
+  }
+  implicit class LongOps(private val v: Long) {
+    def asBytes: ByteString = ByteString.copyFrom(Longs.toByteArray(v))
+  }
+  implicit class FloatOps(private val v: Float) {
+    def asBytes: ByteString = ByteString.copyFrom(Ints.toByteArray(java.lang.Float.floatToIntBits(v)))
+  }
+  implicit class DoubleOps(private val v: Double) {
+    def asBytes: ByteString = ByteString.copyFrom(Longs.toByteArray(java.lang.Double.doubleToLongBits(v)))
+  }
+  implicit class StringOps(private val v: String) {
+    def asBytes: ByteString = ByteString.copyFromUtf8(v)
   }
 }
