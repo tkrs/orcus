@@ -3,7 +3,6 @@ package orcus.free
 import java.nio.ByteBuffer
 
 import cats.InjectK
-import cats.MonadError
 import cats.free.Free
 import orcus.codec.Decoder
 import orcus.codec.FamilyDecoder
@@ -47,11 +46,8 @@ object ResultOp {
   final case class GetColumnLatestCell(result: Result, family: Array[Byte], qualifier: Array[Byte])
       extends ResultOp[Option[Cell]]
 
-  final case class Get[A: ValueCodec](result: Result, family: Array[Byte], qualifier: Array[Byte])
-      extends ResultOp[Option[A]] {
-    def run[M[_]](implicit M: MonadError[M, Throwable]): M[Option[A]] =
-      orcus.result.get[A, M](result, family, qualifier)
-  }
+  final case class Get[A](result: Result, family: Array[Byte], qualifier: Array[Byte], codec: ValueCodec[A])
+      extends ResultOp[Option[A]]
 
   final case class GetValue(result: Result, family: Array[Byte], qualifier: Array[Byte])
       extends ResultOp[Option[Array[Byte]]]
@@ -59,16 +55,10 @@ object ResultOp {
   final case class GetValueAsByteBuffer(result: Result, family: Array[Byte], qualifier: Array[Byte])
       extends ResultOp[Option[ByteBuffer]]
 
-  final case class GetFamily[A: FamilyDecoder](result: Result, family: Array[Byte]) extends ResultOp[A] {
-    def run[M[_]](implicit M: MonadError[M, Throwable]): M[A] =
-      orcus.result.getFamily[A, M](result, family)
-  }
-  final case class GetFamilyMap(result: Result, family: Array[Byte]) extends ResultOp[Map[Array[Byte], Array[Byte]]]
+  final case class GetFamily[A](result: Result, family: Array[Byte], codec: FamilyDecoder[A]) extends ResultOp[A]
+  final case class GetFamilyMap(result: Result, family: Array[Byte])                          extends ResultOp[Map[Array[Byte], Array[Byte]]]
 
-  final case class To[A: Decoder](result: Result) extends ResultOp[A] {
-    def run[M[_]](implicit M: MonadError[M, Throwable]): M[A] =
-      orcus.result.to[A, M](result)
-  }
+  final case class To[A](result: Result, decoder: Decoder[A]) extends ResultOp[A]
 }
 
 abstract private[free] class ResultOps0[M[_]](implicit inj: InjectK[ResultOp, M]) extends ResultApi[M] {
@@ -87,7 +77,7 @@ abstract private[free] class ResultOps0[M[_]](implicit inj: InjectK[ResultOp, M]
     Free.inject[ResultOp, M](GetColumnLatestCell(r, family, qualifier))
 
   override def get[A: ValueCodec](result: Result, family: Array[Byte], qualifier: Array[Byte]): ResultF[Option[A]] =
-    Free.inject[ResultOp, M](Get[A](result, family, qualifier))
+    Free.inject[ResultOp, M](Get[A](result, family, qualifier, ValueCodec[A]))
 
   override def getValue(result: Result, family: Array[Byte], qualifier: Array[Byte]): ResultF[Option[Array[Byte]]] =
     Free.inject[ResultOp, M](GetValue(result, family, qualifier))
@@ -100,13 +90,13 @@ abstract private[free] class ResultOps0[M[_]](implicit inj: InjectK[ResultOp, M]
     Free.inject[ResultOp, M](GetValueAsByteBuffer(result, family, qualifier))
 
   override def getFamily[A: FamilyDecoder](result: Result, family: Array[Byte]): ResultF[A] =
-    Free.inject[ResultOp, M](GetFamily[A](result, family))
+    Free.inject[ResultOp, M](GetFamily[A](result, family, FamilyDecoder[A]))
 
   override def getFamilyMap(result: Result, family: Array[Byte]): ResultF[Map[Array[Byte], Array[Byte]]] =
     Free.inject[ResultOp, M](GetFamilyMap(result, family))
 
   override def to[A: Decoder](result: Result): ResultF[A] =
-    Free.inject[ResultOp, M](To[A](result))
+    Free.inject[ResultOp, M](To[A](result, Decoder[A]))
 }
 
 class ResultOps[M[_]](implicit inj: InjectK[ResultOp, M]) extends ResultOps0[M]

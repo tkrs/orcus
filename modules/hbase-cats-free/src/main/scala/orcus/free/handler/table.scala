@@ -32,7 +32,7 @@ object table {
             case Delete(a)        => kleisli(delete[M](_, a))
             case Append(a)        => kleisli(append[M](_, a))
             case Increment(a)     => kleisli(increment[M](_, a))
-            case batch @ Batch(_) => kleisli(batch.run[M])
+            case Batch(a)         => kleisli(batch[M, Seq](_, a))
           }
       }
   }
