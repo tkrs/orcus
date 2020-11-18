@@ -7,7 +7,7 @@ lazy val orcus = project
   .settings(
     ThisBuild / organization := "com.github.tkrs",
     ThisBuild / scalaVersion := V.`scala2.13`,
-    ThisBuild / crossScalaVersions := Seq( V.`scala2.13`, V.`scala2.12`),
+    ThisBuild / crossScalaVersions := Seq(V.`scala2.13`, V.`scala2.12`),
     ThisBuild / resolvers ++= Seq(Resolver.sonatypeRepo("releases"), Resolver.sonatypeRepo("snapshots")),
     ThisBuild / libraryDependencies ++= TestDeps ++ Seq(Hbase % Provided, compilerPlugin(KindProjector)),
     ThisBuild / scalacOptions ++= compilerOptions ++ warnCompilerOptions ++ {
@@ -23,10 +23,30 @@ lazy val orcus = project
     ThisBuild / scalafixOnCompile := true,
     ThisBuild / scalafixDependencies += OrganizeImports,
     ThisBuild / semanticdbEnabled := true,
-    ThisBuild / semanticdbVersion := scalafixSemanticdb.revision,
+    ThisBuild / semanticdbVersion := scalafixSemanticdb.revision
   )
-  .aggregate(core, `cats-effect`, `cats-free`, monix, `twitter-util`, bigtable, example, `example-bigtable`, benchmark)
-  .dependsOn(core, `cats-effect`, `cats-free`, monix, `twitter-util`, bigtable, example, `example-bigtable`, benchmark)
+  .aggregate(core,
+             hbase,
+             bigtable,
+             `cats-effect`,
+             `hbase-cats-free`,
+             monix,
+             `twitter-util`,
+             `hbase-example`,
+             `bigtable-example`,
+             benchmark
+  )
+  .dependsOn(core,
+             hbase,
+             bigtable,
+             `cats-effect`,
+             `hbase-cats-free`,
+             monix,
+             `twitter-util`,
+             `hbase-example`,
+             `bigtable-example`,
+             benchmark
+  )
 
 lazy val core = project
   .in(file("modules/core"))
@@ -47,6 +67,19 @@ lazy val core = project
       )
       .map(_.withSources)
   )
+
+lazy val hbase = project
+  .in(file("modules/hbase"))
+  .settings(publishSettings)
+  .settings(crossVersionSharedSources)
+  .settings(
+    description := "orcus hbase",
+    moduleName := "orcus-hbase",
+    libraryDependencies ++= Seq(
+      Hbase.withSources() % Provided
+    )
+  )
+  .dependsOn(core)
 
 lazy val monix = project
   .in(file("modules/monix"))
@@ -86,8 +119,8 @@ lazy val `cats-effect` = project
   )
   .dependsOn(core % "compile->compile;test->test")
 
-lazy val `cats-free` = project
-  .in(file("modules/cats-free"))
+lazy val `hbase-cats-free` = project
+  .in(file("modules/hbase-cats-free"))
   .settings(publishSettings)
   .settings(crossVersionSharedSources)
   .settings(
@@ -97,7 +130,7 @@ lazy val `cats-free` = project
   .settings(
     libraryDependencies += CatsFree.withSources
   )
-  .dependsOn(core)
+  .dependsOn(hbase)
 
 lazy val bigtable = project
   .in(file("modules/bigtable"))
@@ -112,8 +145,8 @@ lazy val bigtable = project
   )
   .dependsOn(core)
 
-lazy val example = project
-  .in(file("modules/example"))
+lazy val `hbase-example` = project
+  .in(file("modules/hbase-example"))
   .settings(publishSettings)
   .settings(noPublishSettings)
   .settings(crossVersionSharedSources)
@@ -134,20 +167,19 @@ lazy val example = project
   .settings(
     scalacOptions -= "-Xfatal-warnings"
   )
-  .dependsOn(`cats-effect`, `cats-free`)
+  .dependsOn(`cats-effect`, `hbase-cats-free`)
 
-lazy val `example-bigtable` = project
-  .in(file("modules/example-bigtable"))
+lazy val `bigtable-example` = project
+  .in(file("modules/bigtable-example"))
   .settings(publishSettings)
   .settings(noPublishSettings)
   .settings(crossVersionSharedSources)
   .settings(
-    description := "orcus example-bigtable",
-    moduleName := "orcus-example-bigtable"
+    description := "orcus bigtable-example",
+    moduleName := "orcus-bigtable-example"
   )
   .settings(
     libraryDependencies ++= Seq(
-      Hbase,
       Logging,
       LogbackClassic
     ).map(_.withSources)
@@ -179,6 +211,7 @@ lazy val benchmark = (project in file("modules/benchmark"))
   .enablePlugins(JmhPlugin)
   .dependsOn(
     Seq(
+      hbase,
       `twitter-util`,
       `cats-effect`,
       monix
