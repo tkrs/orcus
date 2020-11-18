@@ -2,7 +2,7 @@
 
 [![Build Status](https://travis-ci.com/tkrs/orcus.svg?branch=master)](https://travis-ci.com/tkrs/orcus)
 [![codecov](https://codecov.io/gh/tkrs/orcus/branch/master/graph/badge.svg)](https://codecov.io/gh/tkrs/orcus)
-[![Maven Central](https://maven-badges.herokuapp.com/maven-central/com.github.tkrs/orcus-core_2.12/badge.svg)](https://maven-badges.herokuapp.com/maven-central/com.github.tkrs/orcus-core_2.12)
+[![Maven Central](https://maven-badges.herokuapp.com/maven-central/com.github.tkrs/orcus-core_2.12/badge.svg)](https://maven-badges.herokuapp.com/maven-central/com.github.tkrs/orcus-core_2.13)
 [![Latest version](https://index.scala-lang.org/tkrs/orcus/latest.svg)](https://index.scala-lang.org/tkrs/orcus/orcus-core)
 
 orcus is a library to interact with HBase/Bigtable built atop [HBase Java Client](https://github.com/apache/hbase/tree/rel/2.0.0-beta-1)/[Bigtable Java Client](https://github.com/googleapis/java-bigtable) for connecting to an HBase/Bigtable instance. Also, it has a feature to automatically derive a result object to an arbitrary type object.
@@ -11,7 +11,7 @@ orcus is a library to interact with HBase/Bigtable built atop [HBase Java Client
 
 ### HBase
 
-Firstly, this library depends on "provided" HBase client on your project. Thus, you must to add an HBase client to your `build.sbt` in addition to `orcus-core`. For example:
+Firstly, this library depends on "provided" HBase client on your project. Thus, you must to add an HBase client to your `build.sbt` in addition to `orcus-hbase`. For example:
 
 ```
 libraryDependencies += Seq(
@@ -20,11 +20,9 @@ libraryDependencies += Seq(
 )
 ```
 
-And, so look at this [example](https://github.com/tkrs/orcus/blob/master/modules/example/src/main/scala/example/FreeMain.scala)
+And, so look at this [example](https://github.com/tkrs/orcus/blob/master/modules/hbase-example/src/main/scala/example/FreeMain.scala)
 
 ### Bigtable
-
-If you use the [google-cloud-bigtable](https://github.com/googleapis/java-bigtable), you can use the `orcus-bigtable`
 
 ```
 libraryDependencies += Seq(
@@ -32,7 +30,7 @@ libraryDependencies += Seq(
 )
 ```
 
-And, so look at this [example](https://github.com/tkrs/orcus/blob/master/modules/example-bigtable/src/main/scala/orcus/example/Main.scala)
+And, so look at this [example](https://github.com/tkrs/orcus/blob/master/modules/bigtable-example/src/main/scala/orcus/example/Main.scala)
 
 LICENSE
 
