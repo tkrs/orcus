@@ -1,6 +1,7 @@
 # orcus
 
-[![Build Status](https://travis-ci.com/tkrs/orcus.svg?branch=master)](https://travis-ci.com/tkrs/orcus)
+[![CI](https://github.com/tkrs/orcus/workflows/CI/badge.svg)](https://github.com/tkrs/orcus/actions?query=workflow%3ACI)
+[![Release](https://github.com/tkrs/orcus/workflows/Release/badge.svg)](https://github.com/tkrs/orcus/actions?query=workflow%3ARelease)
 [![codecov](https://codecov.io/gh/tkrs/orcus/branch/master/graph/badge.svg)](https://codecov.io/gh/tkrs/orcus)
 [![Maven Central](https://maven-badges.herokuapp.com/maven-central/com.github.tkrs/orcus-core_2.12/badge.svg)](https://maven-badges.herokuapp.com/maven-central/com.github.tkrs/orcus-core_2.13)
 [![Latest version](https://index.scala-lang.org/tkrs/orcus/latest.svg)](https://index.scala-lang.org/tkrs/orcus/orcus-core)
