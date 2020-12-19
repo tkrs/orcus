@@ -8,10 +8,10 @@ object Dependencies {
     val kindProjector   = "0.11.2"
     val organizeImports = "0.4.4"
 
-    val cats        = "2.3.0"
+    val cats        = "2.3.1"
     val monix       = "3.3.0"
-    val twitterUtil = "20.12.0"
-    val catsEffect  = "2.3.0"
+    val twitterUtil = "20.10.0"
+    val catsEffect  = "2.3.1"
     val shapeless   = "2.3.3"
     val scalatest   = "3.2.3"
     val scalatestplus = new {
@@ -20,7 +20,7 @@ object Dependencies {
     }
 
     val hbase            = "2.3.3"
-    val bigtable         = "1.18.1"
+    val bigtable         = "1.19.2"
     val logback          = "1.2.3"
     val scalaLogging     = "3.9.2"
     val scalaJava8Compat = "0.9.1"
