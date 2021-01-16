@@ -5,7 +5,7 @@ object Dependencies {
     val `scala2.13` = "2.13.3"
     val `scala2.12` = "2.12.12"
 
-    val kindProjector   = "0.11.2"
+    val kindProjector   = "0.11.3"
     val organizeImports = "0.4.4"
 
     val cats        = "2.3.1"
