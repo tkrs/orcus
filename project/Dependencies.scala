@@ -5,22 +5,22 @@ object Dependencies {
     val `scala2.13` = "2.13.3"
     val `scala2.12` = "2.12.12"
 
-    val kindProjector   = "0.11.2"
-    val organizeImports = "0.4.4"
+    val kindProjector   = "0.11.3"
+    val organizeImports = "0.5.0"
 
-    val cats        = "2.3.1"
+    val cats        = "2.4.2"
     val monix       = "3.3.0"
-    val twitterUtil = "20.12.0"
-    val catsEffect  = "2.3.1"
+    val twitterUtil = "20.10.0"
+    val catsEffect  = "2.3.3"
     val shapeless   = "2.3.3"
-    val scalatest   = "3.2.3"
+    val scalatest   = "3.2.4"
     val scalatestplus = new {
       val scalacheck = "3.2.2.0"
       val mockito    = "3.2.3.0"
     }
 
-    val hbase            = "2.3.3"
-    val bigtable         = "1.19.2"
+    val hbase            = "2.4.1"
+    val bigtable         = "1.20.0"
     val logback          = "1.2.3"
     val scalaLogging     = "3.9.2"
     val scalaJava8Compat = "0.9.1"
