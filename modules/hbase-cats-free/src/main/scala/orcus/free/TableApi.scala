@@ -52,37 +52,37 @@ abstract private[free] class TableOps0[M[_]](implicit inj: InjectK[TableOp, M]) 
   import TableOp._
 
   override def getName: TableF[TableName] =
-    Free.inject[TableOp, M](GetName)
+    Free.liftInject[M](GetName)
 
   override def getConfiguration: TableF[HConfig] =
-    Free.inject[TableOp, M](GetConfiguration)
+    Free.liftInject[M](GetConfiguration)
 
   override def exists(a: HGet): TableF[Boolean] =
-    Free.inject[TableOp, M](Exists(a))
+    Free.liftInject[M](Exists(a))
 
   override def get(a: HGet): TableF[HResult] =
-    Free.inject[TableOp, M](Get(a))
+    Free.liftInject[M](Get(a))
 
   override def put(a: HPut): TableF[Unit] =
-    Free.inject[TableOp, M](Put(a))
+    Free.liftInject[M](Put(a))
 
   override def getScanner(a: HScan): TableF[HResultScanner] =
-    Free.inject[TableOp, M](GetScanner(a))
+    Free.liftInject[M](GetScanner(a))
 
   override def scanAll(a: HScan): TableF[Seq[HResult]] =
-    Free.inject[TableOp, M](ScanAll(a))
+    Free.liftInject[M](ScanAll(a))
 
   override def delete(a: HDelete): TableF[Unit] =
-    Free.inject[TableOp, M](Delete(a))
+    Free.liftInject[M](Delete(a))
 
   override def append(a: HAppend): TableF[HResult] =
-    Free.inject[TableOp, M](Append(a))
+    Free.liftInject[M](Append(a))
 
   override def increment(a: HIncrement): TableF[HResult] =
-    Free.inject[TableOp, M](Increment(a))
+    Free.liftInject[M](Increment(a))
 
   override def batch(actions: Seq[_ <: Row]): TableF[Seq[BatchResult]] =
-    Free.inject[TableOp, M](Batch(actions))
+    Free.liftInject[M](Batch(actions))
 
   // override def existsAll(gets: Seq[Get]): TableF[Seq[Boolean]] = ???
 }

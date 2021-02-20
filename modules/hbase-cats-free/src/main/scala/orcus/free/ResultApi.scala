@@ -65,38 +65,38 @@ abstract private[free] class ResultOps0[M[_]](implicit inj: InjectK[ResultOp, M]
   import ResultOp._
 
   override def getRow(r: Result): ResultF[Option[Array[Byte]]] =
-    Free.inject[ResultOp, M](GetRow(r))
+    Free.liftInject[M](GetRow(r))
 
   override def rawCells(r: Result): ResultF[Seq[Cell]] =
-    Free.inject[ResultOp, M](RawCells(r))
+    Free.liftInject[M](RawCells(r))
 
   override def getColumnCells(r: Result, family: Array[Byte], qualifier: Array[Byte]): ResultF[Seq[Cell]] =
-    Free.inject[ResultOp, M](GetColumnCells(r, family, qualifier))
+    Free.liftInject[M](GetColumnCells(r, family, qualifier))
 
   override def getColumnLatestCell(r: Result, family: Array[Byte], qualifier: Array[Byte]): ResultF[Option[Cell]] =
-    Free.inject[ResultOp, M](GetColumnLatestCell(r, family, qualifier))
+    Free.liftInject[M](GetColumnLatestCell(r, family, qualifier))
 
   override def get[A: ValueCodec](result: Result, family: Array[Byte], qualifier: Array[Byte]): ResultF[Option[A]] =
-    Free.inject[ResultOp, M](Get[A](result, family, qualifier, ValueCodec[A]))
+    Free.liftF(inj.inj(Get[A](result, family, qualifier, ValueCodec[A])))
 
   override def getValue(result: Result, family: Array[Byte], qualifier: Array[Byte]): ResultF[Option[Array[Byte]]] =
-    Free.inject[ResultOp, M](GetValue(result, family, qualifier))
+    Free.liftInject[M](GetValue(result, family, qualifier))
 
   override def getValueAsByteBuffer(
     result: Result,
     family: Array[Byte],
     qualifier: Array[Byte]
   ): ResultF[Option[ByteBuffer]] =
-    Free.inject[ResultOp, M](GetValueAsByteBuffer(result, family, qualifier))
+    Free.liftInject[M](GetValueAsByteBuffer(result, family, qualifier))
 
   override def getFamily[A: FamilyDecoder](result: Result, family: Array[Byte]): ResultF[A] =
-    Free.inject[ResultOp, M](GetFamily[A](result, family, FamilyDecoder[A]))
+    Free.liftF(inj.inj(GetFamily[A](result, family, FamilyDecoder[A])))
 
   override def getFamilyMap(result: Result, family: Array[Byte]): ResultF[Map[Array[Byte], Array[Byte]]] =
-    Free.inject[ResultOp, M](GetFamilyMap(result, family))
+    Free.liftInject[M](GetFamilyMap(result, family))
 
   override def to[A: Decoder](result: Result): ResultF[A] =
-    Free.inject[ResultOp, M](To[A](result, Decoder[A]))
+    Free.liftF(inj.inj(To[A](result, Decoder[A])))
 }
 
 class ResultOps[M[_]](implicit inj: InjectK[ResultOp, M]) extends ResultOps0[M]
