@@ -8,12 +8,12 @@ object Dependencies {
     val kindProjector   = "0.11.3"
     val organizeImports = "0.5.0"
 
-    val cats        = "2.3.1"
+    val cats        = "2.4.2"
     val monix       = "3.3.0"
     val twitterUtil = "20.10.0"
-    val catsEffect  = "2.3.1"
+    val catsEffect  = "2.3.3"
     val shapeless   = "2.3.3"
-    val scalatest   = "3.2.4"
+    val scalatest   = "3.2.5"
     val scalatestplus = new {
       val scalacheck = "3.2.2.0"
       val mockito    = "3.2.4.0"
