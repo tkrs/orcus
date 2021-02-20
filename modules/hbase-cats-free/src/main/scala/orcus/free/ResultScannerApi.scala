@@ -24,10 +24,10 @@ abstract private[free] class ResultScannerOps0[M[_]](implicit inj: InjectK[Resul
   import ResultScannerOp._
 
   override def nextOne(resultScanner: ResultScanner): ResultScannerF[Option[Result]] =
-    Free.inject[ResultScannerOp, M](NextOne(resultScanner))
+    Free.liftInject[M](NextOne(resultScanner))
 
   override def next(resultScanner: ResultScanner, i: Int): ResultScannerF[Seq[Result]] =
-    Free.inject[ResultScannerOp, M](Next(resultScanner, i))
+    Free.liftInject[M](Next(resultScanner, i))
 }
 
 class ResultScannerOps[M[_]](implicit inj: InjectK[ResultScannerOp, M]) extends ResultScannerOps0[M]
