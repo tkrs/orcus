@@ -79,7 +79,7 @@ trait FreeMain extends IOApp with LazyLogging {
 
     novels.toList
       .map((prog _).tupled)
-      .sequence[Free[F, ?], Unit] *> Free.pure(())
+      .sequence[Free[F, *], Unit] *> Free.pure(())
   }
 
   final def scanProgram[F[_]](numRecords: Int)(implicit
@@ -98,7 +98,7 @@ trait FreeMain extends IOApp with LazyLogging {
   ): Free[F, Vector[Option[Novel]]] =
     results.toVector
       .map(resultOps.to[Option[Novel]])
-      .sequence[Free[F, ?], Option[Novel]]
+      .sequence[Free[F, *], Option[Novel]]
 
   final def program[F[_]](implicit
     T: TableOps[F],
@@ -114,23 +114,23 @@ trait FreeMain extends IOApp with LazyLogging {
     } yield ys
   }
 
-  final type Algebra[A]      = EitherK[TableOp, EitherK[ResultOp, ResultScannerOp, ?], A]
+  final type Algebra[A]      = EitherK[TableOp, EitherK[ResultOp, ResultScannerOp, *], A]
   final type TableK[F[_], A] = Kleisli[F, AsyncTableT, A]
 
   final def interpreter[M[_]](implicit
     tableHandlerM: TableHandler[M],
     resultHandlerM: ResultHandler[M],
     resultScannerHandlerM: ResultScannerHandler[M]
-  ): Algebra ~> TableK[M, ?] = {
-    val t: TableOp ~> TableK[M, ?]          = tableHandlerM
-    val r: ResultOp ~> TableK[M, ?]         = resultHandlerM.liftF
-    val rs: ResultScannerOp ~> TableK[M, ?] = resultScannerHandlerM.liftF
+  ): Algebra ~> TableK[M, *] = {
+    val t: TableOp ~> TableK[M, *]          = tableHandlerM
+    val r: ResultOp ~> TableK[M, *]         = resultHandlerM.liftF
+    val rs: ResultScannerOp ~> TableK[M, *] = resultScannerHandlerM.liftF
 
     t.or(r.or(rs))
   }
 
   final def runExample(conn: AsyncConnection): IO[ExitCode] = {
-    val i: Algebra ~> TableK[IO, ?]          = interpreter[IO]
+    val i: Algebra ~> TableK[IO, *]          = interpreter[IO]
     val k: TableK[IO, Vector[Option[Novel]]] = program[Algebra].foldMap(i)
 
     for {
@@ -181,6 +181,6 @@ object Novel {
 
 object Syntax {
   implicit final class Nat[F[_], G[_]](val nat: F ~> G) extends AnyVal {
-    def liftF[E]: F ~> Kleisli[G, E, ?] = λ[F ~> Kleisli[G, E, ?]](fa => Kleisli(_ => nat(fa)))
+    def liftF[E]: F ~> Kleisli[G, E, *] = λ[F ~> Kleisli[G, E, *]](fa => Kleisli(_ => nat(fa)))
   }
 }
