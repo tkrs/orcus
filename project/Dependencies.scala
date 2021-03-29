@@ -8,7 +8,7 @@ object Dependencies {
     val kindProjector   = "0.11.3"
     val organizeImports = "0.5.0"
 
-    val cats        = "2.4.2"
+    val cats        = "2.5.0"
     val monix       = "3.3.0"
     val twitterUtil = "21.2.0"
     val catsEffect  = "2.4.0"
