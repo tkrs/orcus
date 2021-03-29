@@ -11,7 +11,7 @@ object Dependencies {
     val cats        = "2.4.2"
     val monix       = "3.3.0"
     val twitterUtil = "21.2.0"
-    val catsEffect  = "2.3.3"
+    val catsEffect  = "2.4.0"
     val shapeless   = "2.3.3"
     val scalatest   = "3.2.6"
     val scalatestplus = new {
@@ -20,9 +20,9 @@ object Dependencies {
     }
 
     val hbase            = "2.4.2"
-    val bigtable         = "1.21.0"
+    val bigtable         = "1.21.2"
     val logback          = "1.2.3"
-    val scalaLogging     = "3.9.2"
+    val scalaLogging     = "3.9.3"
     val scalaJava8Compat = "0.9.1"
   }
 
