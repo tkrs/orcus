@@ -2,27 +2,27 @@ import sbt._
 
 object Dependencies {
   val V = new {
-    val `scala2.13` = "2.13.3"
+    val `scala2.13` = "2.13.5"
     val `scala2.12` = "2.12.13"
 
     val kindProjector   = "0.11.3"
     val organizeImports = "0.5.0"
 
-    val cats        = "2.4.2"
+    val cats        = "2.5.0"
     val monix       = "3.3.0"
     val twitterUtil = "21.2.0"
-    val catsEffect  = "2.3.3"
-    val shapeless   = "2.3.3"
-    val scalatest   = "3.2.5"
+    val catsEffect  = "2.4.1"
+    val shapeless   = "2.3.4"
+    val scalatest   = "3.2.7"
     val scalatestplus = new {
       val scalacheck = "3.2.2.0"
-      val mockito    = "3.2.5.0"
+      val mockito    = "3.2.7.0"
     }
 
-    val hbase            = "2.4.1"
-    val bigtable         = "1.20.1"
+    val hbase            = "2.4.2"
+    val bigtable         = "1.22.0"
     val logback          = "1.2.3"
-    val scalaLogging     = "3.9.2"
+    val scalaLogging     = "3.9.3"
     val scalaJava8Compat = "0.9.1"
   }
 
