@@ -11,7 +11,7 @@ object Dependencies {
     val cats        = "2.5.0"
     val monix       = "3.3.0"
     val twitterUtil = "21.2.0"
-    val catsEffect  = "2.4.1"
+    val catsEffect  = "2.5.0"
     val shapeless   = "2.3.4"
     val scalatest   = "3.2.7"
     val scalatestplus = new {
