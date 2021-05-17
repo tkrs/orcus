@@ -23,7 +23,7 @@ object Dependencies {
     val bigtable         = "1.24.0"
     val logback          = "1.2.3"
     val scalaLogging     = "3.9.3"
-    val scalaJava8Compat = "0.9.1"
+    val scalaJava8Compat = "1.0.0"
   }
 
   lazy val KindProjector   = ("org.typelevel"       %% "kind-projector"   % V.kindProjector).cross(CrossVersion.full)
