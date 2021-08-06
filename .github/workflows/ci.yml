@@ -9,11 +9,11 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v2
-      - uses: olafurpg/setup-scala@v10
+      - uses: olafurpg/setup-scala@v13
         with:
           java-version: openjdk@1.11
       - run: sbt coverage +test coverageReport
-      - uses: codecov/codecov-action@v1
+      - uses: codecov/codecov-action@v2
         with:
           token: ${{ secrets.CODECOV_TOKEN }} # not required for public repos
           flags: unittests
@@ -23,7 +23,7 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v2
-      - uses: olafurpg/setup-scala@v10
+      - uses: olafurpg/setup-scala@v13
         with:
           java-version: openjdk@1.11
       - run: sbt scalafmtCheckAll
@@ -31,7 +31,7 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v2
-      - uses: olafurpg/setup-scala@v10
+      - uses: olafurpg/setup-scala@v13
         with:
           java-version: openjdk@1.11
       - run: sbt "scalafixAll --check"
