@@ -7,8 +7,8 @@ lazy val orcus = project
     inThisBuild(
       Seq(
         organization := "com.github.tkrs",
-        homepage := Some(url("https://github.com/tkrs/orcus")),
-        licenses := Seq("MIT License" -> url("http://www.opensource.org/licenses/mit-license.php")),
+        homepage     := Some(url("https://github.com/tkrs/orcus")),
+        licenses     := Seq("MIT License" -> url("http://www.opensource.org/licenses/mit-license.php")),
         developers := List(
           Developer(
             "tkrs",
@@ -17,11 +17,11 @@ lazy val orcus = project
             url("https://github.com/tkrs")
           )
         ),
-        scalaVersion := V.`scala2.13`,
+        scalaVersion       := V.`scala2.13`,
         crossScalaVersions := Seq(V.`scala2.13`, V.`scala2.12`),
-        fork := true,
-        scalafmtOnCompile := true,
-        scalafixOnCompile := true,
+        fork               := true,
+        scalafmtOnCompile  := true,
+        scalafixOnCompile  := true,
         scalafixDependencies += OrganizeImports,
         semanticdbEnabled := true,
         semanticdbVersion := scalafixSemanticdb.revision
@@ -61,7 +61,7 @@ lazy val core = project
   .settings(crossVersionSharedSources)
   .settings(
     description := "orcus core",
-    moduleName := "orcus-core"
+    moduleName  := "orcus-core"
   )
   .settings(
     libraryDependencies ++= Seq
@@ -81,7 +81,7 @@ lazy val hbase = project
   .settings(crossVersionSharedSources)
   .settings(
     description := "orcus hbase",
-    moduleName := "orcus-hbase",
+    moduleName  := "orcus-hbase",
     libraryDependencies += Hbase.withSources()
   )
   .dependsOn(core)
@@ -92,7 +92,7 @@ lazy val monix = project
   .settings(crossVersionSharedSources)
   .settings(
     description := "orcus monix",
-    moduleName := "orcus-monix"
+    moduleName  := "orcus-monix"
   )
   .settings(
     libraryDependencies += MonixEval.withSources
@@ -105,7 +105,7 @@ lazy val `twitter-util` = project
   .settings(crossVersionSharedSources)
   .settings(
     description := "orcus twitter-util",
-    moduleName := "orcus-twitter-util"
+    moduleName  := "orcus-twitter-util"
   )
   .settings(
     libraryDependencies += TwitterUtil.withSources
@@ -117,7 +117,7 @@ lazy val `cats-effect` = project
   .settings(sharedSettings)
   .settings(
     description := "orcus cats-effect",
-    moduleName := "orcus-cats-effect"
+    moduleName  := "orcus-cats-effect"
   )
   .settings(
     libraryDependencies += CatsEffect.withSources
@@ -130,7 +130,7 @@ lazy val `hbase-cats-free` = project
   .settings(crossVersionSharedSources)
   .settings(
     description := "orcus cats-free",
-    moduleName := "orcus-cats-free"
+    moduleName  := "orcus-cats-free"
   )
   .settings(
     libraryDependencies += CatsFree.withSources
@@ -143,7 +143,7 @@ lazy val bigtable = project
   .settings(crossVersionSharedSources)
   .settings(
     description := "orcus bigtable",
-    moduleName := "orcus-bigtable"
+    moduleName  := "orcus-bigtable"
   )
   .settings(
     libraryDependencies += Bigtable.withSources
@@ -157,7 +157,7 @@ lazy val `hbase-example` = project
   .settings(crossVersionSharedSources)
   .settings(
     description := "orcus example",
-    moduleName := "orcus-example"
+    moduleName  := "orcus-example"
   )
   .settings(
     libraryDependencies ++= Seq(
@@ -167,7 +167,7 @@ lazy val `hbase-example` = project
     ).map(_.withSources)
   )
   .settings(
-    fork := true,
+    fork            := true,
     coverageEnabled := false
   )
   .settings(
@@ -182,7 +182,7 @@ lazy val `bigtable-example` = project
   .settings(crossVersionSharedSources)
   .settings(
     description := "orcus bigtable-example",
-    moduleName := "orcus-bigtable-example"
+    moduleName  := "orcus-bigtable-example"
   )
   .settings(
     libraryDependencies ++= Seq(
@@ -191,7 +191,7 @@ lazy val `bigtable-example` = project
     ).map(_.withSources)
   )
   .settings(
-    fork := true,
+    fork            := true,
     coverageEnabled := false
   )
   .settings(
@@ -205,7 +205,7 @@ lazy val benchmark = (project in file("modules/benchmark"))
   .settings(crossVersionSharedSources)
   .settings(
     description := "orcus benchmark",
-    moduleName := "orcus-benchmark"
+    moduleName  := "orcus-benchmark"
   )
   .settings(
     libraryDependencies ++= Seq(
