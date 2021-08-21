@@ -56,7 +56,7 @@ object ResultOp {
       extends ResultOp[Option[ByteBuffer]]
 
   final case class GetFamily[A](result: Result, family: Array[Byte], codec: FamilyDecoder[A]) extends ResultOp[A]
-  final case class GetFamilyMap(result: Result, family: Array[Byte])                          extends ResultOp[Map[Array[Byte], Array[Byte]]]
+  final case class GetFamilyMap(result: Result, family: Array[Byte]) extends ResultOp[Map[Array[Byte], Array[Byte]]]
 
   final case class To[A](result: Result, decoder: Decoder[A]) extends ResultOp[A]
 }
