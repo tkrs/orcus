@@ -3,7 +3,7 @@ import sbt._
 object Dependencies {
   val V = new {
     val `scala2.13` = "2.13.5"
-    val `scala2.12` = "2.12.12"
+    val `scala2.12` = "2.12.15"
 
     val kindProjector   = "0.13.0"
     val organizeImports = "0.5.0"
