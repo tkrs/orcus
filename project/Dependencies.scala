@@ -10,7 +10,7 @@ object Dependencies {
 
     val cats        = "2.6.1"
     val monix       = "3.4.0"
-    val twitterUtil = "21.12.0"
+    val twitterUtil = "21.8.0"
     val catsEffect  = "2.5.3"
     val shapeless   = "2.3.7"
     val scalatest   = "3.2.10"
