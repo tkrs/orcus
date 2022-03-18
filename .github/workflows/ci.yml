@@ -8,7 +8,7 @@ jobs:
   build:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v2
+      - uses: actions/checkout@v3
       - uses: olafurpg/setup-scala@v13
         with:
           java-version: openjdk@1.11
@@ -22,7 +22,7 @@ jobs:
   scalafmt:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v2
+      - uses: actions/checkout@v3
       - uses: olafurpg/setup-scala@v13
         with:
           java-version: openjdk@1.11
@@ -30,7 +30,7 @@ jobs:
   scalafix:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v2
+      - uses: actions/checkout@v3
       - uses: olafurpg/setup-scala@v13
         with:
           java-version: openjdk@1.11
