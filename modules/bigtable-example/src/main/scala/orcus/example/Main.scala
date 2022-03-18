@@ -31,7 +31,7 @@ import orcus.bigtable.codec.semiauto._
 import scala.util.control.NonFatal
 
 object Main extends IOApp with LazyLogging {
-  private[this] val dataSettings = {
+  private[this] val dataSettings =
     if (sys.env.contains("BIGTABLE_EMULATOR_HOST"))
       BigtableDataSettings.newBuilder().setProjectId("fake").setInstanceId("fake").build()
     else {
@@ -85,7 +85,6 @@ object Main extends IOApp with LazyLogging {
 
       builder.build()
     }
-  }
 
   private[this] val tableId = "cpu"
 
@@ -159,8 +158,9 @@ final case class Metric(percentage: Int, tags: List[String])
 
 object Metric {
   implicit val decodeTags: PrimitiveDecoder[List[String]] = bs =>
-    try if (bs == null) Right(Nil)
-    else Right(bs.toStringUtf8.split(",").toList.map(_.trim))
+    try
+      if (bs == null) Right(Nil)
+      else Right(bs.toStringUtf8.split(",").toList.map(_.trim))
     catch {
       case NonFatal(e) => Left(e)
     }
