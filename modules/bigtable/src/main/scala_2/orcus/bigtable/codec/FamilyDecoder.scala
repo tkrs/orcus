@@ -1,6 +1,7 @@
 package orcus.bigtable.codec
 
 import com.google.cloud.bigtable.data.v2.models.RowCell
+import com.google.protobuf.ByteString
 import orcus.internal.ScalaVersionSpecifics._
 
 import scala.annotation.tailrec
@@ -21,13 +22,15 @@ private[bigtable] trait FamilyDecoder1 {
   ): FamilyDecoder[M[K, V]] = { family =>
     val builder = factory.newBuilder
 
-    @tailrec def loop(cells: List[RowCell]): Either[Throwable, M[K, V]] =
+    @tailrec def loop(cells: List[RowCell], added: Set[ByteString]): Either[Throwable, M[K, V]] =
       cells match {
+        case h :: t if added(h.getQualifier()) =>
+          loop(t, added)
         case h :: t =>
           decodeK(h.getQualifier) match {
             case Right(q) =>
               decodeV(h.getValue) match {
-                case Right(v) => builder += q -> v; loop(t)
+                case Right(v) => builder += q -> v; loop(t, added + h.getQualifier)
                 case l        => l.asInstanceOf[Either[Throwable, M[K, V]]]
               }
             case l => l.asInstanceOf[Either[Throwable, M[K, V]]]
@@ -36,7 +39,7 @@ private[bigtable] trait FamilyDecoder1 {
           Right(builder.result())
       }
 
-    loop(family)
+    loop(family, Set.empty)
   }
 
   implicit def decodeOptionA[A](implicit decodeA: FamilyDecoder[A]): FamilyDecoder[Option[A]] =

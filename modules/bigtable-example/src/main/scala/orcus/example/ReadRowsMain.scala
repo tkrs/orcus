@@ -9,11 +9,9 @@ import cats.effect.ExitCode
 import cats.effect.IO
 import cats.effect.IOApp
 import cats.syntax.all._
-import com.google.api.gax.core.FixedCredentialsProvider
-import com.google.auth.oauth2.GoogleCredentials
-import com.google.cloud.ServiceOptions
+import com.google.cloud.bigtable.admin.v2.BigtableTableAdminClient
+import com.google.cloud.bigtable.admin.v2.models.CreateTableRequest
 import com.google.cloud.bigtable.data.v2.BigtableDataClient
-import com.google.cloud.bigtable.data.v2.BigtableDataSettings
 import com.google.cloud.bigtable.data.v2.models.Filters
 import com.google.cloud.bigtable.data.v2.models.Query
 import com.google.cloud.bigtable.data.v2.models.RowMutation
@@ -31,61 +29,8 @@ import orcus.bigtable.codec.semiauto._
 
 import scala.util.control.NonFatal
 
-object Main extends IOApp with LazyLogging {
-  private[this] val dataSettings =
-    if (sys.env.contains("BIGTABLE_EMULATOR_HOST"))
-      BigtableDataSettings.newBuilder().setProjectId("fake").setInstanceId("fake").build()
-    else {
-      val builder = BigtableDataSettings
-        .newBuilder()
-        .setCredentialsProvider(FixedCredentialsProvider.create(GoogleCredentials.getApplicationDefault))
-        .setProjectId(ServiceOptions.getDefaultProjectId)
-        .setInstanceId(sys.env.getOrElse("BIGTABLE_INSTANCE", "fake"))
-        .setAppProfileId(sys.env.getOrElse("BIGTABLE_APP_PROFILE", "default"))
-
-      val stubSettings = builder.stubSettings()
-      val readRowsRetrySettings = stubSettings
-        .readRowsSettings()
-        .getRetrySettings
-        .toBuilder
-        .setInitialRetryDelay(org.threeten.bp.Duration.ofMillis(5))
-        .setRetryDelayMultiplier(2)
-        .setMaxRetryDelay(org.threeten.bp.Duration.ofMillis(500L))
-        .setInitialRpcTimeout(org.threeten.bp.Duration.ofSeconds(1L))
-        .setRpcTimeoutMultiplier(1.0)
-        .setMaxRpcTimeout(org.threeten.bp.Duration.ofSeconds(3L))
-        .setTotalTimeout(org.threeten.bp.Duration.ofSeconds(5L))
-        .build()
-      val readRowRetrySettings = stubSettings
-        .readRowSettings()
-        .getRetrySettings
-        .toBuilder
-        .setInitialRetryDelay(org.threeten.bp.Duration.ofMillis(5))
-        .setRetryDelayMultiplier(2)
-        .setMaxRetryDelay(org.threeten.bp.Duration.ofMillis(500L))
-        .setInitialRpcTimeout(org.threeten.bp.Duration.ofSeconds(1L))
-        .setRpcTimeoutMultiplier(1.0)
-        .setMaxRpcTimeout(org.threeten.bp.Duration.ofSeconds(2L))
-        .setTotalTimeout(org.threeten.bp.Duration.ofSeconds(5L))
-        .build()
-      val mutateRowRetrySettings = stubSettings
-        .mutateRowSettings()
-        .getRetrySettings
-        .toBuilder
-        .setInitialRetryDelay(org.threeten.bp.Duration.ofMillis(5))
-        .setRetryDelayMultiplier(2)
-        .setMaxRetryDelay(org.threeten.bp.Duration.ofMillis(500L))
-        .setInitialRpcTimeout(org.threeten.bp.Duration.ofSeconds(1L))
-        .setRpcTimeoutMultiplier(1.0)
-        .setMaxRpcTimeout(org.threeten.bp.Duration.ofSeconds(1L))
-        .setTotalTimeout(org.threeten.bp.Duration.ofSeconds(5L))
-        .build()
-      stubSettings.readRowsSettings().setRetrySettings(readRowsRetrySettings)
-      stubSettings.readRowSettings().setRetrySettings(readRowRetrySettings)
-      stubSettings.mutateRowSettings().setRetrySettings(mutateRowRetrySettings)
-
-      builder.build()
-    }
+object ReadRowsMain extends IOApp with LazyLogging {
+  import Settings._
 
   private[this] val tableId = "cpu"
 
@@ -104,8 +49,17 @@ object Main extends IOApp with LazyLogging {
   private[this] val cpuNums = (1 to sys.runtime.availableProcessors()).toList
 
   override def run(args: List[String]): IO[ExitCode] =
+    createTable >> mutateAndRead >> IO(ExitCode.Success)
+
+  private def tableRequest = CreateTableRequest.of(tableId).addFamily("metric")
+
+  private def createTable =
+    IO(BigtableTableAdminClient.create(adminSettings))
+      .bracket(c => IO(c.exists(tableId)).ifM(IO.unit, IO(c.createTable(tableRequest))))(r => IO(r.close()))
+
+  private def mutateAndRead =
     IO(BigtableDataClient.create(dataSettings))
-      .bracket(r => runMutate(r) >> runRead(r))(r => IO(r.close())) >> IO(ExitCode.Success)
+      .bracket(r => runMutate(r) >> runRead(r))(r => IO(r.close()))
 
   private def runMutate(dataClient: BigtableDataClient): IO[Unit] = {
     val wrapped = DataClient[IO](dataClient)
@@ -143,9 +97,24 @@ object Main extends IOApp with LazyLogging {
     val filter = Filters.FILTERS.timestamp().range().of(start, end)
     val query  = Query.create(tableId).prefix(userName + keySep).filter(filter)
 
-    ((wrapped.readRowsAsync(query) <* ContextShift[IO].shift) >>=
-      (rows => IO.fromEither(CRow.decodeRows[(String, CPU)](rows))))
-      .flatTap(a => IO(logger.info(s"readRows: ${a.toString}")))
+    val read =
+      (wrapped.readRowsAsync(query) <* ContextShift[IO].shift)
+        .flatTap(rows =>
+          IO(
+            rows.zipWithIndex.foreach { case (r, i) =>
+              logger.info(s"readRows[$i], rowkey: ${r.rowKey}, ${r.families.map { case (k, v) =>
+                  k -> v.map(c => (c.getFamily(), c.getQualifier().toStringUtf8(), c.getTimestamp(), c.getValue().toStringUtf8()))
+                }}")
+            }
+          )
+        )
+
+    val decode =
+      (rows: Vector[CRow]) =>
+        IO.fromEither(CRow.decodeRows[(String, CPU)](rows))
+          .flatTap(a => IO(logger.info(s"decodeRows: ${a.toString}")))
+
+    read >>= decode
   }
 }
 

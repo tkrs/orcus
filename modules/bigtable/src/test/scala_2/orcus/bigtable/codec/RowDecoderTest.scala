@@ -10,7 +10,7 @@ import orcus.bigtable.codec.semiauto._
 import org.scalatest.funsuite.AnyFunSuite
 
 class RowDecoderTest extends AnyFunSuite {
-  case class Foo(c1: Bar, c2: Option[Baz], c3: Option[Baz] = None)
+  case class Foo(c1: Bar, c2: Option[Baz], c3: Option[Baz] = None, c4: Map[String, String] = Map.empty)
 
   object Foo {
     implicit val decode: RowDecoder[Foo] = derivedRowDecoder[Foo]
@@ -76,13 +76,45 @@ class RowDecoderTest extends AnyFunSuite {
             java.util.List.of(),
             10.555f.asBytes
           )
+        ),
+        "c4" -> List(
+          RowCell.create(
+            "c4",
+            "z".asBytes,
+            ts,
+            java.util.List.of(),
+            "abc".asBytes
+          ),
+          RowCell.create(
+            "c4",
+            "z".asBytes,
+            ts,
+            java.util.List.of(),
+            "def".asBytes
+          ),
+          RowCell.create(
+            "c4",
+            "z".asBytes,
+            ts,
+            java.util.List.of(),
+            "ghi".asBytes
+          ),
+          RowCell.create(
+            "c4",
+            "x".asBytes,
+            ts,
+            java.util.List.of(),
+            "kkk".asBytes
+          )
         )
       )
     )
 
     val expected = Foo(
       Bar(10, "string", Some(10.999)),
-      Some(Baz(101L, true, 10.555f))
+      Some(Baz(101L, true, 10.555f)),
+      None,
+      Map("z" -> "abc", "x" -> "kkk")
     )
 
     assert(RowDecoder[Foo].apply(row) === Right(expected))
