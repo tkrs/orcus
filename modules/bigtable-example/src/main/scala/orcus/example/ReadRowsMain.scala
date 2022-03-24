@@ -19,8 +19,8 @@ import com.google.common.primitives.Ints
 import com.google.protobuf.ByteString
 import com.typesafe.scalalogging.LazyLogging
 import orcus.async.instances.catsEffect.concurrent._
-import orcus.bigtable.CRow
 import orcus.bigtable.DataClient
+import orcus.bigtable.Row
 import orcus.bigtable.async.implicits._
 import orcus.bigtable.codec.FamilyDecoder
 import orcus.bigtable.codec.PrimitiveDecoder
@@ -110,8 +110,8 @@ object ReadRowsMain extends IOApp with LazyLogging {
         )
 
     val decode =
-      (rows: Vector[CRow]) =>
-        IO.fromEither(CRow.decodeRows[(String, CPU)](rows))
+      (rows: Vector[Row]) =>
+        IO.fromEither(Row.decodeRows[(String, CPU)](rows))
           .flatTap(a => IO(logger.info(s"decodeRows: ${a.toString}")))
 
     read >>= decode
