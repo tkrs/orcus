@@ -6,7 +6,7 @@ import com.google.api.core.ApiFuture
 import com.google.api.gax.rpc.ResponseObserver
 import com.google.api.gax.rpc.StreamController
 import com.google.cloud.bigtable.data.v2.BigtableDataClient
-import com.google.cloud.bigtable.data.v2.models._
+import com.google.cloud.bigtable.data.v2.models.{Row => GRow, _}
 import orcus.async.AsyncHandler
 import orcus.async.Par
 import orcus.bigtable.codec.RowDecoder
@@ -17,9 +17,9 @@ import scala.collection.mutable
 
 trait DataClient[F[_]] {
 
-  def readRowAsync(query: Query): F[Option[CRow]]
+  def readRowAsync(query: Query): F[Option[Row]]
 
-  def readRowsAsync(query: Query): F[Vector[CRow]]
+  def readRowsAsync(query: Query): F[Vector[Row]]
 
   def sampleRowKeysAsync(tableId: String): F[List[KeyOffset]]
 
@@ -29,7 +29,7 @@ trait DataClient[F[_]] {
 
   def checkAndMutateRowAsync(mutation: ConditionalRowMutation): F[Boolean]
 
-  def readModifyWriteRowAsync(mutation: ReadModifyWriteRow): F[Option[CRow]]
+  def readModifyWriteRowAsync(mutation: ReadModifyWriteRow): F[Option[Row]]
 
   def close(): Unit
 }
@@ -49,10 +49,10 @@ final class DefaultDataClient[F[_]](client: BigtableDataClient)(implicit
 ) extends DataClient[F] {
   private[this] val adapter = DataClientAdapter
 
-  def readRowAsync(query: Query): F[Option[CRow]] =
+  def readRowAsync(query: Query): F[Option[Row]] =
     adapter.readRowAsync(client, query)
 
-  def readRowsAsync(query: Query): F[Vector[CRow]] =
+  def readRowsAsync(query: Query): F[Vector[Row]] =
     adapter.readRowsAsync(client, query)
 
   def sampleRowKeysAsync(tableId: String): F[List[KeyOffset]] =
@@ -67,7 +67,7 @@ final class DefaultDataClient[F[_]](client: BigtableDataClient)(implicit
   def checkAndMutateRowAsync(mutation: ConditionalRowMutation): F[Boolean] =
     adapter.checkAndMutateRowAsync(client, mutation)
 
-  def readModifyWriteRowAsync(mutation: ReadModifyWriteRow): F[Option[CRow]] =
+  def readModifyWriteRowAsync(mutation: ReadModifyWriteRow): F[Option[Row]] =
     adapter.readModifyWriteRowAsync(client, mutation)
 
   def close(): Unit =
@@ -86,17 +86,17 @@ object DataClientAdapter {
       case row  => F.fromEither(RowDecoder[A].apply(decode(row))).map(Option.apply)
     }
 
-  def readRowsAsync[F[_]](client: BigtableDataClient, query: Query)(implicit F: AsyncHandler[F]): F[Vector[CRow]] =
-    F.handle[Vector[CRow]](
+  def readRowsAsync[F[_]](client: BigtableDataClient, query: Query)(implicit F: AsyncHandler[F]): F[Vector[Row]] =
+    F.handle[Vector[Row]](
       cb =>
         client.readRowsAsync(
           query,
-          new ResponseObserver[Row] {
+          new ResponseObserver[GRow] {
             private[this] var controller: StreamController = _
-            private[this] val acc                          = Vector.newBuilder[CRow]
+            private[this] val acc                          = Vector.newBuilder[Row]
 
             def onStart(controller: StreamController): Unit = this.controller = controller
-            def onResponse(response: Row): Unit             = acc += decode(response)
+            def onResponse(response: GRow): Unit            = acc += decode(response)
             def onError(e: Throwable): Unit                 = cb(e.asLeft)
             def onComplete(): Unit                          = cb(acc.result().asRight)
           }
@@ -131,7 +131,7 @@ object DataClientAdapter {
   def readModifyWriteRowAsync[F[_]](client: BigtableDataClient, mutation: ReadModifyWriteRow)(implicit
     F: MonadError[F, Throwable],
     parF: Par.Aux[ApiFuture, F]
-  ): F[Option[CRow]] =
+  ): F[Option[Row]] =
     F.flatMap(parF.parallel(client.readModifyWriteRowAsync(mutation)).map(Option.apply)) {
       case Some(row) => F.pure(Option(decode(row)))
       case _         => F.pure(none)
@@ -139,7 +139,7 @@ object DataClientAdapter {
 
   def close(client: BigtableDataClient): Unit = client.close()
 
-  private def decode(row: Row): CRow = {
+  private def decode(row: GRow): Row = {
     val acc   = Map.newBuilder[String, List[RowCell]]
     val cells = row.getCells
     val size  = cells.size()
@@ -165,6 +165,6 @@ object DataClientAdapter {
         loop(ii)
       }
 
-    CRow(row.getKey.toStringUtf8, loop(0))
+    Row(row.getKey.toStringUtf8, loop(0))
   }
 }

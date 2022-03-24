@@ -5,7 +5,7 @@ import com.google.common.primitives.Ints
 import com.google.common.primitives.Longs
 import com.google.common.primitives.Shorts
 import com.google.protobuf.ByteString
-import orcus.bigtable.CRow
+import orcus.bigtable.Row
 import orcus.bigtable.codec.semiauto._
 import org.scalatest.funsuite.AnyFunSuite
 
@@ -28,7 +28,7 @@ class RowDecoderTest extends AnyFunSuite {
 
   test("decodeFoo") {
     val ts = System.currentTimeMillis() * 1000L
-    val row = CRow(
+    val row = Row(
       "rowkey",
       Map(
         "c1" -> List(
@@ -122,7 +122,7 @@ class RowDecoderTest extends AnyFunSuite {
 
   test("decodeOption") {
     val ts = System.currentTimeMillis() * 1000L
-    val row = CRow(
+    val row = Row(
       "rowkey",
       Map(
         "c1" -> List(
@@ -181,7 +181,7 @@ class RowDecoderTest extends AnyFunSuite {
 
   test("decodeMap") {
     val ts = System.currentTimeMillis() * 1000L
-    val row = CRow(
+    val row = Row(
       "rowkey",
       Map(
         "c1" -> List(

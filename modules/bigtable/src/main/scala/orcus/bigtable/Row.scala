@@ -4,12 +4,12 @@ import cats.syntax.traverse._
 import com.google.cloud.bigtable.data.v2.models.RowCell
 import orcus.bigtable.codec.RowDecoder
 
-final case class CRow(rowKey: String, families: Map[String, List[RowCell]]) {
+final case class Row(rowKey: String, families: Map[String, List[RowCell]]) {
   def decode[A: RowDecoder]: Either[Throwable, A] = RowDecoder[A].apply(this)
 }
 
-object CRow {
+object Row {
 
-  def decodeRows[A: RowDecoder](rows: Vector[CRow]): Either[Throwable, Vector[A]] =
+  def decodeRows[A: RowDecoder](rows: Vector[Row]): Either[Throwable, Vector[A]] =
     rows.traverse(_.decode[A])
 }

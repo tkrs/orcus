@@ -1,12 +1,12 @@
 package orcus.bigtable.codec
 
-import orcus.bigtable.CRow
+import orcus.bigtable.Row
 import orcus.internal.ScalaVersionSpecifics._
 
 import scala.annotation.tailrec
 
 trait RowDecoder[A] {
-  def apply(row: CRow): Either[Throwable, A]
+  def apply(row: Row): Either[Throwable, A]
 }
 
 object RowDecoder extends RowDecoder1 {
@@ -14,7 +14,7 @@ object RowDecoder extends RowDecoder1 {
 }
 
 private[bigtable] trait RowDecoder1 {
-  implicit val decodeRowAsRow: RowDecoder[CRow] = row => Right(row)
+  implicit val decodeRowAsRow: RowDecoder[Row] = row => Right(row)
 
   implicit def decodeRowAsMap[V, M[_, _] <: Map[String, V]](implicit
     decodeV: FamilyDecoder[V],
@@ -25,7 +25,7 @@ private[bigtable] trait RowDecoder1 {
   implicit def decodeRowAsVWithKey[V](implicit V: RowDecoder[V]): RowDecoder[(String, V)] =
     row => V.apply(row).map(r => row.rowKey -> r)
 
-  private def decodeRow[V, M[_, _] <: Map[String, V]](row: CRow)(implicit
+  private def decodeRow[V, M[_, _] <: Map[String, V]](row: Row)(implicit
     decodeV: FamilyDecoder[V],
     factory: Factory[(String, V), M[String, V]]
   ): Either[Throwable, M[String, V]] = {
