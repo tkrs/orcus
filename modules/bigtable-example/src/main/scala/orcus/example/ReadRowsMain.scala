@@ -4,6 +4,7 @@ import java.time.Duration
 import java.time.Instant
 import java.util.concurrent.ThreadLocalRandom
 
+import cats.effect.ContextShift
 import cats.effect.ExitCode
 import cats.effect.IO
 import cats.effect.IOApp

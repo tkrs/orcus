@@ -1,5 +1,6 @@
 package orcus.example
 
+import cats.effect.ContextShift
 import cats.effect.ExitCode
 import cats.effect.IO
 import cats.effect.IOApp
