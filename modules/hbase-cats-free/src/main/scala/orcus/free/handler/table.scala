@@ -9,7 +9,7 @@ import orcus.free.TableOp
 import orcus.table.AsyncTableT
 
 object table {
-  trait Handler[M[_]] extends (TableOp ~> Kleisli[M, AsyncTableT, *])
+  trait Handler[M[_]] extends TableOp ~> Kleisli[M, AsyncTableT, *]
 
   object Handler {
     import orcus.table._

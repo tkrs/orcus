@@ -121,7 +121,7 @@ class TableSpec extends AnyFunSpec with MockitoSugar with Matchers {
       it("should call scanAll successfully") {
         val m = mock[AsyncTable[ScanResultConsumer]]
 
-        val scan = new HScan()
+        val scan = new HScan
         val expected = Seq(
           mock[Result],
           mock[Result]
@@ -141,7 +141,7 @@ class TableSpec extends AnyFunSpec with MockitoSugar with Matchers {
         val m = mock[AsyncTable[ScanResultConsumer]]
         val r = mock[ResultScanner]
 
-        val s = new HScan()
+        val s = new HScan
           .withStartRow(Bytes.toBytes("1"))
 
         when(m.getScanner(s)).thenReturn(r)

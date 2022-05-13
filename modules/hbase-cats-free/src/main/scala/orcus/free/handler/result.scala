@@ -5,7 +5,7 @@ import cats.~>
 import orcus.free.ResultOp
 
 object result {
-  trait Handler[M[_]] extends (ResultOp ~> M)
+  trait Handler[M[_]] extends ResultOp ~> M
 
   object Handler {
     import orcus.result._

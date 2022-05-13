@@ -79,7 +79,7 @@ object ReadRowsMain extends IOApp with LazyLogging {
 
       wrapped.mutateRowAsync(rowMutation)
     }
-    (traverse <* ContextShift[IO].shift) >> IO.unit
+    traverse <* ContextShift[IO].shift >> IO.unit
   }
 
   private def runRead(dataClient: BigtableDataClient): IO[Unit] =

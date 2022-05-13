@@ -249,8 +249,8 @@ lazy val obsoletedOptions = Seq("-Xfuture", "-Ypartial-unification", "-Yno-adapt
 lazy val sharedSettings = Seq(
   scalacOptions ++= compilerOptions ++ warnCompilerOptions ++ {
     CrossVersion.partialVersion(scalaVersion.value) match {
-      case Some((2, n)) if n >= 13 => Nil
-      case _                       => obsoletedOptions
+      case Some(2, n) if n >= 13 => Nil
+      case _                     => obsoletedOptions
     }
   },
   libraryDependencies ++= TestDeps ++ Seq(compilerPlugin(KindProjector))
@@ -258,14 +258,14 @@ lazy val sharedSettings = Seq(
 
 lazy val crossVersionSharedSources: Seq[Setting[_]] =
   Seq(Compile, Test).map { sc =>
-    (sc / unmanagedSourceDirectories) ++= {
+    sc / unmanagedSourceDirectories ++= {
       (sc / unmanagedSourceDirectories).value.flatMap { dir =>
         if (dir.getName != "scala") Seq(dir)
         else
           CrossVersion.partialVersion(scalaVersion.value) match {
-            case Some((3, _))            => Seq(file(dir.getPath + "_3"))
-            case Some((2, n)) if n >= 13 => Seq(file(dir.getPath + "_2"), file(dir.getPath + "_2.13+"))
-            case _                       => Seq(file(dir.getPath + "_2"), file(dir.getPath + "_2.12-"))
+            case Some(3, _)            => Seq(file(dir.getPath + "_3"))
+            case Some(2, n) if n >= 13 => Seq(file(dir.getPath + "_2"), file(dir.getPath + "_2.13+"))
+            case _                     => Seq(file(dir.getPath + "_2"), file(dir.getPath + "_2.12-"))
           }
       }
     }

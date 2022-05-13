@@ -87,7 +87,7 @@ trait FreeMain extends IOApp with LazyLogging {
     resultScannerOps: ResultScannerOps[F]
   ): Free[F, Seq[Result]] = {
     def mkScan =
-      new Scan()
+      new Scan
         .setRowPrefixFilter(Bytes.toBytes(keyPrefix))
 
     tableOps.getScanner(mkScan) >>= (sc => resultScannerOps.next(sc, numRecords))

@@ -44,7 +44,7 @@ object ReadRowMain extends IOApp with LazyLogging {
       .setCell("c1", ByteString.copyFromUtf8("q2"), now, ByteString.copyFromUtf8("bb"))
       .setCell("c2", ByteString.copyFromUtf8("q1"), now, ByteString.copyFromUtf8("cc"))
 
-    (wrapped.mutateRowAsync(rowMutation) <* ContextShift[IO].shift) >> IO.unit
+    wrapped.mutateRowAsync(rowMutation) <* ContextShift[IO].shift >> IO.unit
   }
 
   private def runRead(dataClient: BigtableDataClient): IO[Unit] =
@@ -73,7 +73,7 @@ object ReadRowMain extends IOApp with LazyLogging {
         }
       )
 
-    (read >>= (IO.fromOption(_)(new RuntimeException("not found")))) >>=
+    read >>= (IO.fromOption(_)(new RuntimeException("not found"))) >>=
       (c => IO.fromEither(c.decode[Map[String, Map[String, String]]]))
   }
 }
