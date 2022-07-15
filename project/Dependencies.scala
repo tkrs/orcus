@@ -9,7 +9,7 @@ object Dependencies {
     val organizeImports = "0.6.0"
 
     val cats        = "2.7.0"
-    val monix       = "3.4.0"
+    val monix       = "3.4.1"
     val twitterUtil = "21.8.0"
     val catsEffect  = "2.5.5"
     val shapeless   = "2.3.9"
@@ -20,7 +20,7 @@ object Dependencies {
     }
 
     val hbase            = "2.4.13"
-    val bigtable         = "2.7.0"
+    val bigtable         = "2.9.0"
     val logback          = "1.2.11"
     val scalaLogging     = "3.9.5"
     val scalaJava8Compat = "1.0.2"
