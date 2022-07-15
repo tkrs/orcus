@@ -10,7 +10,7 @@ object Dependencies {
 
     val cats        = "2.7.0"
     val monix       = "3.4.1"
-    val twitterUtil = "21.8.0"
+    val twitterUtil = "22.4.0"
     val catsEffect  = "2.5.5"
     val shapeless   = "2.3.9"
     val scalatest   = "3.2.12"
@@ -34,7 +34,7 @@ object Dependencies {
   lazy val CatsEffect     = "org.typelevel"              %% "cats-effect"           % V.catsEffect
   lazy val MonixEval      = "io.monix"                   %% "monix-eval"            % V.monix
   lazy val TwitterUtil    = "com.twitter"                %% "util-core"             % V.twitterUtil
-  lazy val CatbirdUtil    = "io.catbird"                 %% "catbird-util"          % V.twitterUtil
+  lazy val CatbirdUtil    = "org.typelevel"              %% "catbird-util"          % V.twitterUtil
   lazy val Shapeless      = "com.chuusai"                %% "shapeless"             % V.shapeless
   lazy val Java8Compat    = "org.scala-lang.modules"     %% "scala-java8-compat"    % V.scalaJava8Compat
   lazy val Hbase          = "org.apache.hbase"            % "hbase-client"          % V.hbase
