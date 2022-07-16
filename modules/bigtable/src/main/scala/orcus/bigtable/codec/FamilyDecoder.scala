@@ -15,31 +15,30 @@ object FamilyDecoder extends FamilyDecoder1 {
 }
 
 private[bigtable] trait FamilyDecoder1 {
-  implicit def decodeMap[K, V, M[_, _] <: Map[K, V]](implicit
+  implicit def decodeMap[K, Q, M[_, _] <: Map[K, Q]](implicit
     decodeK: PrimitiveDecoder[K],
-    decodeV: PrimitiveDecoder[V],
-    factory: Factory[(K, V), M[K, V]]
-  ): FamilyDecoder[M[K, V]] = { family =>
+    decodeV: ValueDecoder[Q],
+    factory: Factory[(K, Q), M[K, Q]]
+  ): FamilyDecoder[M[K, Q]] = { family =>
     val builder = factory.newBuilder
 
-    @tailrec def loop(cells: List[RowCell], added: Set[ByteString]): Either[Throwable, M[K, V]] =
+    @tailrec def loop(cells: List[(ByteString, List[RowCell])]): Either[Throwable, M[K, Q]] =
       cells match {
-        case h :: t if added(h.getQualifier()) =>
-          loop(t, added)
-        case h :: t =>
-          decodeK(h.getQualifier) match {
+        case (q, vs) :: t =>
+          decodeK(q) match {
             case Right(q) =>
-              decodeV(h.getValue) match {
-                case Right(v) => builder += q -> v; loop(t, added + h.getQualifier)
-                case l        => l.asInstanceOf[Either[Throwable, M[K, V]]]
+              decodeV(vs) match {
+                case Right(v) => builder += q -> v; loop(t)
+                case l        => l.asInstanceOf[Either[Throwable, M[K, Q]]]
               }
-            case l => l.asInstanceOf[Either[Throwable, M[K, V]]]
+            case l => l.asInstanceOf[Either[Throwable, M[K, Q]]]
           }
         case _ =>
           Right(builder.result())
       }
 
-    loop(family, Set.empty)
+    if (family == null) Right(builder.result())
+    else loop(family.groupBy(_.getQualifier()).toList)
   }
 
   implicit def decodeOptionA[A](implicit decodeA: FamilyDecoder[A]): FamilyDecoder[Option[A]] =
