@@ -13,15 +13,15 @@ private[bigtable] trait DerivedFamilyDecoder1 {
 
   implicit def familyDecodeLabelledHCons[K <: Symbol, H, T <: HList](implicit
     K: Witness.Aux[K],
-    H: PrimitiveDecoder[H],
+    H: ValueDecoder[H],
     T: Lazy[DerivedFamilyDecoder[T]]
   ): DerivedFamilyDecoder[FieldType[K, H] :: T] =
     family =>
       T.value(family) match {
         case Right(t) =>
-          val h = family.collectFirst {
-            case r if r.getQualifier.toStringUtf8 == K.value.name => r.getValue
-          }.orNull
+          val h = family.collect {
+            case r if r.getQualifier.toStringUtf8 == K.value.name => r
+          }
           H(h) match {
             case Right(h) => Right(field[K](h) :: t)
             case Left(e)  => Left(e)

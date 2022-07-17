@@ -176,7 +176,7 @@ class RowDecoderTest extends AnyFunSuite {
 
     val expected = Foo(Bar(10, "string", None), None, Some(Baz(101L, true, 10.555f, None, None)))
 
-    assert(RowDecoder[Foo].apply(row) === Right(expected))
+    assert(RowDecoder[Foo].apply(row).toTry.get === expected)
   }
 
   test("decodeMap") {

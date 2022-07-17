@@ -148,7 +148,7 @@ class ScalaJavaConverter extends AsyncHandlerBenchmark {
 
 class TwitterFutureAsyncHandler extends AsyncHandlerBenchmark {
   import com.twitter.conversions.DurationOps._
-  import io.catbird.util._
+  import org.typelevel.catbird.util._
   import orcus.async.instances.twitterUtil.future._
 
   @Benchmark

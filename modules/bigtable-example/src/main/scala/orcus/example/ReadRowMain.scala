@@ -50,7 +50,7 @@ object ReadRowMain extends IOApp with LazyLogging {
     readRow(dataClient)
       .map(v => logger.info(s"got the row: $v"))
 
-  private def readRow(dataClient: BigtableDataClient): IO[Map[String, Map[String, String]]] = {
+  private def readRow(dataClient: BigtableDataClient): IO[Map[String, Map[String, List[String]]]] = {
     logger.info("readRow start")
     val wrapped = DataClient[IO](dataClient)
     val query   = Query.create("table")
@@ -73,6 +73,6 @@ object ReadRowMain extends IOApp with LazyLogging {
       )
 
     (read >>= (IO.fromOption(_)(new RuntimeException("not found")))) >>=
-      (c => IO.fromEither(c.decode[Map[String, Map[String, String]]]))
+      (c => IO.fromEither(c.decode[Map[String, Map[String, List[String]]]]))
   }
 }
