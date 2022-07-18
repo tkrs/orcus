@@ -10,28 +10,26 @@ trait FamilyDecoder[A] {
   def apply(family: List[RowCell]): Either[Throwable, A]
 }
 
-object FamilyDecoder extends FamilyDecoder1 {
+object FamilyDecoder {
   @inline def apply[A](implicit A: FamilyDecoder[A]): FamilyDecoder[A] = A
-}
 
-private[bigtable] trait FamilyDecoder1 {
-  implicit def decodeMap[K, Q, M[_, _] <: Map[K, Q]](implicit
+  implicit def decodeMap[K, Q](implicit
     decodeK: PrimitiveDecoder[K],
     decodeV: ValueDecoder[Q],
-    factory: Factory[(K, Q), M[K, Q]]
-  ): FamilyDecoder[M[K, Q]] = { family =>
+    factory: Factory[(K, Q), Map[K, Q]]
+  ): FamilyDecoder[Map[K, Q]] = { family =>
     val builder = factory.newBuilder
 
-    @tailrec def loop(cells: List[(ByteString, List[RowCell])]): Either[Throwable, M[K, Q]] =
+    @tailrec def loop(cells: List[(ByteString, List[RowCell])]): Either[Throwable, Map[K, Q]] =
       cells match {
         case (q, vs) :: t =>
           decodeK(q) match {
             case Right(q) =>
               decodeV(vs) match {
                 case Right(v) => builder += q -> v; loop(t)
-                case l        => l.asInstanceOf[Either[Throwable, M[K, Q]]]
+                case l        => l.asInstanceOf[Either[Throwable, Map[K, Q]]]
               }
-            case l => l.asInstanceOf[Either[Throwable, M[K, Q]]]
+            case l => l.asInstanceOf[Either[Throwable, Map[K, Q]]]
           }
         case _ =>
           Right(builder.result())

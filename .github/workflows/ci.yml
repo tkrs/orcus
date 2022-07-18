@@ -15,7 +15,8 @@ jobs:
         run: |
           scala212=$(grep "scala2.12" project/Dependencies.scala | sed -E 's/.*= //')
           scala213=$(grep "scala2.13" project/Dependencies.scala | sed -E 's/.*= //')
-          echo "::set-output name=matrix::{\"scalaVersion\": [${scala212}, ${scala213}]}"
+          scala3=$(grep "scala3" project/Dependencies.scala | sed -E 's/.*= //')
+          echo "::set-output name=matrix::{\"scalaVersion\": [${scala212}, ${scala213}, ${scala3}]}"
   build:
     runs-on: ubuntu-latest
     needs:
@@ -28,8 +29,12 @@ jobs:
       - uses: olafurpg/setup-scala@v13
         with:
           java-version: openjdk@1.11
+      - run: sbt ++${{ matrix.scalaVersion }} test
+        if: startsWith(matrix.scalaVersion, '3')
       - run: sbt ++${{ matrix.scalaVersion }} coverage test coverageReport
+        if: ${{ !startsWith(matrix.scalaVersion, '3') }}
       - uses: codecov/codecov-action@v3
+        if: ${{ !startsWith(matrix.scalaVersion, '3') }}
         with:
           token: ${{ secrets.CODECOV_TOKEN }} # not required for public repos
           flags: unittests

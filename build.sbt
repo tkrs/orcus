@@ -17,8 +17,8 @@ lazy val orcus = project
             url("https://github.com/tkrs")
           )
         ),
-        scalaVersion       := V.`scala2.13`,
-        crossScalaVersions := Seq(V.`scala2.13`, V.`scala2.12`),
+        scalaVersion       := V.scala3,
+        crossScalaVersions := Seq(V.`scala2.13`, V.`scala2.12`, V.scala3),
         fork               := true,
         scalafmtOnCompile  := true,
         scalafixOnCompile  := true,
@@ -30,9 +30,21 @@ lazy val orcus = project
   )
   .settings(
     Compile / console / scalacOptions --= warnCompilerOptions,
-    Compile / console / scalacOptions += "-Yrepl-class-based"
+    Compile / console / scalacOptions ++= {
+      CrossVersion.partialVersion(scalaVersion.value) match {
+        case Some((3, _)) => Seq("-explain")
+        case _            => Seq("-Yrepl-class-based")
+      }
+    }
   )
   .aggregate(core, bigtable, `cats-effect`, `bigtable-example`)
+
+lazy val shapeless = Def.setting {
+  CrossVersion.partialVersion(scalaVersion.value) match {
+    case Some((3, _)) => Shapeless3
+    case _            => Shapeless
+  }
+}
 
 lazy val core = project
   .in(file("modules/core"))
@@ -43,15 +55,12 @@ lazy val core = project
     moduleName  := "orcus-core"
   )
   .settings(
-    libraryDependencies ++= Seq
-      .concat(
-        Seq(
-          CatsCore,
-          Shapeless,
-          Java8Compat
-        )
-      )
-      .map(_.withSources)
+    libraryDependencies ++=
+      Seq(
+        CatsCore,
+        shapeless.value,
+        Java8Compat
+      ).map(_.withSources)
   )
 
 lazy val `cats-effect` = project
@@ -126,13 +135,14 @@ lazy val warnCompilerOptions = Seq(
 lazy val obsoletedOptions = Seq("-Xfuture", "-Ypartial-unification", "-Yno-adapted-args", "-Ywarn-inaccessible")
 
 lazy val sharedSettings = Seq(
-  scalacOptions ++= compilerOptions ++ warnCompilerOptions ++ {
+  scalacOptions ++= compilerOptions ++ {
     CrossVersion.partialVersion(scalaVersion.value) match {
-      case Some((2, n)) if n >= 13 => Nil
-      case _                       => obsoletedOptions
+      case Some((3, _))  => Nil
+      case Some((2, 13)) => compilerOptions ++ warnCompilerOptions ++ Seq("-Xsource:3")
+      case _             => compilerOptions ++ warnCompilerOptions ++ obsoletedOptions ++ Seq("-Xsource:3")
     }
   },
-  libraryDependencies ++= TestDeps ++ Seq(compilerPlugin(KindProjector))
+  libraryDependencies ++= TestDeps
 )
 
 lazy val crossVersionSharedSources: Seq[Setting[_]] =
