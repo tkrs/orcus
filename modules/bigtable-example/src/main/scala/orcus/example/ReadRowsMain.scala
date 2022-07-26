@@ -124,16 +124,21 @@ object CPU {
   implicit val decode: RowDecoder[CPU] = derivedRowDecoder[CPU]
 }
 
-final case class Metric(percentage: Int, tags: List[String])
+final case class Metric(percentage: Int, tags: List[Tags])
 
 object Metric {
-  implicit val decodeTags: PrimitiveDecoder[List[String]] = bs =>
+  implicit val decodeTags: PrimitiveDecoder[Tags] = bs =>
     try
-      if (bs == null) Right(Nil)
-      else Right(bs.toStringUtf8.split(",").toList.map(_.trim))
+      if (bs == null) Right(Tags.empty)
+      else Right(Tags(bs.toStringUtf8.split(",").toList.map(_.trim)))
     catch {
       case NonFatal(e) => Left(e)
     }
 
   implicit val decode: FamilyDecoder[Metric] = derivedFamilyDecoder[Metric]
+}
+
+final case class Tags(value: List[String])
+object Tags {
+  val empty = Tags(Nil)
 }
