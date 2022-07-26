@@ -17,6 +17,8 @@ import orcus.async.instances.catsEffect.concurrent._
 import orcus.bigtable.DataClient
 import orcus.bigtable.async.implicits._
 
+import scala.util.Random
+
 object ReadRowMain extends IOApp with LazyLogging {
   import Settings._
 
@@ -40,18 +42,21 @@ object ReadRowMain extends IOApp with LazyLogging {
     val now = System.currentTimeMillis() * 1000L
     val rowMutation = RowMutation
       .create("table", "key")
-      .setCell("c1", ByteString.copyFromUtf8("q1"), now, ByteString.copyFromUtf8("aa"))
-      .setCell("c1", ByteString.copyFromUtf8("q2"), now, ByteString.copyFromUtf8("bb"))
-      .setCell("c2", ByteString.copyFromUtf8("q1"), now, ByteString.copyFromUtf8("cc"))
+      .setCell("c1", ByteString.copyFromUtf8("q1"), now, ByteString.copyFromUtf8(Random.alphanumeric.take(3).mkString))
+      .setCell("c1", ByteString.copyFromUtf8("q2"), now, ByteString.copyFromUtf8(Random.alphanumeric.take(2).mkString))
+      .setCell("c2", ByteString.copyFromUtf8("q1"), now, ByteString.copyFromUtf8(Random.alphanumeric.take(5).mkString))
 
     (wrapped.mutateRowAsync(rowMutation) <* ContextShift[IO].shift) >> IO.unit
   }
 
   private def runRead(dataClient: BigtableDataClient): IO[Unit] =
     readRow(dataClient)
-      .map(v => logger.info(s"got the row: $v"))
+      .map { case (x, y) =>
+        logger.info(s"got the row as Map: $x")
+        logger.info(s"got the row as T: $y")
+      }
 
-  private def readRow(dataClient: BigtableDataClient): IO[Map[String, Map[String, List[String]]]] = {
+  private def readRow(dataClient: BigtableDataClient): IO[(Map[String, Map[String, List[String]]], T)] = {
     logger.info("readRow start")
     val wrapped = DataClient[IO](dataClient)
     val query   = Query.create("table")
@@ -73,7 +78,16 @@ object ReadRowMain extends IOApp with LazyLogging {
         }
       )
 
+    import orcus.bigtable.codec.auto._
+
     (read >>= (IO.fromOption(_)(new RuntimeException("not found")))) >>=
-      (c => IO.fromEither(c.decode[Map[String, Map[String, List[String]]]]))
+      (c =>
+        IO.fromEither(c.decode[Map[String, Map[String, List[String]]]]) >>=
+          (x => IO.fromEither(c.decode[T]).map(y => x -> y))
+      )
   }
 }
+
+final case class T(c1: C1, c2: C2)
+final case class C1(q1: String, q2: List[String])
+final case class C2(q1: List[String])
