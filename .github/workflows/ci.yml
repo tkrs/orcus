@@ -5,20 +5,42 @@ on:
       - master
   pull_request:
 jobs:
+  setup:
+    runs-on: ubuntu-latest
+    outputs:
+      scala-versions:  ${{ steps.set-scala-versions.outputs.matrix }}
+    steps:
+      - uses: actions/checkout@v3
+      - id: set-scala-versions
+        run: |
+          scala212=$(grep "scala2.12" project/Dependencies.scala | sed -E 's/.*= //')
+          scala213=$(grep "scala2.13" project/Dependencies.scala | sed -E 's/.*= //')
+          echo "::set-output name=matrix::{\"scalaVersion\": [${scala212}, ${scala213}]}"
   build:
     runs-on: ubuntu-latest
+    needs:
+      - setup
+    strategy:
+      fail-fast: false
+      matrix: ${{ fromJson(needs.setup.outputs.scala-versions) }}
     steps:
       - uses: actions/checkout@v3
       - uses: olafurpg/setup-scala@v13
         with:
           java-version: openjdk@1.11
-      - run: sbt coverage +test coverageReport
+      - run: sbt ++${{ matrix.scalaVersion }} coverage test coverageReport
       - uses: codecov/codecov-action@v3
         with:
           token: ${{ secrets.CODECOV_TOKEN }} # not required for public repos
           flags: unittests
           fail_ci_if_error: true
           verbose: true
+  post-build:
+    needs:
+      - build
+    runs-on: ubuntu-latest
+    steps:
+      - run: ':'
   scalafmt:
     runs-on: ubuntu-latest
     steps:
