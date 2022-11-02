@@ -7,7 +7,7 @@
 [![Maven Central](https://maven-badges.herokuapp.com/maven-central/com.github.tkrs/orcus-core_2.12/badge.svg)](https://maven-badges.herokuapp.com/maven-central/com.github.tkrs/orcus-core_2.13)
 [![Latest version](https://index.scala-lang.org/tkrs/orcus/latest.svg)](https://index.scala-lang.org/tkrs/orcus/orcus-core)
 
-orcus is a library to interact with HBase/Bigtable built atop [Bigtable Java Client](https://github.com/googleapis/java-bigtable) for connecting to an HBase/Bigtable instance. Also, it has a feature to automatically derive a result object to an arbitrary type object.
+orcus is a library to interact with HBase/Bigtable built atop [Bigtable Java Client](https://github.com/googleapis/java-bigtable) for connecting to an Bigtable instance. Also, it has a feature to automatically derive a result object to an arbitrary type object.
 
 ## How to use it
 
