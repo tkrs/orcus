@@ -1,24 +1,15 @@
-package orcus.async.instances.catsEffect
+package orcus.async.instances
 
 import java.util.concurrent.CompletableFuture
 
-import cats.effect.ContextShift
 import cats.effect.IO
-import cats.effect.Timer
+import cats.effect.unsafe.implicits.global
 import orcus.async._
 import orcus.async.implicits._
-import orcus.async.instances.catsEffect.concurrent._
+import orcus.async.instances.catsEffect._
 import org.scalatest.flatspec.AnyFlatSpec
 
-import scala.concurrent._
-
-class CatsEffectConcurrentHandlerSpec extends AnyFlatSpec with AsyncSpec {
-  import ExecutionContext.global
-
-  implicit def contextShift: ContextShift[IO] =
-    IO.contextShift(global)
-
-  implicit def timer: Timer[IO] = IO.timer(global)
+class CatsEffectHandlerSpec extends AnyFlatSpec with AsyncSpec {
 
   it should "convert to a IO" in {
     def run = Par[CompletableFuture, IO].parallel(CompletableFuture.completedFuture(10))

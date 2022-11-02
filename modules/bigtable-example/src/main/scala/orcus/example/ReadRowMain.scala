@@ -1,6 +1,5 @@
 package orcus.example
 
-import cats.effect.ContextShift
 import cats.effect.ExitCode
 import cats.effect.IO
 import cats.effect.IOApp
@@ -13,7 +12,7 @@ import com.google.cloud.bigtable.data.v2.models.Query
 import com.google.cloud.bigtable.data.v2.models.RowMutation
 import com.google.protobuf.ByteString
 import com.typesafe.scalalogging.LazyLogging
-import orcus.async.instances.catsEffect.concurrent._
+import orcus.async.instances.catsEffect._
 import orcus.bigtable.DataClient
 import orcus.bigtable.async.implicits._
 
@@ -46,7 +45,7 @@ object ReadRowMain extends IOApp with LazyLogging {
       .setCell("c1", ByteString.copyFromUtf8("q2"), now, ByteString.copyFromUtf8(Random.alphanumeric.take(2).mkString))
       .setCell("c2", ByteString.copyFromUtf8("q1"), now, ByteString.copyFromUtf8(Random.alphanumeric.take(5).mkString))
 
-    (wrapped.mutateRowAsync(rowMutation) <* ContextShift[IO].shift) >> IO.unit
+    wrapped.mutateRowAsync(rowMutation) >> IO.unit
   }
 
   private def runRead(dataClient: BigtableDataClient): IO[Unit] =
@@ -61,7 +60,8 @@ object ReadRowMain extends IOApp with LazyLogging {
     val wrapped = DataClient[IO](dataClient)
     val query   = Query.create("table")
 
-    val read = (wrapped.readRowAsync(query) <* ContextShift[IO].shift)
+    val read = wrapped
+      .readRowAsync(query)
       .flatTap(row =>
         IO {
           row.foreach { r =>

@@ -4,7 +4,6 @@ import java.time.Duration
 import java.time.Instant
 import java.util.concurrent.ThreadLocalRandom
 
-import cats.effect.ContextShift
 import cats.effect.ExitCode
 import cats.effect.IO
 import cats.effect.IOApp
@@ -18,7 +17,7 @@ import com.google.cloud.bigtable.data.v2.models.RowMutation
 import com.google.common.primitives.Ints
 import com.google.protobuf.ByteString
 import com.typesafe.scalalogging.LazyLogging
-import orcus.async.instances.catsEffect.concurrent._
+import orcus.async.instances.catsEffect._
 import orcus.bigtable.DataClient
 import orcus.bigtable.Row
 import orcus.bigtable.async.implicits._
@@ -79,7 +78,7 @@ object ReadRowsMain extends IOApp with LazyLogging {
 
       wrapped.mutateRowAsync(rowMutation)
     }
-    (traverse <* ContextShift[IO].shift) >> IO.unit
+    traverse >> IO.unit
   }
 
   private def runRead(dataClient: BigtableDataClient): IO[Unit] =
@@ -98,7 +97,8 @@ object ReadRowsMain extends IOApp with LazyLogging {
     val query  = Query.create(tableId).prefix(userName + keySep).filter(filter)
 
     val read =
-      (wrapped.readRowsAsync(query) <* ContextShift[IO].shift)
+      wrapped
+        .readRowsAsync(query)
         .flatTap(rows =>
           IO(
             rows.zipWithIndex.foreach { case (r, i) =>
