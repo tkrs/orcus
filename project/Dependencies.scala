@@ -8,20 +8,18 @@ object Dependencies {
     val kindProjector   = "0.13.2"
     val organizeImports = "0.6.0"
 
-    val cats        = "2.8.0"
-    val monix       = "3.4.1"
-    val twitterUtil = "22.4.0"
-    val catsEffect  = "3.3.14"
-    val shapeless   = "2.3.9"
-    val scalatest   = "3.2.12"
+    val cats       = "2.8.0"
+    val catsEffect = "3.3.14"
+    val shapeless  = "2.3.10"
+    val scalatest  = "3.2.13"
     val scalatestplus = new {
       val scalacheck = "3.2.2.0"
       val mockito    = "3.2.10.0"
     }
 
-    val hbase            = "2.4.13"
-    val bigtable         = "2.9.0"
-    val logback          = "1.2.11"
+    val hbase            = "2.4.14"
+    val bigtable         = "2.11.2"
+    val logback          = "1.4.0"
     val scalaLogging     = "3.9.5"
     val scalaJava8Compat = "1.0.2"
   }
@@ -30,11 +28,7 @@ object Dependencies {
   lazy val OrganizeImports = "com.github.liancheng" %% "organize-imports" % V.organizeImports
 
   lazy val CatsCore       = "org.typelevel"              %% "cats-core"             % V.cats
-  lazy val CatsFree       = "org.typelevel"              %% "cats-free"             % V.cats
   lazy val CatsEffect     = "org.typelevel"              %% "cats-effect"           % V.catsEffect
-  lazy val MonixEval      = "io.monix"                   %% "monix-eval"            % V.monix
-  lazy val TwitterUtil    = "com.twitter"                %% "util-core"             % V.twitterUtil
-  lazy val CatbirdUtil    = "org.typelevel"              %% "catbird-util"          % V.twitterUtil
   lazy val Shapeless      = "com.chuusai"                %% "shapeless"             % V.shapeless
   lazy val Java8Compat    = "org.scala-lang.modules"     %% "scala-java8-compat"    % V.scalaJava8Compat
   lazy val Hbase          = "org.apache.hbase"            % "hbase-client"          % V.hbase
