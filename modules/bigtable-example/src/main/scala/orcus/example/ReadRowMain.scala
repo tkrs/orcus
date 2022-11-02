@@ -29,11 +29,18 @@ object ReadRowMain extends IOApp with LazyLogging {
 
   private def createTable =
     IO(BigtableTableAdminClient.create(adminSettings))
-      .bracket(c => IO(c.exists("table")).ifM(IO.unit, IO(c.createTable(tableRequest))))(r => IO(r.close()))
+      .flatTap(c => IO(logger.info(s"bigtable admin client created: $c")))
+      .bracket(c =>
+        IO(c.exists("table"))
+          .flatTap(r => IO(logger.info(s"table exists: $r")))
+          .ifM(IO.unit, IO(c.createTable(tableRequest)).flatTap(t => IO(logger.info(s"table created: $t"))))
+      )(r => IO(r.close()))
 
   private def mutateAndRead =
     IO(BigtableDataClient.create(dataSettings))
-      .bracket(r => runMutate(r) >> runRead(r))(r => IO(r.close()))
+      .flatTap(c => IO(logger.info(s"bigtable data client created: $c")))
+      .bracket(r => runMutate(r).flatTap(_ => IO(logger.info("mutated"))) >> runRead(r))(r => IO(r.close()))
+      .handleErrorWith { e => e.printStackTrace(); IO.raiseError(e) }
 
   private def runMutate(dataClient: BigtableDataClient): IO[Unit] = {
     val wrapped = DataClient[IO](dataClient)
