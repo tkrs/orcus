@@ -17,7 +17,6 @@ object Dependencies {
       val mockito    = "3.2.10.0"
     }
 
-    val hbase            = "2.4.14"
     val bigtable         = "2.11.2"
     val logback          = "1.4.0"
     val scalaLogging     = "3.9.5"
@@ -31,7 +30,6 @@ object Dependencies {
   lazy val CatsEffect     = "org.typelevel"              %% "cats-effect"           % V.catsEffect
   lazy val Shapeless      = "com.chuusai"                %% "shapeless"             % V.shapeless
   lazy val Java8Compat    = "org.scala-lang.modules"     %% "scala-java8-compat"    % V.scalaJava8Compat
-  lazy val Hbase          = "org.apache.hbase"            % "hbase-client"          % V.hbase
   lazy val Bigtable       = "com.google.cloud"            % "google-cloud-bigtable" % V.bigtable
   lazy val LogbackClassic = "ch.qos.logback"              % "logback-classic"       % V.logback
   lazy val Logging        = "com.typesafe.scala-logging" %% "scala-logging"         % V.scalaLogging
