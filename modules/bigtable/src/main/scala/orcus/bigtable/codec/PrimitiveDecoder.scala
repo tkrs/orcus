@@ -11,11 +11,9 @@ trait PrimitiveDecoder[A] {
   def apply(value: ByteString): Either[Throwable, A]
 }
 
-object PrimitiveDecoder extends PrimitiveDecoder1 {
+object PrimitiveDecoder {
   @inline def apply[A](implicit A: PrimitiveDecoder[A]): PrimitiveDecoder[A] = A
-}
 
-private[bigtable] trait PrimitiveDecoder1 {
   implicit val decodeString: PrimitiveDecoder[String] = bs =>
     try Right(bs.toStringUtf8)
     catch {

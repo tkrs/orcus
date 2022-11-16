@@ -9,12 +9,12 @@ trait JCompletableFutureHandler {
     new Par[CompletableFuture] {
       type G[α] = F[α]
 
-      def parallel: CompletableFuture ~> F = λ[CompletableFuture ~> F](toF(_))
-
-      private def toF[A](cf: CompletableFuture[A]): F[A] =
-        F.handle[A](
-          cb => cf.whenComplete((t, u) => cb(if (u != null) Left(u) else Right(t))),
-          cf.cancel(false)
-        )
+      def parallel: CompletableFuture ~> F = new (CompletableFuture ~> F) {
+        def apply[A](cf: CompletableFuture[A]): F[A] =
+          F.handle[A](
+            cb => cf.whenComplete((t, u) => cb(if (u != null) Left(u) else Right(t))),
+            cf.cancel(false)
+          )
+      }
     }
 }

@@ -40,7 +40,9 @@ object ReadRowMain extends IOApp with LazyLogging {
     IO(BigtableDataClient.create(dataSettings))
       .flatTap(c => IO(logger.info(s"bigtable data client created: $c")))
       .bracket(r => runMutate(r).flatTap(_ => IO(logger.info("mutated"))) >> runRead(r))(r => IO(r.close()))
-      .handleErrorWith { e => e.printStackTrace(); IO.raiseError(e) }
+      .handleErrorWith { e =>
+        e.printStackTrace(); IO.raiseError(e)
+      }
 
   private def runMutate(dataClient: BigtableDataClient): IO[Unit] = {
     val wrapped = DataClient[IO](dataClient)
@@ -86,15 +88,8 @@ object ReadRowMain extends IOApp with LazyLogging {
       )
 
     import orcus.bigtable.codec.auto._
-
-    (read >>= (IO.fromOption(_)(new RuntimeException("not found")))) >>=
-      (c =>
-        IO.fromEither(c.decode[Map[String, Map[String, List[String]]]]) >>=
-          (x => IO.fromEither(c.decode[T]).map(y => x -> y))
-      )
+    (read >>= (IO.fromOption(_)(new RuntimeException("not found")))) >>= (c =>
+      (IO.fromEither(c.decode[Map[String, Map[String, List[String]]]]), IO.fromEither(c.decode[T])).tupled
+    )
   }
 }
-
-final case class T(c1: C1, c2: C2)
-final case class C1(q1: String, q2: List[String])
-final case class C2(q1: List[String])

@@ -7,7 +7,7 @@ import org.scalatest.TestSuite
 
 import scala.concurrent._
 
-trait AsyncSpec { _: TestSuite =>
+trait AsyncSpec { _a: TestSuite =>
 
   def failedFuture[A](e: Throwable): CompletableFuture[A] =
     CompletableFuture.failedFuture(e)
