@@ -23,7 +23,15 @@ class CatsEffectHandlerSpec extends AnyFlatSpec with AsyncSpec {
   }
   it should "convert to a cancelable IO" in {
     val f = blockedFuture[Int]
-    Par[CompletableFuture, IO].parallel(f).start.flatMap(_.cancel).delayBy(1.second).unsafeRunSync()
+
+    val run = for {
+      fiber <- Par[CompletableFuture, IO].parallel(f).start
+      _     <- IO.sleep(3.seconds)
+      _     <- fiber.cancel
+    } yield ()
+
+    run.unsafeRunSync()
+
     assert(f.isCancelled)
   }
 }
