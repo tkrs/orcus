@@ -8,6 +8,11 @@ object catsEffect {
   implicit def handleAsync[F[_]](implicit F: Async[F]): AsyncHandler[F] =
     new AsyncHandler[F] {
       def handle[A](callback: AsyncHandler.Callback[A], cancel: => Unit): F[A] =
-        F.async[A](cb => F.delay { callback(cb); Some(F.delay(cancel)) })
+        F.async[A](cb =>
+          F.delay {
+            callback(cb)
+            Some(F.delay { println("do cancel"); cancel })
+          }
+        )
     }
 }
