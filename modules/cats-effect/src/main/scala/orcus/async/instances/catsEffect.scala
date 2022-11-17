@@ -11,7 +11,7 @@ object catsEffect {
         F.async[A](cb =>
           F.delay {
             callback(cb)
-            Some(F.delay { println("do cancel"); cancel })
+            Some(F.delay(cancel))
           }
         )
     }
