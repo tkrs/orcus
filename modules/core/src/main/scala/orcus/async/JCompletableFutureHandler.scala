@@ -2,7 +2,6 @@ package orcus.async
 
 import java.util.concurrent.CompletableFuture
 
-import cats.FlatMap
 import cats.~>
 
 trait JCompletableFutureHandler {
