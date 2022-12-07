@@ -9,7 +9,7 @@ trait RowDecoder[A] {
   def apply(row: Row): Either[Throwable, A]
 }
 
-object RowDecoder {
+object RowDecoder extends RowDecoder1 {
   @inline def apply[A](implicit A: RowDecoder[A]): RowDecoder[A] = A
 
   implicit val decodeRowAsRow: RowDecoder[Row] = row => Right(row)

@@ -10,7 +10,7 @@ trait FamilyDecoder[A] {
   def apply(family: List[RowCell]): Either[Throwable, A]
 }
 
-object FamilyDecoder {
+object FamilyDecoder extends FamilyDecoder1 {
   @inline def apply[A](implicit A: FamilyDecoder[A]): FamilyDecoder[A] = A
 
   implicit def decodeMap[K, Q](implicit
