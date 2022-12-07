@@ -7,7 +7,7 @@ trait DerivedFamilyDecoder[A] extends FamilyDecoder[A]
 
 object DerivedFamilyDecoder extends DerivedFamilyDecoder1
 
-private[bigtable] trait DerivedFamilyDecoder1 {
+private[codec] trait DerivedFamilyDecoder1 {
 
   implicit val familyDecodeHNil: DerivedFamilyDecoder[HNil] = _ => Right(HNil)
 

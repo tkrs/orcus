@@ -9,7 +9,7 @@ trait DerivedFamilyDecoder[A] extends FamilyDecoder[A]
 
 object DerivedFamilyDecoder extends DerivedFamilyDecoder1
 
-private[bigtable] trait DerivedFamilyDecoder1:
+private[codec] trait DerivedFamilyDecoder1:
 
   private val pure = [A] => (a: A) => Right(a)
   private val map  = [A, B] => (fa: Either[Throwable, A], f: A => B) => fa.map(f)

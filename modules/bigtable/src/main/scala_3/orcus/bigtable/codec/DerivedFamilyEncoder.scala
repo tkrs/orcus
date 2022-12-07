@@ -7,7 +7,7 @@ trait DerivedFamilyEncoder[A] extends FamilyEncoder[A]
 
 object DerivedFamilyEncoder extends DerivedFamilyEncoder1
 
-private[bigtable] trait DerivedFamilyEncoder1:
+private[codec] trait DerivedFamilyEncoder1:
 
   given familyEncoderGen[A](using
     inst: K0.ProductInstances[PrimitiveEncoder, A],

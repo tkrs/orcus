@@ -7,7 +7,7 @@ trait DerivedRowDecoder[A] extends RowDecoder[A]
 
 object DerivedRowDecoder extends DerivedRowDecoder1
 
-private[bigtable] trait DerivedRowDecoder1 {
+private[codec] trait DerivedRowDecoder1 {
 
   implicit val decodeHNil: DerivedRowDecoder[HNil] = _ => Right(HNil)
 
