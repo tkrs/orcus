@@ -12,14 +12,14 @@ object Dependencies {
     val cats       = "2.9.0"
     val catsEffect = "3.4.4"
     val shapeless  = "2.3.10"
-    val shapeless3 = "3.2.0"
+    val shapeless3 = "3.3.0"
     val scalatest  = "3.2.14"
     val scalatestplus = new {
       val scalacheck = "3.2.14.0"
       val mockito    = "3.2.14.0"
     }
 
-    val bigtable         = "2.17.0"
+    val bigtable         = "2.17.1"
     val logback          = "1.4.5"
     val scalaLogging     = "3.9.5"
     val scalaJava8Compat = "1.0.2"
