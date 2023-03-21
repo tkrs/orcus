@@ -20,7 +20,7 @@ object Dependencies {
     }
 
     val bigtable         = "2.20.0"
-    val logback          = "1.4.5"
+    val logback          = "1.4.6"
     val scalaLogging     = "3.9.5"
     val scalaJava8Compat = "1.0.2"
   }
