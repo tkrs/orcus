@@ -13,7 +13,7 @@ object Dependencies {
     val catsEffect = "3.4.11"
     val shapeless  = "2.3.10"
     val shapeless3 = "3.3.0"
-    val scalatest  = "3.2.15"
+    val scalatest  = "3.2.16"
     val scalatestplus = new {
       val scalacheck = "3.2.16.0"
       val mockito    = "3.2.15.0"
