@@ -2,7 +2,7 @@ import sbt._
 
 object Dependencies {
   val V = new {
-    val `scala2.13` = "2.13.10"
+    val `scala2.13` = "2.13.11"
     val `scala2.12` = "2.12.18"
     val scala3      = "3.3.0"
 
@@ -19,7 +19,7 @@ object Dependencies {
       val mockito    = "3.2.15.0"
     }
 
-    val bigtable         = "2.23.2"
+    val bigtable         = "2.23.3"
     val logback          = "1.4.7"
     val scalaLogging     = "3.9.5"
     val scalaJava8Compat = "1.0.2"
