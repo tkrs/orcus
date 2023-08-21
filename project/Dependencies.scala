@@ -9,7 +9,7 @@ object Dependencies {
     val kindProjector   = "0.13.2"
     val organizeImports = "0.6.0"
 
-    val cats       = "2.9.0"
+    val cats       = "2.10.0"
     val catsEffect = "3.5.1"
     val shapeless  = "2.3.10"
     val shapeless3 = "3.3.0"
@@ -19,7 +19,7 @@ object Dependencies {
       val mockito    = "3.2.15.0"
     }
 
-    val bigtable         = "2.25.1"
+    val bigtable         = "2.27.0"
     val logback          = "1.4.11"
     val scalaLogging     = "3.9.5"
     val scalaJava8Compat = "1.0.2"
