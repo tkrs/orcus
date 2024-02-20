@@ -15,7 +15,7 @@ object Dependencies {
     val shapeless3 = "3.4.1"
     val scalatest  = "3.2.17"
     val scalatestplus = new {
-      val scalacheck = "3.2.17.0"
+      val scalacheck = "3.2.18.0"
       val mockito    = "3.2.15.0"
     }
 
