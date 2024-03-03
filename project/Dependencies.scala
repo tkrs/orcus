@@ -4,7 +4,7 @@ object Dependencies {
   val V = new {
     val `scala2.13` = "2.13.12"
     val `scala2.12` = "2.12.18"
-    val scala3      = "3.3.1"
+    val scala3      = "3.3.3"
 
     val kindProjector   = "0.13.2"
     val organizeImports = "0.6.0"
