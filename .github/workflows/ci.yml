@@ -35,7 +35,7 @@ jobs:
         if: startsWith(matrix.scalaVersion, '3')
       - run: sbt ++${{ matrix.scalaVersion }} coverage test coverageReport
         if: ${{ !startsWith(matrix.scalaVersion, '3') }}
-      - uses: codecov/codecov-action@v3
+      - uses: codecov/codecov-action@v4
         if: ${{ startsWith(matrix.scalaVersion, '2.13') }}
         with:
           flags: unittests
