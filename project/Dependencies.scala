@@ -10,7 +10,7 @@ object Dependencies {
     val organizeImports = "0.6.0"
 
     val cats       = "2.10.0"
-    val catsEffect = "3.5.3"
+    val catsEffect = "3.5.4"
     val shapeless  = "2.3.10"
     val shapeless3 = "3.4.1"
     val scalatest  = "3.2.18"
