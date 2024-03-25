@@ -27,7 +27,7 @@ jobs:
           git push --follow-tags
           echo "tag_name=$(git describe HEAD --abbrev=0)" >> $GITHUB_OUTPUT
       - name: Create release
-        uses: softprops/action-gh-release@v1
+        uses: softprops/action-gh-release@v2
         with:
           name: Release ${{ steps.publish_tag.outputs.tag_name }}
           tag_name: ${{ steps.publish_tag.outputs.tag_name }}
