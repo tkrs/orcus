@@ -4,7 +4,7 @@ object Dependencies {
   val V = new {
     val `scala2.13` = "2.13.13"
     val `scala2.12` = "2.12.19"
-    val scala3      = "3.3.3"
+    val scala3      = "3.4.1"
 
     val kindProjector   = "0.13.2"
     val organizeImports = "0.6.0"
@@ -20,7 +20,7 @@ object Dependencies {
     }
 
     val bigtable         = "2.38.0"
-    val logback          = "1.5.3"
+    val logback          = "1.5.6"
     val scalaLogging     = "3.9.5"
     val scalaJava8Compat = "1.0.2"
   }
