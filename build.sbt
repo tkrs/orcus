@@ -23,7 +23,8 @@ lazy val orcus = project
         scalafmtOnCompile  := true,
         scalafixOnCompile  := true,
         semanticdbEnabled  := true,
-        semanticdbVersion  := scalafixSemanticdb.revision
+        semanticdbVersion  := scalafixSemanticdb.revision,
+        dynverSeparator    := "-"
       )
     )
   )
