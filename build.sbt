@@ -22,9 +22,8 @@ lazy val orcus = project
         fork               := true,
         scalafmtOnCompile  := true,
         scalafixOnCompile  := true,
-        scalafixDependencies += OrganizeImports,
-        semanticdbEnabled := true,
-        semanticdbVersion := scalafixSemanticdb.revision
+        semanticdbEnabled  := true,
+        semanticdbVersion  := scalafixSemanticdb.revision
       )
     )
   )
