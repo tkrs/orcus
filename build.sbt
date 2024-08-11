@@ -18,7 +18,7 @@ lazy val orcus = project
           )
         ),
         scalaVersion       := V.scala3,
-        crossScalaVersions := Seq(V.`scala2.13`, V.`scala2.12`, V.scala3),
+        crossScalaVersions := Seq(V.`scala2.13`, V.scala3),
         fork               := true,
         scalafmtOnCompile  := true,
         scalafixOnCompile  := true,
@@ -151,9 +151,8 @@ lazy val crossVersionSharedSources: Seq[Setting[_]] =
         if (dir.getName != "scala") Seq(dir)
         else
           CrossVersion.partialVersion(scalaVersion.value) match {
-            case Some((3, _))            => Seq(file(dir.getPath + "_3"))
-            case Some((2, n)) if n >= 13 => Seq(file(dir.getPath + "_2"), file(dir.getPath + "_2.13+"))
-            case _                       => Seq(file(dir.getPath + "_2"), file(dir.getPath + "_2.12-"))
+            case Some((3, _)) => Seq(file(dir.getPath + "_3"))
+            case _            => Seq(file(dir.getPath + "_2"))
           }
       }
     }

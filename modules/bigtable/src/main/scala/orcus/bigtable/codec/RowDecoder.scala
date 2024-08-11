@@ -1,7 +1,7 @@
 package orcus.bigtable.codec
 
 import orcus.bigtable.Row
-import orcus.internal.ScalaVersionSpecifics._
+import orcus.internal.ScalaVersionSpecifics.*
 
 import scala.annotation.tailrec
 

@@ -4,12 +4,12 @@ import java.util.concurrent.CompletableFuture
 
 import cats.effect.IO
 import cats.effect.unsafe.implicits.global
-import orcus.async._
-import orcus.async.implicits._
-import orcus.async.instances.catsEffect._
+import orcus.async.*
+import orcus.async.implicits.*
+import orcus.async.instances.catsEffect.*
 import org.scalatest.flatspec.AnyFlatSpec
 
-import scala.concurrent.duration._
+import scala.concurrent.duration.*
 
 class CatsEffectHandlerSpec extends AnyFlatSpec with AsyncSpec {
 

@@ -1,6 +1,6 @@
 package orcus.internal
 
-import scala.jdk.CollectionConverters._
+import scala.jdk.CollectionConverters.*
 
 object Utils {
   @inline def toSeq[A](list: java.util.List[A]): Seq[A] =
