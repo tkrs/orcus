@@ -6,8 +6,7 @@ object Dependencies {
     val `scala2.12` = "2.12.19"
     val scala3      = "3.4.2"
 
-    val kindProjector   = "0.13.2"
-    val organizeImports = "0.6.0"
+    val kindProjector = "0.13.2"
 
     val cats       = "2.12.0"
     val catsEffect = "3.5.4"
@@ -24,8 +23,6 @@ object Dependencies {
     val scalaLogging     = "3.9.5"
     val scalaJava8Compat = "1.0.2"
   }
-
-  lazy val OrganizeImports = "com.github.liancheng" %% "organize-imports" % V.organizeImports
 
   lazy val CatsCore       = "org.typelevel"              %% "cats-core"             % V.cats
   lazy val CatsEffect     = "org.typelevel"              %% "cats-effect"           % V.catsEffect
