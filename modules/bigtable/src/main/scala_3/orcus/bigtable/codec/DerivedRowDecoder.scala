@@ -1,7 +1,7 @@
 package orcus.bigtable.codec
 
 import orcus.bigtable.Row
-import shapeless3.deriving._
+import shapeless3.deriving.*
 
 import scala.annotation.tailrec
 

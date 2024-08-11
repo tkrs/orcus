@@ -1,6 +1,6 @@
 package orcus.bigtable.async
 
-import cats.syntax.either._
+import cats.syntax.either.*
 import cats.~>
 import com.google.api.core.ApiFuture
 import com.google.api.core.ApiFutureCallback

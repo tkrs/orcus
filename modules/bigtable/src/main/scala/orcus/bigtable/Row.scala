@@ -1,6 +1,6 @@
 package orcus.bigtable
 
-import cats.syntax.traverse._
+import cats.syntax.traverse.*
 import com.google.cloud.bigtable.data.v2.models.RowCell
 import orcus.bigtable.codec.RowDecoder
 

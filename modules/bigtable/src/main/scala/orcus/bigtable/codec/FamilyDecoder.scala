@@ -2,7 +2,7 @@ package orcus.bigtable.codec
 
 import com.google.cloud.bigtable.data.v2.models.RowCell
 import com.google.protobuf.ByteString
-import orcus.internal.ScalaVersionSpecifics._
+import orcus.internal.ScalaVersionSpecifics.*
 
 import scala.annotation.tailrec
 

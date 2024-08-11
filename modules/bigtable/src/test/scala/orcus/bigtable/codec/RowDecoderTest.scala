@@ -6,7 +6,7 @@ import com.google.common.primitives.Longs
 import com.google.common.primitives.Shorts
 import com.google.protobuf.ByteString
 import orcus.bigtable.Row
-import orcus.bigtable.codec.semiauto._
+import orcus.bigtable.codec.semiauto.*
 import org.scalatest.funsuite.AnyFunSuite
 
 class RowDecoderTest extends AnyFunSuite {

@@ -6,7 +6,7 @@ import com.google.api.core.ApiFuture
 import com.google.api.gax.rpc.ResponseObserver
 import com.google.api.gax.rpc.StreamController
 import com.google.cloud.bigtable.data.v2.BigtableDataClient
-import com.google.cloud.bigtable.data.v2.models.{Row => GRow, _}
+import com.google.cloud.bigtable.data.v2.models.{Row as GRow, *}
 import orcus.async.AsyncHandler
 import orcus.async.Par
 import orcus.bigtable.codec.RowDecoder
@@ -47,7 +47,7 @@ final class DefaultDataClient[F[_]](client: BigtableDataClient)(implicit
   asyncH: AsyncHandler[F],
   parF: Par.Aux[ApiFuture, F]
 ) extends DataClient[F] {
-  private[this] val adapter = DataClientAdapter
+  private val adapter = DataClientAdapter
 
   def readRowAsync(query: Query): F[Option[Row]] =
     adapter.readRowAsync(client, query)
@@ -56,7 +56,10 @@ final class DefaultDataClient[F[_]](client: BigtableDataClient)(implicit
     adapter.readRowsAsync(client, query)
 
   def sampleRowKeysAsync(tableId: String): F[List[KeyOffset]] =
-    adapter.sampleRowKeysAsync(client, tableId)
+    adapter.sampleRowKeysAsync(client, TableId.of(tableId))
+
+  def sampleRowKeysAsync(targetId: TargetId): F[List[KeyOffset]] =
+    adapter.sampleRowKeysAsync(client, targetId)
 
   def mutateRowAsync(mutation: RowMutation): F[Unit] =
     adapter.mutateRowAsync(client, mutation)
@@ -92,10 +95,9 @@ object DataClientAdapter {
         client.readRowsAsync(
           query,
           new ResponseObserver[GRow] {
-            private[this] var controller: StreamController = _
-            private[this] val acc                          = Vector.newBuilder[Row]
+            private val acc = Vector.newBuilder[Row]
 
-            def onStart(controller: StreamController): Unit = this.controller = controller
+            def onStart(controller: StreamController): Unit = {}
             def onResponse(response: GRow): Unit            = acc += decode(response)
             def onError(e: Throwable): Unit                 = cb(e.asLeft)
             def onComplete(): Unit                          = cb(acc.result().asRight)
@@ -104,11 +106,18 @@ object DataClientAdapter {
       ()
     )
 
+  @Deprecated
   def sampleRowKeysAsync[F[_]](client: BigtableDataClient, tableId: String)(implicit
     F: Monad[F],
     parF: Par.Aux[ApiFuture, F]
   ): F[List[KeyOffset]] =
-    parF.parallel(client.sampleRowKeysAsync(tableId)).map(Utils.toList)
+    this.sampleRowKeysAsync(client, TableId.of(tableId))
+
+  def sampleRowKeysAsync[F[_]](client: BigtableDataClient, targetId: TargetId)(implicit
+    F: Monad[F],
+    parF: Par.Aux[ApiFuture, F]
+  ): F[List[KeyOffset]] =
+    parF.parallel(client.sampleRowKeysAsync(targetId)).map(Utils.toList)
 
   def mutateRowAsync[F[_]](client: BigtableDataClient, rowMutation: RowMutation)(implicit
     F: Monad[F],

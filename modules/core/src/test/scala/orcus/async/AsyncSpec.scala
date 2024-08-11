@@ -5,7 +5,7 @@ import java.util.function.Supplier
 
 import org.scalatest.TestSuite
 
-import scala.concurrent._
+import scala.concurrent.*
 
 trait AsyncSpec { _a: TestSuite =>
 

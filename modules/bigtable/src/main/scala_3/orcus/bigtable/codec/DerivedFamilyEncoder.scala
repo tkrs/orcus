@@ -1,7 +1,7 @@
 package orcus.bigtable.codec
 
 import com.google.protobuf.ByteString
-import shapeless3.deriving._
+import shapeless3.deriving.*
 
 trait DerivedFamilyEncoder[A] extends FamilyEncoder[A]
 

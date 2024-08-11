@@ -1,7 +1,7 @@
 package orcus.bigtable.codec
 
-import shapeless._
-import shapeless.labelled._
+import shapeless.*
+import shapeless.labelled.*
 
 trait DerivedRowDecoder[A] extends RowDecoder[A]
 

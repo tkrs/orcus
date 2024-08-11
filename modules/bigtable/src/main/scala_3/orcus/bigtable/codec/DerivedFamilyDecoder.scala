@@ -1,7 +1,7 @@
 package orcus.bigtable.codec
 
 import com.google.cloud.bigtable.data.v2.models.RowCell
-import shapeless3.deriving._
+import shapeless3.deriving.*
 
 import scala.annotation.tailrec
 
