@@ -2,8 +2,8 @@ import sbt._
 
 object Dependencies {
   val V = new {
-    val `scala2.13` = "2.13.14"
-    val scala3      = "3.4.3"
+    val `scala2.13` = "2.13.15"
+    val scala3      = "3.5.1"
 
     val kindProjector = "0.13.2"
 
@@ -18,7 +18,7 @@ object Dependencies {
     }
 
     val bigtable         = "2.45.0"
-    val logback          = "1.5.7"
+    val logback          = "1.5.9"
     val scalaLogging     = "3.9.5"
     val scalaJava8Compat = "1.0.2"
   }
