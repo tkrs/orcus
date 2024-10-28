@@ -8,7 +8,7 @@ object Dependencies {
     val kindProjector = "0.13.2"
 
     val cats       = "2.12.0"
-    val catsEffect = "3.5.4"
+    val catsEffect = "3.5.5"
     val shapeless  = "2.3.12"
     val shapeless3 = "3.4.3"
     val scalatest  = "3.2.19"
