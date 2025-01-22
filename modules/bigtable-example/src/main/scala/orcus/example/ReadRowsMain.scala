@@ -104,7 +104,9 @@ object ReadRowsMain extends IOApp with LazyLogging {
           IO(
             rows.zipWithIndex.foreach { case (r, i) =>
               logger.info(s"readRows[$i], rowkey: ${r.rowKey}, ${r.families.map { case (k, v) =>
-                  k -> v.map(c => (c.getFamily(), c.getQualifier().toStringUtf8(), c.getTimestamp(), c.getValue().toStringUtf8()))
+                  k -> v.map(c =>
+                    (c.getFamily(), c.getQualifier().toStringUtf8(), c.getTimestamp(), c.getValue().toStringUtf8())
+                  )
                 }}")
             }
           )
