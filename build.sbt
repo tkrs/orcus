@@ -18,7 +18,7 @@ lazy val orcus = project
           )
         ),
         scalaVersion       := V.scala3,
-        crossScalaVersions := Seq(V.`scala2.13`, V.scala3),
+        crossScalaVersions := Seq(V.scala2, V.scala3),
         fork               := true,
         scalafmtOnCompile  := true,
         scalafixOnCompile  := true,
