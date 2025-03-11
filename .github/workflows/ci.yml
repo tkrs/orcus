@@ -5,38 +5,32 @@ on:
       - master
   pull_request:
 jobs:
-  setup:
-    runs-on: ubuntu-latest
-    outputs:
-      scala-versions: ${{ steps.set-scala-versions.outputs.matrix }}
-    steps:
-      - uses: actions/checkout@v4
-      - id: set-scala-versions
-        run: |
-          scala213=$(grep "scala2.13" project/Dependencies.scala | sed -E 's/.*= //')
-          scala3=$(grep "scala3" project/Dependencies.scala | sed -E 's/.*= //')
-          echo "matrix={\"scalaVersion\": [${scala213}, ${scala3}]}" >> $GITHUB_OUTPUT
   build:
     runs-on: ubuntu-latest
-    needs:
-      - setup
     strategy:
       fail-fast: false
-      matrix: ${{ fromJson(needs.setup.outputs.scala-versions) }}
+      matrix:
+        scala: 
+          - "2"
+          - "3"
     steps:
       - uses: actions/checkout@v4
+      - id: scala-version
+        run: |
+          scala_version=$(grep "scala${{ matrix.scala }}" project/Dependencies.scala | sed -E 's/.*= //')
+          echo "value=${scala_version}" >> $GITHUB_OUTPUT
       - uses: actions/setup-java@v4
         with:
           java-version: "11"
           distribution: "temurin"
           cache: "sbt"
       - uses: sbt/setup-sbt@v1
-      - run: sbt ++${{ matrix.scalaVersion }} test
-        if: startsWith(matrix.scalaVersion, '3')
+      - run: sbt ++${{ steps.scala-version.outputs.value }} test
+        if: matrix.scala == '3'
       - run: sbt ++${{ matrix.scalaVersion }} coverage test coverageReport
-        if: ${{ !startsWith(matrix.scalaVersion, '3') }}
+        if: matrix.scala == '3'
       - uses: codecov/codecov-action@v5
-        if: ${{ startsWith(matrix.scalaVersion, '2.13') }}
+        if: matrix.scala == '2'
         with:
           flags: unittests
           verbose: true
