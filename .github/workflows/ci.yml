@@ -10,14 +10,14 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        scala: 
-          - "2"
-          - "3"
+        versions: 
+          - "scala2"
+          - "scala3"
     steps:
       - uses: actions/checkout@v4
       - id: scala-version
         run: |
-          scala_version=$(grep "scala${{ matrix.scala }}" project/Dependencies.scala | sed -E 's/.*= //')
+          scala_version=$(grep "${{ matrix.versions }}" project/Dependencies.scala | sed -E 's/.*= //')
           echo "value=${scala_version}" >> $GITHUB_OUTPUT
       - uses: actions/setup-java@v4
         with:
@@ -26,11 +26,11 @@ jobs:
           cache: "sbt"
       - uses: sbt/setup-sbt@v1
       - run: sbt ++${{ steps.scala-version.outputs.value }} test
-        if: matrix.scala == '3'
-      - run: sbt ++${{ matrix.scalaVersion }} coverage test coverageReport
-        if: matrix.scala == '3'
+        if: matrix.versions == 'scala3'
+      - run: sbt ++${{ steps.scala-version.outputs.value }} coverage test coverageReport
+        if: matrix.versions == 'scala2'
       - uses: codecov/codecov-action@v5
-        if: matrix.scala == '2'
+        if: matrix.versions == 'scala2'
         with:
           flags: unittests
           verbose: true
