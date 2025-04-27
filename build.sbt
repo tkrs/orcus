@@ -1,3 +1,4 @@
+import java.nio.file.Files
 import Dependencies._
 
 lazy val orcus = project
@@ -6,6 +7,7 @@ lazy val orcus = project
   .settings(
     inThisBuild(
       Seq(
+        version      := Files.readString(file("version.txt").toPath()).trim(),
         organization := "com.github.tkrs",
         homepage     := Some(url("https://github.com/tkrs/orcus")),
         licenses     := Seq("MIT License" -> url("http://www.opensource.org/licenses/mit-license.php")),
@@ -137,7 +139,7 @@ lazy val obsoletedOptions = Seq("-Xfuture", "-Ypartial-unification", "-Yno-adapt
 lazy val sharedSettings = Seq(
   scalacOptions ++= compilerOptions ++ {
     CrossVersion.partialVersion(scalaVersion.value) match {
-      case Some((3, _))  => Nil
+      case Some((3, _))  => Seq("-Wunused:imports")
       case Some((2, 13)) => compilerOptions ++ warnCompilerOptions ++ Seq("-Xsource:3")
       case _             => compilerOptions ++ warnCompilerOptions ++ obsoletedOptions ++ Seq("-Xsource:3")
     }

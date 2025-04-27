@@ -88,7 +88,6 @@ object ReadRowMain extends IOApp with LazyLogging {
         }
       )
 
-    import orcus.bigtable.codec.auto._
     (read >>= (IO.fromOption(_)(new RuntimeException("not found")))) >>= (c =>
       (IO.fromEither(c.decode[Map[String, Map[String, List[String]]]]), IO.fromEither(c.decode[T])).tupled
     )
