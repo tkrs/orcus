@@ -25,8 +25,7 @@ lazy val orcus = project
         scalafmtOnCompile  := true,
         scalafixOnCompile  := true,
         semanticdbEnabled  := true,
-        semanticdbVersion  := scalafixSemanticdb.revision,
-        dynverSeparator    := "-"
+        semanticdbVersion  := scalafixSemanticdb.revision
       )
     )
   )
@@ -134,14 +133,11 @@ lazy val warnCompilerOptions = Seq(
   "-Ywarn-numeric-widen"
 )
 
-lazy val obsoletedOptions = Seq("-Xfuture", "-Ypartial-unification", "-Yno-adapted-args", "-Ywarn-inaccessible")
-
 lazy val sharedSettings = Seq(
   scalacOptions ++= compilerOptions ++ {
     CrossVersion.partialVersion(scalaVersion.value) match {
-      case Some((3, _))  => Seq("-Wunused:imports")
-      case Some((2, 13)) => compilerOptions ++ warnCompilerOptions ++ Seq("-Xsource:3")
-      case _             => compilerOptions ++ warnCompilerOptions ++ obsoletedOptions ++ Seq("-Xsource:3")
+      case Some((3, _)) => Seq("-Wunused:imports")
+      case _            => compilerOptions ++ warnCompilerOptions ++ Seq("-Xsource:3")
     }
   },
   libraryDependencies ++= TestDeps
