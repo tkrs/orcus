@@ -1,5 +1,12 @@
 # Changelog
 
+## [0.28.12](https://github.com/tkrs/orcus/compare/v0.28.11...v0.28.12) (2025-05-01)
+
+
+### Miscellaneous Chores
+
+* release 0.28.12 ([547b222](https://github.com/tkrs/orcus/commit/547b22294493765972afe5d5e80269895164ad9e))
+
 ## v0.16.2 (06/08/2018)
 - #148 Upgraded HBase client
 ---
