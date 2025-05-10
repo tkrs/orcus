@@ -9,8 +9,7 @@ class DerivedFamilyEncoderSpec extends AnyFunSuite {
   case class Foo(id: Long, name: String)
 
   test("auto") {
-    import auto._
-    import DerivedFamilyEncoder.given
+    import auto.given
 
     val f = FamilyEncoder[Foo].apply(Foo(8437L, "tkrs"))
 
