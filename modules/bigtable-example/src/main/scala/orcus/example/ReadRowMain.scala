@@ -48,7 +48,7 @@ object ReadRowMain extends IOApp with LazyLogging {
   private def runMutate(dataClient: BigtableDataClient): IO[Unit] = {
     val wrapped = DataClient[IO](dataClient)
 
-    val now = System.currentTimeMillis() * 1000L
+    val now         = System.currentTimeMillis() * 1000L
     val rowMutation = RowMutation
       .create(TableId.of("table"), "key")
       .setCell("c1", ByteString.copyFromUtf8("q1"), now, ByteString.copyFromUtf8(Random.alphanumeric.take(3).mkString))
