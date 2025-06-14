@@ -1,5 +1,17 @@
 # Changelog
 
+## [0.28.3](https://github.com/tkrs/orcus/compare/v0.28.3...v0.28.3) (2025-06-14)
+
+
+### Miscellaneous Chores
+
+* release 0.28.12 ([547b222](https://github.com/tkrs/orcus/commit/547b22294493765972afe5d5e80269895164ad9e))
+
+
+### Build System
+
+* **deps:** bump google-cloud-bigtable from 2.58.2 to 2.60.0 ([#905](https://github.com/tkrs/orcus/issues/905)) ([180c29d](https://github.com/tkrs/orcus/commit/180c29dcaa36f73412fce5c0d9e6892a813be1f7))
+
 ## [0.28.12](https://github.com/tkrs/orcus/compare/v0.28.11...v0.28.12) (2025-05-01)
 
 
