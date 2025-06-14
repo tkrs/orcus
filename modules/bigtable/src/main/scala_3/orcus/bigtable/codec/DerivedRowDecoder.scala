@@ -9,8 +9,8 @@ trait DerivedRowDecoder[A] extends RowDecoder[A]
 
 object DerivedRowDecoder:
 
-  private val pure = [A] => (a: A) => Right(a)
-  private val map  = [A, B] => (fa: Either[Throwable, A], f: A => B) => fa.map(f)
+  private val pure     = [A] => (a: A) => Right(a)
+  private val map      = [A, B] => (fa: Either[Throwable, A], f: A => B) => fa.map(f)
   private val tailRecM = [A, B] =>
     (a: A, f: A => Either[Throwable, Either[A, B]]) =>
       @tailrec def loop(a: A): Either[Throwable, B] = f(a) match

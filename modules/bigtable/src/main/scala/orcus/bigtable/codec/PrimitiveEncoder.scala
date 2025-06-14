@@ -14,10 +14,10 @@ object PrimitiveEncoder extends PrimitiveEncoder1 {
 }
 
 private[bigtable] trait PrimitiveEncoder1 {
-  implicit val encodeString: PrimitiveEncoder[String]         = ByteString.copyFromUtf8(_)
-  implicit val encodeByteString: PrimitiveEncoder[ByteString] = identity(_)
-  implicit val encodeLong: PrimitiveEncoder[Long]             = v => ByteString.copyFrom(Longs.toByteArray(v))
-  implicit val encodeBytes: PrimitiveEncoder[Array[Byte]]     = ByteString.copyFrom(_)
+  implicit val encodeString: PrimitiveEncoder[String]          = ByteString.copyFromUtf8(_)
+  implicit val encodeByteString: PrimitiveEncoder[ByteString]  = identity(_)
+  implicit val encodeLong: PrimitiveEncoder[Long]              = v => ByteString.copyFrom(Longs.toByteArray(v))
+  implicit val encodeBytes: PrimitiveEncoder[Array[Byte]]      = ByteString.copyFrom(_)
   implicit val encodeBooleanAsHBase: PrimitiveEncoder[Boolean] = v =>
     ByteString.copyFrom(Array(if (v) -1.toByte else 0.toByte))
   implicit val encodeShortAsHBase: PrimitiveEncoder[Short] = v => ByteString.copyFrom(Shorts.toByteArray(v))

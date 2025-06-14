@@ -27,7 +27,7 @@ class RowDecoderTest extends AnyFunSuite {
   }
 
   test("decodeFoo") {
-    val ts = System.currentTimeMillis() * 1000L
+    val ts  = System.currentTimeMillis() * 1000L
     val row = Row(
       "rowkey",
       Map(
@@ -121,7 +121,7 @@ class RowDecoderTest extends AnyFunSuite {
   }
 
   test("decodeOption") {
-    val ts = System.currentTimeMillis() * 1000L
+    val ts  = System.currentTimeMillis() * 1000L
     val row = Row(
       "rowkey",
       Map(
@@ -180,7 +180,7 @@ class RowDecoderTest extends AnyFunSuite {
   }
 
   test("decodeMap") {
-    val ts = System.currentTimeMillis() * 1000L
+    val ts  = System.currentTimeMillis() * 1000L
     val row = Row(
       "rowkey",
       Map(

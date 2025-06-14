@@ -67,7 +67,7 @@ object ReadRowsMain extends IOApp with LazyLogging {
     val millis                = System.currentTimeMillis()
     val micros                = millis * 1000L
     val reversedCurrentMillis = Long.MaxValue - millis
-    val traverse = cpuNums.traverse[IO, Unit] { num =>
+    val traverse              = cpuNums.traverse[IO, Unit] { num =>
       logger.info(s"runMutate: $num")
       val usage = ThreadLocalRandom.current().nextInt(0, 100)
       val tags  = Seq("app:fake,location=asia")
