@@ -9,7 +9,13 @@ jobs:
   release-please:
     runs-on: ubuntu-latest
     steps:
+      - name: Generate github app token
+        id: generate_token
+        uses: actions/create-github-app-token@v2
+        with:
+          app-id: ${{ secrets.GH_APP_ID }}
+          private-key: ${{ secrets.GH_APP_PRIVATE_KEY }}
       - uses: googleapis/release-please-action@v4
         with:
-          token: ${{ secrets.RELEASE_PLEASE_TOKEN }}
+          token: ${{ steps.generate_token.outputs.token }}
           release-type: simple
