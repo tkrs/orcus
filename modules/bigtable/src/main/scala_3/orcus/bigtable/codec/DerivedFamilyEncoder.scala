@@ -16,9 +16,7 @@ private[codec] trait DerivedFamilyEncoder1:
     def apply(v: A): Map[ByteString, ByteString] =
       val builder = Map.newBuilder[ByteString, ByteString]
       labelling.elemLabels.zipWithIndex.foreach { case (l, i) =>
-        builder += ByteString.copyFromUtf8(l) -> inst.project(v)(i)(
-          [t] => (f: PrimitiveEncoder[t], pt: t) => f(pt)
-        )
+        builder += ByteString.copyFromUtf8(l) -> inst.project(v)(i)([t] => (f: PrimitiveEncoder[t], pt: t) => f(pt))
       }
       builder.result()
 
