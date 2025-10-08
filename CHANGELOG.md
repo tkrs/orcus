@@ -1,5 +1,12 @@
 # Changelog
 
+## [0.28.14](https://github.com/tkrs/orcus/compare/v0.28.13...v0.28.14) (2025-10-08)
+
+
+### Miscellaneous Chores
+
+* release 0.28.14 ([#942](https://github.com/tkrs/orcus/issues/942)) ([1a68f6b](https://github.com/tkrs/orcus/commit/1a68f6bc62fa4212ac030a2a6aabed056a1d5b31))
+
 ## [0.28.13](https://github.com/tkrs/orcus/compare/v0.28.3...v0.28.13) (2025-06-14)
 
 
