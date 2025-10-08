@@ -20,7 +20,7 @@ jobs:
           - "scala2"
           - "scala3"
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v5
       - id: scala-version
         run: |
           scala_version=$(grep "${{ matrix.versions }}" project/Dependencies.scala | sed -E 's/.*= //')
@@ -43,7 +43,7 @@ jobs:
   scalafmt:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v5
       - uses: actions/setup-java@v5
         with:
           java-version: "11"
@@ -54,7 +54,7 @@ jobs:
   scalafix:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v5
       - uses: actions/setup-java@v5
         with:
           java-version: "11"
