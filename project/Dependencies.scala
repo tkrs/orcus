@@ -3,12 +3,12 @@ import sbt._
 object Dependencies {
   val V = new {
     val scala2 = "2.13.17"
-    val scala3 = "3.7.1"
+    val scala3 = "3.7.3"
 
     val kindProjector = "0.13.2"
 
     val cats          = "2.13.0"
-    val catsEffect    = "3.6.1"
+    val catsEffect    = "3.6.3"
     val shapeless     = "2.3.13"
     val shapeless3    = "3.5.0"
     val scalatest     = "3.2.19"
@@ -17,9 +17,9 @@ object Dependencies {
       val mockito    = "3.2.15.0"
     }
 
-    val bigtable         = "2.60.0"
-    val logback          = "1.5.18"
-    val scalaLogging     = "3.9.5"
+    val bigtable         = "2.67.0"
+    val logback          = "1.5.19"
+    val scalaLogging     = "3.9.6"
     val scalaJava8Compat = "1.0.2"
   }
 
