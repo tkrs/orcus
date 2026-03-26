@@ -35,7 +35,7 @@ jobs:
         if: matrix.versions == 'scala3'
       - run: sbt ++${{ steps.scala-version.outputs.value }} coverage test coverageReport
         if: matrix.versions == 'scala2'
-      - uses: codecov/codecov-action@v5
+      - uses: codecov/codecov-action@v6
         if: matrix.versions == 'scala2'
         with:
           flags: unittests
