@@ -14,7 +14,7 @@ object Dependencies {
     val scalatest     = "3.2.19"
     val scalatestplus = new {
       val scalacheck = "3.2.17.0"
-      val mockito    = "3.2.15.0"
+      val mockito    = "3.2.18.0"
     }
 
     val bigtable         = "2.75.0"
@@ -34,7 +34,7 @@ object Dependencies {
 
   lazy val Scalatest  = "org.scalatest"     %% "scalatest"       % V.scalatest
   lazy val Scalacheck = "org.scalatestplus" %% "scalacheck-1-17" % V.scalatestplus.scalacheck
-  lazy val Mockito    = "org.scalatestplus" %% "mockito-4-6"     % V.scalatestplus.mockito
+  lazy val Mockito    = "org.scalatestplus" %% "mockito-4-11"    % V.scalatestplus.mockito
 
   lazy val TestDeps = Seq(Scalatest, Scalacheck, Mockito).map(_ % Test)
 }
