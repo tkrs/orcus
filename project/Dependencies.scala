@@ -17,7 +17,7 @@ object Dependencies {
       val mockito    = "3.2.15.0"
     }
 
-    val bigtable         = "2.75.1"
+    val bigtable         = "2.88.0"
     val logback          = "1.5.32"
     val scalaLogging     = "3.9.6"
     val scalaJava8Compat = "1.0.2"
